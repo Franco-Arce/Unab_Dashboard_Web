@@ -21,7 +21,7 @@ export default function LeadsPage() {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
-    const [filters, setFilters] = useState({ base: '', programa: '' });
+    const [showFilters, setShowFilters] = useState(false);
 
     const fetchLeads = async () => {
         setLoading(true);
@@ -43,6 +43,12 @@ export default function LeadsPage() {
 
     const totalPages = Math.ceil(total / 25);
 
+    const resetFilters = () => {
+        setFilters({ base: '', programa: '' });
+        setShowFilters(false);
+        setPage(1);
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -57,10 +63,62 @@ export default function LeadsPage() {
                     />
                 </div>
 
-                <div className="flex gap-2 w-full md:w-auto">
-                    <button className="flex items-center gap-2 px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-2xl text-sm font-bold hover:bg-zinc-800 transition-all flex-1 md:flex-none">
+                <div className="flex gap-2 w-full md:w-auto relative">
+                    <button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className={`flex items-center gap-2 px-4 py-3 border rounded-2xl text-sm font-bold transition-all flex-1 md:flex-none ${showFilters ? 'bg-primary text-black border-primary' : 'bg-zinc-900 border-zinc-800 text-white hover:bg-zinc-800'}`}
+                    >
                         <Filter className="w-4 h-4" /> Filtros Avanzados
                     </button>
+
+                    <AnimatePresence>
+                        {showFilters && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 10 }}
+                                className="absolute right-0 top-16 w-80 bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-2xl z-50 space-y-4"
+                            >
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Base de Datos</label>
+                                    <select
+                                        value={filters.base}
+                                        onChange={(e) => { setFilters({ ...filters, base: e.target.value }); setPage(1); }}
+                                        className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-2.5 text-xs outline-none focus:border-primary"
+                                    >
+                                        <option value="">Todas las bases</option>
+                                        <option value="NEW LEADS POSGRADO 2026-01">Posgrado 2026-01</option>
+                                        <option value="NEW LEADS PREGRADO 2026-1">Pregrado 2026-1</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Programa</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Ej: Derecho..."
+                                        value={filters.programa}
+                                        onChange={(e) => { setFilters({ ...filters, programa: e.target.value }); setPage(1); }}
+                                        className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-2.5 text-xs outline-none focus:border-primary"
+                                    />
+                                </div>
+                                <div className="pt-2 flex gap-2">
+                                    <button
+                                        onClick={() => setShowFilters(false)}
+                                        className="flex-1 bg-zinc-800 py-2.5 rounded-xl text-xs font-bold hover:bg-zinc-700 transition-all"
+                                    >
+                                        Cerrar
+                                    </button>
+                                    <button
+                                        onClick={resetFilters}
+                                        className="flex-1 bg-red-400/10 text-red-400 py-2.5 rounded-xl text-xs font-bold hover:bg-red-400/20 transition-all"
+                                    >
+                                        Limpiar
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
                     <div className="flex items-center gap-2 bg-zinc-900/50 border border-zinc-800 rounded-2xl px-4 py-3">
                         <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{total.toLocaleString()} leads</span>
                     </div>

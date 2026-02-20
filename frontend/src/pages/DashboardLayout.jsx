@@ -139,8 +139,8 @@ export default function DashboardLayout() {
                             <span className="text-xs text-zinc-500 font-bold uppercase tracking-widest">Aliado Educativo</span>
                             <span className="font-bold text-sm">Universidad UNAB</span>
                         </div>
-                        <div className="w-10 h-10 bg-white p-1.5 rounded-xl shadow-lg shadow-white/5">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/2/25/LogoUnab.png" alt="UNAB" className="w-full h-full object-contain" />
+                        <div className="w-10 h-10 bg-white p-1.5 rounded-xl shadow-lg shadow-white/5 flex items-center justify-center">
+                            <img src="https://www.unab.edu.co/sites/default/files/logo_unab_footer.png" alt="UNAB" className="w-full h-auto object-contain" />
                         </div>
                     </div>
                 </header>

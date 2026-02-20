@@ -100,7 +100,7 @@ async def get_no_util(_user: str = Depends(require_auth)):
             "porcentaje": round(cnt / total * 100, 2) if total else 0,
         })
 
-    return {"subcategorias": result, "total": total}
+    return {"no_util": result, "no_util_total": total}
 
 
 @router.get("/admitidos")

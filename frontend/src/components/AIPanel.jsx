@@ -73,21 +73,23 @@ export default function AIPanel() {
                         <div key={i} className="h-24 bg-zinc-900/50 rounded-2xl animate-pulse border border-zinc-800" />
                     ))
                 ) : (
-                    insights.map((insight, idx) => (
-                        <motion.div
-                            key={idx}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: idx * 0.1 }}
-                            className="bg-zinc-900/50 border border-zinc-800 p-4 rounded-2xl hover:border-primary/30 transition-all group"
-                        >
-                            <div className="flex items-center gap-2 mb-2">
-                                {getIcon(insight.icon)}
-                                <h3 className="text-[10px] font-black uppercase tracking-widest text-zinc-400 truncate">{insight.title}</h3>
-                            </div>
-                            <p className="text-[13px] text-zinc-200 leading-snug break-words overflow-hidden line-clamp-4">{insight.description}</p>
-                        </motion.div>
-                    ))
+                    <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: idx * 0.1 }}
+                        className="bg-zinc-900/50 border border-zinc-800 p-4 rounded-2xl hover:border-primary/30 transition-all group flex flex-col gap-2 min-h-[120px]"
+                    >
+                        <div className="flex items-start gap-2">
+                            <div className="mt-0.5 flex-shrink-0">{getIcon(insight.icon)}</div>
+                            <h3 className="text-[10px] font-black uppercase tracking-widest text-zinc-400 leading-tight">
+                                {insight.title}
+                            </h3>
+                        </div>
+                        <p className="text-[12px] text-zinc-300 leading-snug break-words overflow-hidden line-clamp-3 group-hover:line-clamp-none transition-all">
+                            {insight.description}
+                        </p>
+                    </motion.div>
                 )}
             </div>
 
