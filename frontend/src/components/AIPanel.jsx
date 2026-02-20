@@ -83,9 +83,9 @@ export default function AIPanel() {
                         >
                             <div className="flex items-center gap-2 mb-2">
                                 {getIcon(insight.icon)}
-                                <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400">{insight.title}</h3>
+                                <h3 className="text-[10px] font-black uppercase tracking-widest text-zinc-400 truncate">{insight.title}</h3>
                             </div>
-                            <p className="text-sm text-zinc-200 leading-snug">{insight.description}</p>
+                            <p className="text-[13px] text-zinc-200 leading-snug break-words overflow-hidden line-clamp-4">{insight.description}</p>
                         </motion.div>
                     ))
                 )}
@@ -119,8 +119,8 @@ export default function AIPanel() {
                                     {m.role === 'user' ? <User className="w-4 h-4 text-zinc-400" /> : <Bot className="w-4 h-4 text-black" />}
                                 </div>
                                 <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm ${m.role === 'user'
-                                        ? 'bg-zinc-900 text-white border border-zinc-800'
-                                        : 'bg-zinc-800/50 text-zinc-200 border border-zinc-700/30'
+                                    ? 'bg-zinc-900 text-white border border-zinc-800'
+                                    : 'bg-zinc-800/50 text-zinc-200 border border-zinc-700/30'
                                     }`}>
                                     {m.content}
                                 </div>

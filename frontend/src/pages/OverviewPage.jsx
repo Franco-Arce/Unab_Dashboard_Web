@@ -108,11 +108,7 @@ export default function OverviewPage() {
                                         tick={{ fill: '#71717a', fontSize: 12, fontWeight: 700 }}
                                         width={120}
                                     />
-                                    <Tooltip
-                                        cursor={{ fill: 'rgba(255,255,255,0.02)' }}
-                                        contentStyle={{ backgroundColor: '#18181b', borderRadius: '16px', border: '1px solid #27272a', color: '#fff' }}
-                                    />
-                                    <Bar dataKey="value" radius={[0, 10, 10, 0]} barSize={40}>
+                                    <Bar dataKey="value" radius={[0, 10, 10, 0]} barSize={40} isAnimationActive={false}>
                                         {funnel.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.color} />
                                         ))}

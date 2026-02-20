@@ -15,17 +15,38 @@ import api from '../api';
 export default function DashboardLayout() {
     const [user, setUser] = useState(null);
     const [meta, setMeta] = useState(null);
+    const [refreshing, setRefreshing] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
 
     useEffect(() => {
         api.me().then(setUser).catch(() => navigate('/'));
-        api.meta().then(setMeta).catch(() => { });
+        loadMeta();
     }, []);
+
+    const loadMeta = () => {
+        api.meta().then(setMeta).catch(() => { });
+    };
 
     const handleLogout = () => {
         localStorage.removeItem('unab_token');
         navigate('/');
+    };
+
+    const handleRefresh = async () => {
+        setRefreshing(true);
+        try {
+            await api.refresh();
+            await loadMeta();
+            // Trigger a re-render of the current page if it's a dashboard child
+            // This is a simple way; a better way would be a global state/event,
+            // but for now, re-fetching meta might be enough if pages listen or we just notify.
+            window.location.reload(); // Simple brute force to ensure all charts update
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setRefreshing(false);
+        }
     };
 
     const navItems = [
@@ -40,7 +61,7 @@ export default function DashboardLayout() {
 
     return (
         <div className="flex min-h-screen bg-black text-white font-sans">
-            {/* Sidebar */}
+            {/* Sidebar ... (no changes needed) */}
             <aside className="w-64 border-r border-zinc-800/50 bg-zinc-950 flex flex-col fixed h-full z-30">
                 <div className="p-6">
                     <div className="flex items-center gap-3 mb-8 px-2">
@@ -102,10 +123,14 @@ export default function DashboardLayout() {
                     <div>
                         <h2 className="text-xl font-bold">{currentTitle}</h2>
                         {meta?.fecha_actualizacion && (
-                            <div className="flex items-center gap-2 text-zinc-500 text-[10px] font-bold tracking-wider uppercase mt-1">
-                                <RefreshCw className="w-3 h-3 animate-spin-slow" />
+                            <button
+                                onClick={handleRefresh}
+                                disabled={refreshing}
+                                className="flex items-center gap-2 text-zinc-500 text-[10px] font-bold tracking-wider uppercase mt-1 hover:text-primary transition-colors disabled:opacity-50"
+                            >
+                                <RefreshCw className={`w-3 h-3 ${refreshing ? 'animate-spin' : ''}`} />
                                 Actualizado: {meta.fecha_actualizacion}
-                            </div>
+                            </button>
                         )}
                     </div>
 
@@ -114,14 +139,14 @@ export default function DashboardLayout() {
                             <span className="text-xs text-zinc-500 font-bold uppercase tracking-widest">Aliado Educativo</span>
                             <span className="font-bold text-sm">Universidad UNAB</span>
                         </div>
-                        <div className="w-8 h-8 bg-white p-1 rounded-lg">
-                            <img src="https://nods.technology/wp-content/uploads/2024/03/logo-unab.png" alt="UNAB" className="w-full h-full object-contain" />
+                        <div className="w-10 h-10 bg-white p-1.5 rounded-xl shadow-lg shadow-white/5">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/2/25/LogoUnab.png" alt="UNAB" className="w-full h-full object-contain" />
                         </div>
                     </div>
                 </header>
 
                 {/* Page Content */}
-                <div className="p-8">
+                <div className="p-4 md:p-8 max-w-[1600px] mx-auto w-full">
                     <Outlet />
                 </div>
             </main>

@@ -185,3 +185,8 @@ async def get_meta(_user: str = Depends(require_auth)):
         "last_refresh": cache.last_refresh.isoformat() if cache.last_refresh else None,
         "total_leads": data.get("total_leads", 0),
     }
+
+@router.post("/refresh")
+async def manual_refresh(_user: str = Depends(require_auth)):
+    await cache.refresh()
+    return {"status": "success", "last_refresh": cache.last_refresh.isoformat()}

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { Target, CheckCircle2, AlertCircle, TrendingUp } from 'lucide-react';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis } from 'recharts';
+import { Target, CheckCircle2, Download, Filter } from 'lucide-react';
 import api from '../api';
+import { exportToCSV } from '../utils/export';
+import AIPanel from '../components/AIPanel';
 
 export default function EstadosPage() {
     const [data, setData] = useState(null);
@@ -14,7 +16,9 @@ export default function EstadosPage() {
 
     if (loading) return <div className="h-96 bg-zinc-900 animate-pulse rounded-3xl" />;
 
-    const COLORS = ['#f5bc02', '#3b82f6', '#10b981', '#f43f5e', '#a855f7', '#fb923c'];
+    const handleExport = () => {
+        exportToCSV(data.estados_by_programa, 'estados_gestion_unab_2026');
+    };
 
     const getProgressionColor = (val, meta) => {
         const perc = (val / meta) * 100;
@@ -26,6 +30,18 @@ export default function EstadosPage() {
 
     return (
         <div className="space-y-8">
+            <div className="flex justify-end gap-3">
+                <button className="flex items-center gap-2 px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-xs font-bold hover:bg-zinc-800 transition-all">
+                    <Filter className="w-3 h-3" /> Filtros
+                </button>
+                <button
+                    onClick={handleExport}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-primary text-black rounded-xl text-xs font-bold hover:bg-amber-400 transition-all shadow-lg shadow-primary/10"
+                >
+                    <Download className="w-3 h-3" /> Exportar
+                </button>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Gauge / Cumplimiento Section */}
                 <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 flex flex-col items-center">
@@ -72,8 +88,7 @@ export default function EstadosPage() {
                             <BarChart data={data.estados_gestion.slice(0, 8)} layout="vertical">
                                 <XAxis type="number" hide />
                                 <YAxis dataKey="gestion" type="category" axisLine={false} tickLine={false} tick={{ fill: '#71717a', fontSize: 11 }} width={120} />
-                                <Tooltip contentStyle={{ backgroundColor: '#09090b', borderRadius: '12px', border: '1px solid #27272a' }} />
-                                <Bar dataKey="total" radius={[0, 4, 4, 0]} fill="#f5bc02" barSize={15} />
+                                <Bar dataKey="total" radius={[0, 4, 4, 0]} fill="#f5bc02" barSize={15} isAnimationActive={false} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
@@ -105,8 +120,6 @@ export default function EstadosPage() {
                         </thead>
                         <tbody className="divide-y divide-zinc-800/50">
                             {data.estados_by_programa.map((item, idx) => {
-                                // Find meta from admisiones (simplified for UI demonstration)
-                                // In a real app we'd join this data in the backend
                                 const meta = 50;
                                 return (
                                     <tr key={idx} className="hover:bg-zinc-800/30 transition-colors">
@@ -135,6 +148,10 @@ export default function EstadosPage() {
                         </tbody>
                     </table>
                 </div>
+            </div>
+
+            <div className="pt-8">
+                <AIPanel />
             </div>
         </div>
     );

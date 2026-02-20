@@ -52,6 +52,7 @@ export const api = {
         return request(`/api/dashboard/leads?${q.toString()}`);
     },
     meta: () => request('/api/dashboard/meta'),
+    refresh: () => request('/api/dashboard/refresh', { method: 'POST' }),
 
     // AI
     aiChat: (message, history = []) =>
