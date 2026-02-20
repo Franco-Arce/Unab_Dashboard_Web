@@ -7,6 +7,8 @@ import { exportToCSV } from '../utils/export';
 import AIPanel from '../components/AIPanel';
 
 export default function NoUtilPage() {
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
