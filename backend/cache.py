@@ -182,11 +182,11 @@ class DashboardCache:
                 FROM fact_unab_sheet2
             """)
             if fecha_row and fecha_row.get("fecha_pos"):
-                data["fecha_actualizacion"] = fecha_row["fecha_pos"].strftime("%d/%m/%Y")
-            elif fecha_row and fecha_row.get("fecha"):
-                data["fecha_actualizacion"] = fecha_row["fecha"].strftime("%d/%m/%Y")
+                data["fecha_actualizacion"] = fecha_row["fecha_pos"].strftime("%d/%m/%Y %H:%M")
+            elif "fecha" in fecha_row:
+                data["fecha_actualizacion"] = fecha_row["fecha"].strftime("%d/%m/%Y %H:%M")
             else:
-                data["fecha_actualizacion"] = datetime.now().strftime("%d/%m/%Y")
+                data["fecha_actualizacion"] = datetime.now().strftime("%d/%m/%Y %H:%M")
 
             self.data = data
             self.last_refresh = datetime.now(timezone.utc)
