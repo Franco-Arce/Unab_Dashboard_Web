@@ -123,12 +123,14 @@ async def ai_insights(_user: str = Depends(require_auth)):
                 if raw.startswith("json"):
                     raw = raw[4:]
             insights = json.loads(raw)
+            return {"insights": insights}
         except:
-            insights = [{"icon": "alert", "title": "Dashboard", "description": "Datos actualizados correctamente."}]
-
-        return {"insights": insights}
+            return {"insights": [{"icon": "alert", "title": "Dashboard", "description": "Datos actualizados, pero no se pudieron procesar los insights."}]}
     except Exception as e:
-        return {"insights": [{"icon": "alert", "title": "Error", "description": str(e)[:100]}]}
+        error_msg = str(e)
+        if "429" in error_msg:
+            return {"insights": [{"icon": "alert", "title": "IA Ocupada", "description": "Límite de peticiones alcanzado. Por favor, intenta de nuevo en unos minutos."}]}
+        return {"insights": [{"icon": "alert", "title": "Error", "description": error_msg[:100]}]}
 
 
 @router.get("/predictions")

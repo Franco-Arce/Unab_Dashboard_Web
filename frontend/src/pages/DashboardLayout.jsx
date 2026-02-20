@@ -122,16 +122,21 @@ export default function DashboardLayout() {
                 <header className="h-20 border-b border-zinc-800/50 bg-black/50 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-20">
                     <div>
                         <h2 className="text-xl font-bold">{currentTitle}</h2>
-                        {meta?.fecha_actualizacion && (
+                        <div className="flex items-center gap-4 mt-2">
                             <button
                                 onClick={handleRefresh}
                                 disabled={refreshing}
-                                className="flex items-center gap-2 text-zinc-500 text-[10px] font-bold tracking-wider uppercase mt-1 hover:text-primary transition-colors disabled:opacity-50"
+                                className="flex items-center gap-2 bg-zinc-800 text-white border border-zinc-700 hover:border-primary hover:text-primary px-3 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-50 cursor-pointer shadow-sm"
                             >
-                                <RefreshCw className={`w-3 h-3 ${refreshing ? 'animate-spin' : ''}`} />
-                                Actualizado: {meta.fecha_actualizacion}
+                                <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+                                ACTUALIZAR DATOS
                             </button>
-                        )}
+                            {meta?.fecha_actualizacion && (
+                                <span className="text-zinc-500 text-[10px] uppercase font-bold tracking-wider flex items-center h-full pt-1">
+                                    Actualizado: {meta.fecha_actualizacion}
+                                </span>
+                            )}
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -140,7 +145,7 @@ export default function DashboardLayout() {
                             <span className="font-bold text-sm">Universidad UNAB</span>
                         </div>
                         <div className="w-10 h-10 bg-white p-1.5 rounded-xl shadow-lg shadow-white/5 flex items-center justify-center">
-                            <img src="https://www.unab.edu.co/sites/default/files/logo_unab_footer.png" alt="UNAB" className="w-full h-auto object-contain" />
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e0/LogoUnab.png" alt="UNAB" className="w-full h-auto object-contain" />
                         </div>
                     </div>
                 </header>
