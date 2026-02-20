@@ -17,8 +17,16 @@ export default function NoUtilPage() {
 
     if (loading) return <div className="h-96 bg-zinc-900 animate-pulse rounded-3xl" />;
 
+    if (!data || !data.no_util || !Array.isArray(data.no_util)) {
+        return (
+            <div className="h-96 bg-zinc-900/50 rounded-3xl flex items-center justify-center border border-zinc-800">
+                <span className="text-zinc-500 font-bold uppercase tracking-widest">No hay datos de leads no útiles disponibles</span>
+            </div>
+        );
+    }
+
     const filtered = data.no_util.filter(item =>
-        item.descripcion_sub.toLowerCase().includes(searchTerm.toLowerCase())
+        (item.descripcion_sub || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const handleExport = () => {
