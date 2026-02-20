@@ -6,7 +6,7 @@ from jose import jwt, JWTError
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
-SECRET = os.getenv("JWT_SECRET", "unab_dashboard_secret_key_2026")
+SECRET = os.getenv("JWT_SECRET")
 ALGORITHM = "HS256"
 VALID_USER = "Admin"
 VALID_PASS = "Admin123"

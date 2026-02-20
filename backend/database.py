@@ -11,11 +11,11 @@ async def get_pool():
     global _pool
     if _pool is None:
         _pool = await asyncpg.create_pool(
-            host=os.getenv("DB_HOST", "77.37.68.210"),
+            host=os.getenv("DB_HOST"),
             port=int(os.getenv("DB_PORT", "5432")),
-            database=os.getenv("DB_NAME", "unab"),
-            user=os.getenv("DB_USER", "nicoyapur"),
-            password=os.getenv("DB_PASSWORD", "Yapur2025###"),
+            database=os.getenv("DB_NAME"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
             min_size=2,
             max_size=10,
         )
