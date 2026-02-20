@@ -21,6 +21,7 @@ export default function LeadsPage() {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
+    const [filters, setFilters] = useState({ base: '', programa: '' });
     const [showFilters, setShowFilters] = useState(false);
 
     const fetchLeads = async () => {
