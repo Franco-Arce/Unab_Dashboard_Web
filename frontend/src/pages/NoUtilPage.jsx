@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
-import { XCircle, Info, Filter, Download } from 'lucide-react';
+import { XCircle, Info, Filter, Download, Search } from 'lucide-react';
 import api from '../api';
 import { exportToCSV } from '../utils/export';
 import AIPanel from '../components/AIPanel';
