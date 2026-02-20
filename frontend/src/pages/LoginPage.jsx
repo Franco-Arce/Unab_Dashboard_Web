@@ -20,7 +20,12 @@ export default function LoginPage() {
             localStorage.setItem('unab_token', res.token);
             navigate('/dashboard');
         } catch (err) {
-            setError('Credenciales incorrectas');
+            console.error('Login error:', err);
+            if (err.message === 'Failed to fetch') {
+                setError('No se pudo conectar con el servidor. Verifica VITE_API_URL en Vercel.');
+            } else {
+                setError(err.message || 'Credenciales incorrectas');
+            }
         } finally {
             setLoading(false);
         }
