@@ -127,7 +127,7 @@ class DashboardCache:
                     COUNT(*) AS cnt
                 FROM fact_contactos_subcategorias fcs
                 JOIN dim_subcategorias ds ON fcs.subcategoria::int = ds.subcategoria
-                WHERE ds.estado ILIKE '%%no util%%'
+                WHERE ds.estado ILIKE '%%no útil%%'
                 GROUP BY ds.descripcion_sub
                 ORDER BY cnt DESC
             """)
@@ -138,7 +138,7 @@ class DashboardCache:
                 SELECT COUNT(*) AS total
                 FROM fact_contactos_subcategorias fcs
                 JOIN dim_subcategorias ds ON fcs.subcategoria::int = ds.subcategoria
-                WHERE ds.estado ILIKE '%%no util%%'
+                WHERE ds.estado ILIKE '%%no útil%%'
             """)
             data["no_util_total"] = no_util_total["total"] if no_util_total else 0
 
@@ -161,7 +161,7 @@ class DashboardCache:
                     fcs.txtprogramainteres AS programa,
                     COUNT(*) AS leads,
                     COUNT(*) FILTER (WHERE ds.gestion IS NOT NULL) AS en_gestion,
-                    COUNT(*) FILTER (WHERE ds.estado ILIKE '%%no util%%') AS no_util,
+                    COUNT(*) FILTER (WHERE ds.estado ILIKE '%%no útil%%') AS no_util,
                     COUNT(*) FILTER (WHERE ds.proceso = 'Oportunidad de Venta') AS op_venta,
                     COUNT(*) FILTER (WHERE ds.proceso = 'Proceso Pago') AS proceso_pago
                 FROM fact_contactos_subcategorias fcs
