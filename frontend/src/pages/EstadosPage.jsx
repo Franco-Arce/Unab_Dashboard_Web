@@ -4,7 +4,6 @@ import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis } from 'recharts';
 import { Target, CheckCircle2, Download, Filter } from 'lucide-react';
 import api from '../api';
 import { exportToCSV } from '../utils/export';
-import AIPanel from '../components/AIPanel';
 
 export default function EstadosPage() {
     const [data, setData] = useState(null);
@@ -150,9 +149,8 @@ export default function EstadosPage() {
                 </div>
             </div>
 
-            <div className="pt-8">
-                <AIPanel />
-            </div>
         </div>
+            </div >
+        </div >
     );
 }

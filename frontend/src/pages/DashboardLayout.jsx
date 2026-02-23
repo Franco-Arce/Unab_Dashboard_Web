@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     LayoutDashboard,
     Send,
@@ -8,14 +8,17 @@ import {
     Users,
     LogOut,
     ChevronRight,
-    RefreshCw
+    RefreshCw,
+    Sparkles
 } from 'lucide-react';
+import AIPanel from '../components/AIPanel';
 import api from '../api';
 
 export default function DashboardLayout() {
     const [user, setUser] = useState(null);
     const [meta, setMeta] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
+    const [showAI, setShowAI] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -144,9 +147,19 @@ export default function DashboardLayout() {
                             <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">Aliado Educativo</span>
                             <span className="font-bold text-sm">Universidad UNAB</span>
                         </div>
-                        <div className="w-10 h-10 bg-white p-1.5 rounded-xl shadow-md flex items-center justify-center border border-nods-border">
+                        <div className="w-10 h-10 bg-white p-1.5 rounded-xl shadow-md flex items-center justify-center border border-nods-border mr-2">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/e/e0/LogoUnab.png" alt="UNAB" className="w-full h-auto object-contain" />
                         </div>
+                        <button
+                            onClick={() => setShowAI(!showAI)}
+                            className={`p-2.5 rounded-xl border transition-all ${showAI
+                                ? 'bg-nods-accent border-nods-accent text-white shadow-lg shadow-nods-accent/20 scale-110'
+                                : 'bg-white border-nods-border text-nods-text-muted hover:border-nods-accent/50 hover:text-nods-accent hover:bg-slate-50'
+                                }`}
+                            title="Asistente IA"
+                        >
+                            <Sparkles size={18} className={showAI ? 'animate-pulse' : ''} />
+                        </button>
                     </div>
                 </header>
 
@@ -154,6 +167,21 @@ export default function DashboardLayout() {
                 <div className="p-4 md:p-8 max-w-[1600px] mx-auto w-full">
                     <Outlet />
                 </div>
+
+                <AnimatePresence>
+                    {showAI && (
+                        <>
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={() => setShowAI(false)}
+                                className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-40"
+                            />
+                            <AIPanel onClose={() => setShowAI(false)} />
+                        </>
+                    )}
+                </AnimatePresence>
             </main>
         </div>
     );

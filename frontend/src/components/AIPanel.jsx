@@ -1,169 +1,205 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Sparkles, MessageSquare, Bot, User, Brain, TrendingUp, AlertCircle, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { X, Send, Brain, TrendingUp, Lightbulb, Sparkles, Loader2, Bot, User } from 'lucide-react';
 import api from '../api';
 
-export default function AIPanel() {
+const ICON_MAP = {
+    trending_up: <TrendingUp size={14} className="text-emerald-500" />,
+    trending_down: <TrendingUp size={14} className="text-rose-500 rotate-180" />,
+    alert: <Lightbulb size={14} className="text-amber-500" />,
+    star: <Sparkles size={14} className="text-violet-500" />,
+};
+
+export default function AIPanel({ onClose }) {
+    const [tab, setTab] = useState('chat');
     const [messages, setMessages] = useState([
         { role: 'assistant', content: '¡Hola! Soy tu analista experto de UNAB. ¿En qué puedo ayudarte hoy con los datos de la campaña?' }
     ]);
     const [input, setInput] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [insights, setInsights] = useState([]);
-    const [loadingInsights, setLoadingInsights] = useState(true);
-    const scrollRef = useRef(null);
+    const [sending, setSending] = useState(false);
+    const [insights, setInsights] = useState(null);
+    const [loadingInsights, setLoadingInsights] = useState(false);
+    const messagesEnd = useRef(null);
 
     useEffect(() => {
-        fetchInsights();
-    }, []);
-
-    useEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-        }
+        messagesEnd.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, [messages]);
 
-    const fetchInsights = async () => {
+    const sendMessage = async () => {
+        if (!input.trim() || sending) return;
+        const userMsg = { role: 'user', content: input };
+        const newMessages = [...messages, userMsg];
+        setMessages(newMessages);
+        setInput('');
+        setSending(true);
+        try {
+            const res = await api.aiChat(input, messages.slice(1));
+            setMessages([...newMessages, { role: 'assistant', content: res.response }]);
+        } catch (e) {
+            setMessages([...newMessages, { role: 'assistant', content: 'Error al procesar tu pregunta. Intentá de nuevo.' }]);
+        }
+        setSending(false);
+    };
+
+    const loadInsights = async () => {
+        if (insights) return;
         setLoadingInsights(true);
         try {
             const res = await api.aiInsights();
-            setInsights(res.insights || []);
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLoadingInsights(false);
+            setInsights(res.insights);
+        } catch (e) {
+            setInsights([{ icon: 'alert', title: 'Error', description: 'No se pudieron generar insights.' }]);
         }
+        setLoadingInsights(false);
     };
 
-    const handleSend = async (e) => {
-        e.preventDefault();
-        if (!input.trim() || loading) return;
+    useEffect(() => {
+        if (tab === 'insights') loadInsights();
+    }, [tab]);
 
-        const userMsg = { role: 'user', content: input };
-        setMessages(prev => [...prev, userMsg]);
-        setInput('');
-        setLoading(true);
-
-        try {
-            const res = await api.aiChat(input, messages);
-            setMessages(prev => [...prev, { role: 'assistant', content: res.response }]);
-        } catch (err) {
-            setMessages(prev => [...prev, { role: 'assistant', content: 'Lo siento, hubo un error al procesar tu consulta.' }]);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const getIcon = (name) => {
-        switch (name) {
-            case 'trending_up': return <TrendingUp className="w-4 h-4 text-nods-success" />;
-            case 'trending_down': return <TrendingUp className="w-4 h-4 text-nods-error rotate-180" />;
-            case 'alert': return <AlertCircle className="w-4 h-4 text-nods-warning" />;
-            case 'star': return <Star className="w-4 h-4 text-nods-accent" />;
-            default: return <Sparkles className="w-4 h-4 text-nods-accent" />;
-        }
-    };
+    const TABS = [
+        { key: 'chat', label: '💬 Chat' },
+        { key: 'insights', label: '💡 Insights' }
+    ];
 
     return (
-        <div className="flex flex-col h-full gap-6">
-            {/* Insights Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-4">
-                {loadingInsights ? (
-                    [1, 2, 3, 4].map(i => (
-                        <div key={i} className="h-24 bg-white rounded-2xl animate-pulse border border-nods-border shadow-sm" />
-                    ))
-                ) : (
-                    insights.map((insight, idx) => (
-                        <motion.div
-                            key={idx}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: idx * 0.1 }}
-                            className="bg-white border border-nods-border p-4 rounded-2xl hover:border-nods-accent/30 transition-all group flex flex-col gap-2 min-h-[120px] shadow-sm"
-                        >
-                            <div className="flex items-start gap-2">
-                                <div className="mt-0.5 flex-shrink-0">{getIcon(insight.icon)}</div>
-                                <h3 className="text-[10px] font-black uppercase tracking-widest text-nods-text-muted leading-tight">
-                                    {insight.title}
-                                </h3>
-                            </div>
-                            <p className="text-[12px] text-nods-text-primary font-medium leading-snug break-words overflow-hidden line-clamp-3 group-hover:line-clamp-none transition-all">
-                                {insight.description}
-                            </p>
-                        </motion.div>
-                    ))
-                )}
-            </div>
-
-            {/* Chat Section */}
-            <div className="flex-1 bg-white border border-nods-border rounded-3xl flex flex-col overflow-hidden relative group shadow-2xl">
-                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-nods-accent/50 to-transparent opacity-30 group-hover:opacity-100 transition-opacity" />
-
-                <div className="p-4 border-b border-nods-border flex items-center justify-between bg-nods-sidebar">
-                    <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-nods-accent animate-pulse shadow-[0_0_8px_#2563EB]" />
-                        <span className="text-xs font-black tracking-widest uppercase text-white/80">Analista UNAB AI</span>
+        <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="fixed top-0 right-0 bottom-0 w-[400px] bg-white border-l border-nods-border shadow-2xl flex flex-col z-50 text-nods-text-primary h-screen"
+        >
+            {/* Header */}
+            <div className="px-5 py-4 border-b border-nods-border flex items-center justify-between bg-nods-sidebar text-white">
+                <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 bg-nods-accent rounded-lg flex items-center justify-center">
+                        <Sparkles size={16} />
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-sm">Analista UNAB AI</h3>
+                        <div className="flex items-center gap-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                            <span className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">En Línea</span>
+                        </div>
                     </div>
                 </div>
+                <button onClick={onClose} className="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center transition-colors">
+                    <X size={14} />
+                </button>
+            </div>
 
-                <div
-                    ref={scrollRef}
-                    className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth"
-                >
-                    <AnimatePresence initial={false}>
-                        {messages.map((m, i) => (
+            {/* Tabs */}
+            <div className="flex border-b border-nods-border">
+                {TABS.map(t => (
+                    <button
+                        key={t.key}
+                        onClick={() => setTab(t.key)}
+                        className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest transition-all border-b-2 ${tab === t.key
+                            ? 'text-nods-accent border-nods-accent bg-blue-50/50'
+                            : 'text-nods-text-muted border-transparent hover:text-nods-accent hover:bg-slate-50'
+                            }`}
+                    >
+                        {t.label}
+                    </button>
+                ))}
+            </div>
+
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto p-6 bg-slate-50/50 space-y-4">
+                {/* Chat */}
+                {tab === 'chat' && (
+                    <div className="flex flex-col gap-4 min-h-full">
+                        {messages.map((msg, i) => (
                             <motion.div
                                 key={i}
-                                initial={{ opacity: 0, y: 10, x: m.role === 'user' ? 20 : -20 }}
-                                animate={{ opacity: 1, y: 0, x: 0 }}
-                                className={`flex gap-3 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}
+                                initial={{ opacity: 0, y: 8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
                             >
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${m.role === 'user' ? 'bg-slate-100' : 'bg-nods-sidebar'
-                                    }`}>
-                                    {m.role === 'user' ? <User className="w-4 h-4 text-nods-text-muted" /> : <Bot className="w-4 h-4 text-white" />}
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm ${msg.role === 'user' ? 'bg-slate-200' : 'bg-nods-sidebar'}`}>
+                                    {msg.role === 'user' ? <User size={14} className="text-nods-text-muted" /> : <Bot size={14} className="text-white" />}
                                 </div>
-                                <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm font-medium shadow-sm ${m.role === 'user'
-                                    ? 'bg-slate-50 text-nods-text-primary border border-nods-border'
-                                    : 'bg-nods-accent text-white border border-nods-accent/20'
+                                <div className={`max-w-[80%] p-3.5 rounded-2xl text-[13px] font-medium leading-relaxed shadow-sm ${msg.role === 'user'
+                                    ? 'bg-nods-accent text-white rounded-tr-none'
+                                    : 'bg-white text-nods-text-primary border border-nods-border rounded-tl-none'
                                     }`}>
-                                    {m.content}
+                                    {msg.content}
                                 </div>
                             </motion.div>
                         ))}
-                    </AnimatePresence>
-                    {loading && (
-                        <div className="flex gap-3">
-                            <div className="w-8 h-8 rounded-full bg-nods-sidebar flex items-center justify-center flex-shrink-0 shadow-md">
-                                <Bot className="w-4 h-4 text-white" />
+                        {sending && (
+                            <div className="flex gap-3">
+                                <div className="w-8 h-8 rounded-full bg-nods-sidebar flex items-center justify-center flex-shrink-0">
+                                    <Bot size={14} className="text-white" />
+                                </div>
+                                <div className="bg-white p-3.5 rounded-2xl border border-nods-border shadow-sm rounded-tl-none flex items-center gap-2">
+                                    <Loader2 size={14} className="animate-spin text-nods-accent" />
+                                    <span className="text-[11px] font-bold text-nods-text-muted uppercase tracking-wider">Analizando...</span>
+                                </div>
                             </div>
-                            <div className="bg-slate-100 rounded-2xl px-4 py-2 flex items-center gap-1 border border-nods-border shadow-sm">
-                                <div className="w-1.5 h-1.5 bg-nods-accent rounded-full animate-bounce [animation-delay:-0.3s]" />
-                                <div className="w-1.5 h-1.5 bg-nods-accent rounded-full animate-bounce [animation-delay:-0.15s]" />
-                                <div className="w-1.5 h-1.5 bg-nods-accent rounded-full animate-bounce" />
-                            </div>
-                        </div>
-                    )}
-                </div>
+                        )}
+                        <div ref={messagesEnd} />
+                    </div>
+                )}
 
-                <form onSubmit={handleSend} className="p-4 bg-slate-50 border-t border-nods-border">
+                {/* Insights */}
+                {tab === 'insights' && (
+                    <div className="space-y-4">
+                        {loadingInsights ? (
+                            <div className="space-y-4">
+                                {[1, 2, 3].map(i => <div key={i} className="h-24 bg-white rounded-2xl animate-pulse border border-nods-border" />)}
+                            </div>
+                        ) : (
+                            insights?.map((ins, i) => (
+                                <motion.div
+                                    key={i}
+                                    className="bg-white border border-nods-border rounded-2xl p-5 shadow-sm hover:border-nods-accent/30 transition-all hover:scale-[1.02]"
+                                    initial={{ opacity: 0, x: 15 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: i * 0.1 }}
+                                >
+                                    <div className="text-[10px] font-black uppercase tracking-widest text-nods-text-muted flex items-center gap-2 mb-2">
+                                        {ICON_MAP[ins.icon] || ICON_MAP.alert}
+                                        {ins.title}
+                                    </div>
+                                    <p className="text-[13px] font-medium text-nods-text-primary leading-relaxed">{ins.description}</p>
+                                </motion.div>
+                            ))
+                        )}
+                        <button
+                            onClick={() => { setInsights(null); loadInsights(); }}
+                            className="w-full mt-2 py-3 bg-white border border-nods-border rounded-xl text-[10px] font-black uppercase tracking-widest text-nods-accent hover:bg-blue-50 transition-all shadow-sm"
+                        >
+                            🔄 Regenerar Insights
+                        </button>
+                    </div>
+                )}
+            </div>
+
+            {/* Input */}
+            {tab === 'chat' && (
+                <div className="p-4 bg-white border-t border-nods-border">
                     <div className="relative">
                         <input
                             type="text"
+                            placeholder="Pregunta sobre la campaña..."
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder="Pregunta sobre los datos..."
-                            className="w-full bg-white border border-nods-border rounded-2xl py-3 pl-4 pr-12 focus:border-nods-accent focus:ring-2 focus:ring-nods-accent/10 outline-none transition-all placeholder:text-nods-text-muted text-nods-text-primary font-medium shadow-inner"
+                            onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+                            disabled={sending}
+                            className="w-full bg-slate-50 border border-nods-border rounded-2xl py-3.5 pl-4 pr-12 text-sm outline-none focus:border-nods-accent focus:ring-4 focus:ring-nods-accent/5 transition-all text-nods-text-primary placeholder:text-nods-text-muted font-medium shadow-inner"
                         />
                         <button
-                            type="submit"
-                            disabled={loading || !input.trim()}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-nods-accent text-white rounded-xl hover:bg-blue-700 transition-all disabled:opacity-50 disabled:grayscale shadow-lg active:scale-95"
+                            onClick={sendMessage}
+                            disabled={sending || !input.trim()}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-nods-accent text-white rounded-xl flex items-center justify-center hover:bg-blue-700 transition-all disabled:opacity-40 shadow-lg"
                         >
-                            <Send className="w-4 h-4" />
+                            <Send size={16} />
                         </button>
                     </div>
-                </form>
-            </div>
-        </div>
+                </div>
+            )}
+        </motion.div>
     );
 }

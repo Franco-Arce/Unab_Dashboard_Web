@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { Search, Filter, Download, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import api from '../api';
 import { exportToCSV } from '../utils/export';
-import AIPanel from '../components/AIPanel';
 
 export default function AdmisionesPage() {
     const [data, setData] = useState(null);
@@ -132,10 +131,6 @@ export default function AdmisionesPage() {
                         </tbody>
                     </table>
                 </div>
-            </div>
-
-            <div className="pt-8">
-                <AIPanel />
             </div>
         </div>
     );

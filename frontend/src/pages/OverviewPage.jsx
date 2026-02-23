@@ -12,7 +12,6 @@ import {
 import { motion } from 'framer-motion';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell, AreaChart, Area, CartesianGrid } from 'recharts';
 import api from '../api';
-import AIPanel from '../components/AIPanel';
 
 export default function OverviewPage() {
     const [kpis, setKpis] = useState(null);
@@ -167,10 +166,6 @@ export default function OverviewPage() {
                     </div>
                 </div>
 
-                {/* AI Panel Section */}
-                <div className="h-full min-h-[600px]">
-                    <AIPanel />
-                </div>
             </div>
         </div>
     );

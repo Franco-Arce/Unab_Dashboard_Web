@@ -4,7 +4,6 @@ import { ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { XCircle, Info, Filter, Download, Search } from 'lucide-react';
 import api from '../api';
 import { exportToCSV } from '../utils/export';
-import AIPanel from '../components/AIPanel';
 
 export default function NoUtilPage() {
     const [data, setData] = useState(null);
@@ -129,9 +128,8 @@ export default function NoUtilPage() {
                 </div>
             </div>
 
-            <div className="pt-8">
-                <AIPanel />
-            </div>
         </div>
+            </div >
+        </div >
     );
 }
