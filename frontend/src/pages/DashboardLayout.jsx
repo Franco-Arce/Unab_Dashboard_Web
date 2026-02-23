@@ -73,8 +73,6 @@ export default function DashboardLayout() {
                 <div className="p-6">
                     <div className="flex items-center gap-4 mb-10 px-2">
                         <img src={nodsWhite} alt="NODS" className="h-6 w-auto opacity-90" />
-                        <div className="h-6 w-[1px] bg-slate-700/50" />
-                        <img src={logoUnab} alt="UNAB" className="h-7 w-auto" />
                     </div>
 
                     <nav className="space-y-1">
