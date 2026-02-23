@@ -32,7 +32,7 @@ async def lifespan(app: FastAPI):
         await cache.refresh()
         print("[Startup] Cache loaded successfully")
     except Exception as e:
-        print(f"[Startup] Cache load failed: {e}")
+        print(f"[Startup] Cache load failed (server will still start): {e}")
 
     refresh_task = asyncio.create_task(periodic_refresh())
 
@@ -54,7 +54,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=False,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
