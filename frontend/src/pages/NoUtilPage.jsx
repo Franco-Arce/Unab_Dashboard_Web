@@ -16,7 +16,7 @@ export default function NoUtilPage() {
 
     if (!data || !data.no_util) {
         return (
-            <div className="h-96 bg-zinc-950 rounded-3xl flex items-center justify-center border border-zinc-800 shadow-2xl">
+            <div className="h-96 bg-nods-sidebar rounded-3xl flex items-center justify-center border border-zinc-800 shadow-2xl">
                 <span className="text-zinc-500 font-bold uppercase tracking-widest">No hay datos de leads no útiles disponibles</span>
             </div>
         );
@@ -68,11 +68,11 @@ export default function NoUtilPage() {
                 </div>
             </div>
 
-            <div className="bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl p-6">
+            <div className="bg-nods-sidebar border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl p-6">
                 <div className="overflow-x-auto rounded-xl border border-zinc-700">
                     <table className="w-full text-left text-sm whitespace-nowrap">
                         <thead>
-                            <tr className="bg-zinc-900 border-b border-zinc-700 text-[11px] font-bold text-zinc-300">
+                            <tr className="bg-[#121826] border-b border-zinc-700 text-[11px] font-bold text-zinc-300">
                                 <th className="px-4 py-3 min-w-[200px]">Subcategoría</th>
                                 <th className="px-4 py-3 text-center text-amber-500">Leads No Útiles ▼</th>
                                 <th className="px-4 py-3 text-center text-amber-500">% No Útil</th>

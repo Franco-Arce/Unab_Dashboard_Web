@@ -28,7 +28,7 @@ export default function EstadosPage() {
     // Calculate totals for the footer row
     let tLeads = 0, tGestion = 0, tNoUtil = 0, tOpVenta = 0, tProcPago = 0;
     let tSol = 0, tAdm = 0, tPag = 0, tMeta = 0, tToques = 0;
-    
+
     if (data?.estados_by_programa) {
         data.estados_by_programa.forEach(p => {
             tLeads += p.leads || 0;
@@ -57,7 +57,7 @@ export default function EstadosPage() {
             </div>
 
             {/* Programs Detailed States (Matches PowerBI Layout) */}
-            <div className="bg-zinc-950 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl pb-4">
+            <div className="bg-nods-sidebar border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl pb-4">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm whitespace-nowrap">
                         <thead>
@@ -101,7 +101,7 @@ export default function EstadosPage() {
                             })}
                             {/* Totals Row */}
                             {data?.estados_by_programa.length > 0 && (
-                                <tr className="bg-zinc-900 border-t-2 border-zinc-700">
+                                <tr className="bg-[#121826] border-t-2 border-zinc-700">
                                     <td className="px-4 py-4 text-sm font-bold text-white">Total</td>
                                     <td className="px-2 py-4 text-center text-sm font-bold text-white">{tLeads.toLocaleString()}</td>
                                     <td className="px-2 py-4 text-center text-sm font-bold text-white">{tGestion.toLocaleString()}</td>
@@ -112,8 +112,8 @@ export default function EstadosPage() {
                                     <td className="px-2 py-4 text-center text-sm font-bold text-amber-500">{tAdm.toLocaleString()}</td>
                                     <td className="px-2 py-4 text-center text-sm font-bold text-amber-500">{tPag.toLocaleString()}</td>
                                     <td className="px-2 py-4 text-center text-sm font-bold text-amber-500">{tMeta.toLocaleString()}</td>
-                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-500">{formatPercent(tPag/tMeta)}</td>
-                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-500">{formatPercent(tPag/tLeads)}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-500">{formatPercent(tPag / tMeta)}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-500">{formatPercent(tPag / tLeads)}</td>
                                     <td className="px-4 py-4 text-center text-sm font-bold text-white">{tToques.toFixed(2)}</td>
                                 </tr>
                             )}

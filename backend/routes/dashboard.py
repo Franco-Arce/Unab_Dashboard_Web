@@ -96,16 +96,57 @@ async def get_leads(
     programa: Optional[str] = Query(None),
     _user: str = Depends(require_auth),
 ):
-    # dim_contactos is dropped, we return empty paginated block
-    # so frontend table just shows no details
+    from database import fetch_all, fetch_one
+    
+    where_clauses = ["1=1"]
+    args = []
+    
+    if search:
+        where_clauses.append(f"(txtnombreapellido ILIKE ${len(args)+1} OR emlmail ILIKE ${len(args)+1} OR teltelefono ILIKE ${len(args)+1})")
+        args.append(f"%{search}%")
+        
+    if base:
+        where_clauses.append(f"base = ${len(args)+1}")
+        args.append(base)
+        
+    if programa:
+        where_clauses.append(f"txtprogramainteres ILIKE ${len(args)+1}")
+        args.append(f"%{programa}%")
+        
+    where_sql = " AND ".join(where_clauses)
+    
+    count_query = f"SELECT COUNT(*) as total FROM dim_contactos WHERE {where_sql}"
+    total_row = await fetch_one(count_query, *args)
+    total = total_row["total"] if total_row else 0
+    
+    offset = (page - 1) * per_page
+    data_query = f"""
+        SELECT 
+            idinterno, txtnombreapellido, emlmail, teltelefono, 
+            feccreacionoportunidad, txtprogramainteres, base,
+            descrip_subcat, ultima_mejor_subcat_string, cant_toques_call_crm, fecha_a_utilizar
+        FROM dim_contactos
+        WHERE {where_sql}
+        ORDER BY fecha_a_utilizar DESC NULLS LAST
+        LIMIT {per_page} OFFSET {offset}
+    """
+    
+    rows = await fetch_all(data_query, *args)
+    
     return {
-        "data": [],
-        "total": 0,
+        "data": rows,
+        "total": total,
         "page": page,
         "per_page": per_page,
     }
 
 
+@router.get("/bases")
+async def get_bases(_user: str = Depends(require_auth)):
+    from database import fetch_all
+    query = "SELECT DISTINCT base FROM dim_contactos WHERE base IS NOT NULL ORDER BY base"
+    rows = await fetch_all(query)
+    return [r["base"] for r in rows]
 @router.get("/meta")
 async def get_meta(_user: str = Depends(require_auth)):
     data = await cache.get_all()

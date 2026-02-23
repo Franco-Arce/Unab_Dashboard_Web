@@ -23,6 +23,11 @@ export default function LeadsPage() {
     const [search, setSearch] = useState('');
     const [filters, setFilters] = useState({ base: '', programa: '' });
     const [showFilters, setShowFilters] = useState(false);
+    const [availableBases, setAvailableBases] = useState([]);
+
+    useEffect(() => {
+        api.bases().then(setAvailableBases).catch(console.error);
+    }, []);
 
     const fetchLeads = async () => {
         setLoading(true);
@@ -88,8 +93,9 @@ export default function LeadsPage() {
                                         className="w-full bg-nods-bg border border-nods-border rounded-xl px-4 py-2.5 text-xs outline-none focus:border-nods-accent text-nods-text-primary"
                                     >
                                         <option value="">Todas las bases</option>
-                                        <option value="NEW LEADS POSGRADO 2026-01">Posgrado 2026-01</option>
-                                        <option value="NEW LEADS PREGRADO 2026-1">Pregrado 2026-1</option>
+                                        {availableBases.map((b, idx) => (
+                                            <option key={idx} value={b}>{b}</option>
+                                        ))}
                                     </select>
                                 </div>
                                 <div className="space-y-2">
@@ -126,10 +132,10 @@ export default function LeadsPage() {
                 </div>
             </div>
 
-            <div className="bg-nods-card border border-nods-border rounded-3xl overflow-hidden min-h-[600px] flex flex-col shadow-2xl">
+            <div className="bg-nods-sidebar border border-nods-border rounded-3xl overflow-hidden min-h-[600px] flex flex-col shadow-2xl">
                 <div className="flex-1 overflow-x-auto">
                     <table className="w-full text-left text-sm">
-                        <thead className="bg-slate-50 border-b border-nods-border text-[10px] font-bold text-nods-text-muted uppercase tracking-widest sticky top-0 z-10">
+                        <thead className="bg-[#121826] border-b border-nods-border text-[10px] font-bold text-nods-text-muted uppercase tracking-widest sticky top-0 z-10">
                             <tr>
                                 <th className="px-6 py-4">Contacto</th>
                                 <th className="px-6 py-4">Programa</th>
@@ -153,11 +159,11 @@ export default function LeadsPage() {
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         transition={{ delay: idx * 0.02 }}
-                                        className="hover:bg-slate-50 transition-colors group"
+                                        className="hover:bg-[#121826] transition-colors group"
                                     >
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-nods-text-muted group-hover:bg-nods-accent group-hover:text-white transition-all shadow-sm">
+                                                <div className="w-10 h-10 rounded-full bg-nods-bg flex items-center justify-center font-bold text-nods-text-muted group-hover:bg-nods-accent group-hover:text-white transition-all shadow-sm">
                                                     {lead.txtnombreapellido?.[0] || 'U'}
                                                 </div>
                                                 <div>
@@ -207,7 +213,7 @@ export default function LeadsPage() {
                 </div>
 
                 {/* Pagination */}
-                <div className="p-6 border-t border-nods-border bg-slate-50/50 flex items-center justify-between">
+                <div className="p-6 border-t border-nods-border bg-nods-sidebar flex items-center justify-between">
                     <div className="text-xs text-nods-text-muted font-bold uppercase tracking-widest">
                         Página {page} de {totalPages}
                     </div>

@@ -77,6 +77,7 @@ export const api = {
         Object.entries(params).forEach(([k, v]) => { if (v) q.set(k, v); });
         return request(`/api/dashboard/leads?${q.toString()}`);
     },
+    bases: () => request('/api/dashboard/bases'),
     meta: () => request('/api/dashboard/meta'),
     refresh: () => request('/api/dashboard/refresh', { method: 'POST' }),
 
