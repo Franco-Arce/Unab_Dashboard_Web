@@ -27,7 +27,7 @@ export default function EstadosPage() {
 
     // Calculate totals for the footer row
     let tLeads = 0, tGestion = 0, tNoUtil = 0, tOpVenta = 0, tProcPago = 0;
-    let tSol = 0, tAdm = 0, tPag = 0, tMeta = 0, tToques = 0;
+    let tSol = 0, tAdm = 0, tPag = 0, tMeta = 0;
 
     if (data?.estados_by_programa) {
         data.estados_by_programa.forEach(p => {
@@ -40,9 +40,7 @@ export default function EstadosPage() {
             tAdm += p.admitidos || 0;
             tPag += p.pagados || 0;
             tMeta += p.meta || 0;
-            tToques += p.toques_prom || 0;
         });
-        if (data.estados_by_programa.length > 0) tToques /= data.estados_by_programa.length; // Average of averages
     }
 
     return (
@@ -74,7 +72,6 @@ export default function EstadosPage() {
                                 <th className="px-2 py-4 text-center text-amber-500">Meta</th>
                                 <th className="px-2 py-4 text-center text-amber-500">Avance</th>
                                 <th className="px-2 py-4 text-center text-amber-500">Conversión</th>
-                                <th className="px-4 py-4 text-center">Toques Prom.</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-zinc-800/60">
@@ -95,7 +92,6 @@ export default function EstadosPage() {
                                         <td className="px-2 py-3 text-center text-xs text-amber-500 font-medium">{item.meta || ''}</td>
                                         <td className="px-2 py-3 text-center text-xs text-amber-500 font-medium">{formatPercent(avance)}</td>
                                         <td className="px-2 py-3 text-center text-xs text-amber-500 font-medium">{formatPercent(conversion)}</td>
-                                        <td className="px-4 py-3 text-center text-xs text-zinc-300">{(item.toques_prom || 0).toFixed(2)}</td>
                                     </tr>
                                 );
                             })}
@@ -114,7 +110,6 @@ export default function EstadosPage() {
                                     <td className="px-2 py-4 text-center text-sm font-bold text-amber-500">{tMeta.toLocaleString()}</td>
                                     <td className="px-2 py-4 text-center text-sm font-bold text-amber-500">{formatPercent(tPag / tMeta)}</td>
                                     <td className="px-2 py-4 text-center text-sm font-bold text-amber-500">{formatPercent(tPag / tLeads)}</td>
-                                    <td className="px-4 py-4 text-center text-sm font-bold text-white">{tToques.toFixed(2)}</td>
                                 </tr>
                             )}
                         </tbody>
