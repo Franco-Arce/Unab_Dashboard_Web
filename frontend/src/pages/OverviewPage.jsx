@@ -95,25 +95,32 @@ export default function OverviewPage() {
                             </div>
                         </div>
 
-                        <div className="h-[300px] w-full relative z-10">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={funnel} layout="vertical" margin={{ left: 100, right: 30 }}>
-                                    <XAxis type="number" hide />
-                                    <YAxis
-                                        type="category"
-                                        dataKey="stage"
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tick={{ fill: '#0f172a', fontSize: 12, fontWeight: 900 }}
-                                        width={120}
-                                    />
-                                    <Bar dataKey="value" radius={[0, 10, 10, 0]} barSize={40} isAnimationActive={false}>
-                                        {funnel.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} stroke="#fff" strokeWidth={2} />
-                                        ))}
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
+                        <div className="py-8 w-full flex flex-col items-center justify-center gap-3 relative z-10 min-h-[300px]">
+                            {funnel.map((entry, index) => (
+                                <div key={index} className="w-full flex flex-col items-center group relative cursor-pointer">
+                                    <motion.div
+                                        initial={{ opacity: 0, width: 0, y: -20 }}
+                                        animate={{ opacity: 1, width: `${Math.max(entry.percent, 10)}%`, y: 0 }}
+                                        transition={{ duration: 0.6, delay: index * 0.1, type: "spring", bounce: 0.4 }}
+                                        className="h-12 md:h-14 rounded-full flex items-center justify-center relative overflow-hidden shadow-lg border border-white/10"
+                                        style={{ backgroundColor: entry.color }}
+                                        whileHover={{ scale: 1.02, filter: "brightness(1.1)" }}
+                                    >
+                                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:animate-[shimmer_1.5s_infinite]" />
+                                        <span className="font-extrabold text-white sm:text-lg z-10 drop-shadow-md">
+                                            {entry.value.toLocaleString()}
+                                        </span>
+                                    </motion.div>
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ delay: 0.5 + (index * 0.1) }}
+                                        className="mt-1 text-[10px] md:text-xs font-bold text-nods-text-muted uppercase tracking-widest text-center"
+                                    >
+                                        {entry.stage} <span className="text-nods-accent ml-1">({entry.percent}%)</span>
+                                    </motion.div>
+                                </div>
+                            ))}
                         </div>
 
                         {/* Funnel Details Table */}
