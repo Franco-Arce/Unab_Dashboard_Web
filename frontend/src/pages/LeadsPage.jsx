@@ -10,7 +10,10 @@ import {
     MapPin,
     Calendar,
     MessageSquare,
-    ExternalLink
+    ExternalLink,
+    Copy,
+    X,
+    Check
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api';
@@ -24,6 +27,31 @@ export default function LeadsPage() {
     const [filters, setFilters] = useState({ base: '', programa: '' });
     const [showFilters, setShowFilters] = useState(false);
     const [availableBases, setAvailableBases] = useState([]);
+
+    // Modal states
+    const [selectedLead, setSelectedLead] = useState(null);
+    const [copied, setCopied] = useState(false);
+
+    const handleCopyInfo = async () => {
+        if (!selectedLead) return;
+        const infoToCopy = `Nombre: ${selectedLead.txtnombreapellido || 'N/A'}\n` +
+            `ID Interno: ${selectedLead.idinterno || 'N/A'}\n` +
+            `Email: ${selectedLead.emlmail || 'N/A'}\n` +
+            `Teléfono: ${selectedLead.teltelefono || 'N/A'}\n` +
+            `Programa: ${selectedLead.txtprogramainteres || 'N/A'}\n` +
+            `Base: ${selectedLead.base || 'N/A'}\n` +
+            `Estado/Gestión: ${selectedLead.ultima_mejor_subcat_string || 'Sin Gestión'} - ${selectedLead.descrip_subcat || ''}\n` +
+            `Fecha a utilizar: ${selectedLead.fecha_a_utilizar ? new Date(selectedLead.fecha_a_utilizar).toLocaleDateString() : 'N/A'}\n` +
+            `Fecha creación op: ${selectedLead.feccreacionoportunidad ? new Date(selectedLead.feccreacionoportunidad).toLocaleDateString() : 'N/A'}`;
+
+        try {
+            await navigator.clipboard.writeText(infoToCopy);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            console.error('Failed to copy info:', err);
+        }
+    };
 
     useEffect(() => {
         api.bases().then(setAvailableBases).catch(console.error);
@@ -140,7 +168,6 @@ export default function LeadsPage() {
                                 <th className="px-6 py-4">Contacto</th>
                                 <th className="px-6 py-4">Programa</th>
                                 <th className="px-6 py-4">Estado / Gestión</th>
-                                <th className="px-6 py-4">Toques</th>
                                 <th className="px-6 py-4">Fecha</th>
                                 <th className="px-6 py-4">Acciones</th>
                             </tr>
@@ -189,19 +216,16 @@ export default function LeadsPage() {
                                             )}
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="flex items-center gap-1.5">
-                                                <div className="h-2 w-2 rounded-full bg-nods-accent shadow-[0_0_8px_rgba(37,99,235,0.4)]" />
-                                                <span className="font-bold text-slate-200">{lead.cant_toques_call_crm || 0}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
                                             <div className="flex items-center gap-1 text-nods-text-muted">
                                                 <Calendar className="w-3 h-3" />
                                                 <span className="text-xs font-medium">{lead.fecha_a_utilizar ? new Date(lead.fecha_a_utilizar).toLocaleDateString() : '-'}</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <button className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-nods-text-muted hover:text-nods-accent">
+                                            <button
+                                                onClick={() => setSelectedLead(lead)}
+                                                className="p-2 hover:bg-[#1f2937] rounded-xl transition-colors text-nods-text-muted hover:text-nods-accent"
+                                            >
                                                 <ExternalLink className="w-4 h-4" />
                                             </button>
                                         </td>
@@ -249,6 +273,110 @@ export default function LeadsPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Lead Details Modal */}
+            <AnimatePresence>
+                {selectedLead && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/80 backdrop-blur-sm p-4"
+                        onClick={() => setSelectedLead(null)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.95, y: 20 }}
+                            className="bg-nods-sidebar border border-zinc-800 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="p-6 border-b border-zinc-800 flex items-center justify-between">
+                                <h2 className="text-lg font-bold text-slate-200">Detalles del Lead</h2>
+                                <button
+                                    onClick={() => setSelectedLead(null)}
+                                    className="p-2 text-nods-text-muted hover:text-white hover:bg-zinc-800 rounded-xl transition-colors"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            <div className="p-6 space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-4">
+                                        <div>
+                                            <div className="text-[10px] text-nods-text-muted uppercase tracking-widest font-bold mb-1">Contacto</div>
+                                            <div className="text-sm font-bold text-slate-200">{selectedLead.txtnombreapellido || '-'}</div>
+                                            <div className="text-sm text-nods-text-muted flex items-center gap-1.5 mt-1">
+                                                <Mail className="w-3.5 h-3.5" /> {selectedLead.emlmail || '-'}
+                                            </div>
+                                            <div className="text-sm text-nods-text-muted flex items-center gap-1.5 mt-1">
+                                                <Phone className="w-3.5 h-3.5" /> {selectedLead.teltelefono || 'Sin teléfono'}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div className="text-[10px] text-nods-text-muted uppercase tracking-widest font-bold mb-1">ID Interno / Base</div>
+                                            <div className="text-sm text-slate-200 font-medium">{selectedLead.idinterno || '-'}</div>
+                                            <div className="text-xs text-nods-text-muted">{selectedLead.base || '-'}</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <div>
+                                            <div className="text-[10px] text-nods-text-muted uppercase tracking-widest font-bold mb-1">Programa de Interés</div>
+                                            <div className="text-sm font-bold text-slate-200 leading-tight">{selectedLead.txtprogramainteres || '-'}</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-[10px] text-nods-text-muted uppercase tracking-widest font-bold mb-1">Estado de Gestión</div>
+                                            {selectedLead.ultima_mejor_subcat_string ? (
+                                                <div className="inline-flex flex-col mt-0.5">
+                                                    <span className="text-sm font-extrabold text-emerald-500">{selectedLead.ultima_mejor_subcat_string}</span>
+                                                    <span className="text-xs text-nods-text-muted">{selectedLead.descrip_subcat}</span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-sm text-amber-500 italic font-medium">Sin gestión</span>
+                                            )}
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <div className="text-[10px] text-nods-text-muted uppercase tracking-widest font-bold mb-1">Creación Op.</div>
+                                                <div className="text-sm text-slate-200">
+                                                    {selectedLead.feccreacionoportunidad ? new Date(selectedLead.feccreacionoportunidad).toLocaleDateString() : '-'}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div className="text-[10px] text-nods-text-muted uppercase tracking-widest font-bold mb-1">A Utilizar</div>
+                                                <div className="text-sm text-slate-200">
+                                                    {selectedLead.fecha_a_utilizar ? new Date(selectedLead.fecha_a_utilizar).toLocaleDateString() : '-'}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="p-6 bg-zinc-900 border-t border-zinc-800 flex justify-end gap-3">
+                                <button
+                                    onClick={handleCopyInfo}
+                                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${copied
+                                            ? 'bg-nods-success text-white shadow-lg shadow-nods-success/20'
+                                            : 'bg-nods-accent text-white hover:bg-blue-600 shadow-lg shadow-nods-accent/20'
+                                        }`}
+                                >
+                                    {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                                    {copied ? '¡Copiado!' : 'Copiar Información'}
+                                </button>
+                                <button
+                                    onClick={() => setSelectedLead(null)}
+                                    className="px-4 py-2.5 bg-zinc-800 text-slate-200 rounded-xl text-xs font-bold hover:bg-zinc-700 transition-all border border-zinc-700"
+                                >
+                                    Cerrar
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
