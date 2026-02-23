@@ -14,6 +14,9 @@ import {
 } from 'lucide-react';
 import AIPanel from '../components/AIPanel';
 import api from '../api';
+import logoUnab from '../assets/logo-unab.png';
+import nodsWhite from '../assets/nods-white.png';
+import nodsDark from '../assets/nods-dark.png';
 
 export default function DashboardLayout() {
     const [user, setUser] = useState(null);
@@ -68,14 +71,10 @@ export default function DashboardLayout() {
             {/* Sidebar ... (no changes needed) */}
             <aside className="w-64 border-r border-nods-border bg-nods-sidebar flex flex-col sticky top-0 h-screen transition-all duration-300">
                 <div className="p-6">
-                    <div className="flex items-center gap-3 mb-8 px-2">
-                        <div className="w-10 h-10 bg-nods-accent rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.2)]">
-                            <span className="text-white font-black text-xl">U</span>
-                        </div>
-                        <div>
-                            <h1 className="font-bold text-lg text-white leading-tight">UNAB</h1>
-                            <p className="text-slate-500 text-[10px] font-bold tracking-widest uppercase">Dashboard</p>
-                        </div>
+                    <div className="flex items-center gap-4 mb-10 px-2">
+                        <img src={nodsWhite} alt="NODS" className="h-6 w-auto opacity-90" />
+                        <div className="h-6 w-[1px] bg-slate-700/50" />
+                        <img src={logoUnab} alt="UNAB" className="h-7 w-auto" />
                     </div>
 
                     <nav className="space-y-1">
@@ -144,12 +143,15 @@ export default function DashboardLayout() {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className="flex flex-col items-end">
-                            <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">Aliado Educativo</span>
-                            <span className="font-bold text-sm">Universidad UNAB</span>
+                        <div className="flex items-center gap-3 mr-4">
+                            <img src={nodsDark} alt="NODS" className="h-4 w-auto opacity-40 grayscale hover:grayscale-0 transition-all cursor-help" title="Powered by NODS" />
                         </div>
-                        <div className="w-10 h-10 bg-white p-1.5 rounded-xl shadow-md flex items-center justify-center border border-nods-border mr-2">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e0/LogoUnab.png" alt="UNAB" className="w-full h-auto object-contain" />
+                        <div className="flex flex-col items-end">
+                            <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Aliado Educativo</span>
+                            <span className="font-bold text-sm text-nods-text-primary">Universidad UNAB</span>
+                        </div>
+                        <div className="w-11 h-11 bg-white p-2 rounded-xl shadow-sm flex items-center justify-center border border-nods-border/50 mr-2">
+                            <img src={logoUnab} alt="UNAB" className="w-full h-auto object-contain" />
                         </div>
                         <button
                             onClick={() => setShowAI(!showAI)}

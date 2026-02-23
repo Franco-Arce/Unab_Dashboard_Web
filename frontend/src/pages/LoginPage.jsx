@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Lock, User, AlertCircle } from 'lucide-react';
 import api from '../api';
 import { motion } from 'framer-motion';
+import logoUnab from '../assets/logo-unab.png';
+import nodsDark from '../assets/nods-dark.png';
 
 export default function LoginPage() {
     const [username, setUsername] = useState('Admin'); // Default for convenience
@@ -38,12 +40,12 @@ export default function LoginPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="w-full max-w-md bg-nods-card backdrop-blur-xl border border-nods-border p-8 rounded-3xl"
             >
-                <div className="flex flex-col items-center mb-8">
-                    <div className="w-16 h-16 bg-nods-accent rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(59,130,246,0.3)]">
-                        <span className="text-white font-black text-2xl">U</span>
+                <div className="flex flex-col items-center mb-10">
+                    <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mb-6 shadow-xl border border-nods-border/50">
+                        <img src={logoUnab} alt="UNAB" className="w-16 h-auto" />
                     </div>
-                    <h1 className="text-2xl font-bold tracking-tight text-nods-text-primary">Universidad UNAB</h1>
-                    <p className="text-nods-text-muted text-sm mt-1">Dashboard de Control de Campaña</p>
+                    <h1 className="text-3xl font-bold tracking-tight text-nods-text-primary">Universidad UNAB</h1>
+                    <p className="text-nods-text-muted text-xs font-bold uppercase tracking-widest mt-2 opacity-60">Dashboard de Control de Campaña</p>
                 </div>
 
                 <form onSubmit={handleLogin} className="space-y-6">
@@ -92,7 +94,7 @@ export default function LoginPage() {
                 </form>
 
                 <div className="mt-8 pt-8 border-t border-nods-border/50 flex flex-col items-center">
-                    <span className="text-nods-text-muted text-xs font-bold tracking-widest uppercase">Grupo Nods</span>
+                    <img src={nodsDark} alt="NODS" className="h-4 w-auto opacity-30 grayscale" />
                 </div>
             </motion.div>
         </div>

@@ -30,6 +30,8 @@ async function request(path, options = {}) {
     return res.json();
 }
 
+let dashboardContext = {};
+
 export const api = {
     // Auth
     login: (username, password) =>
@@ -40,12 +42,36 @@ export const api = {
     me: () => request('/api/auth/me'),
 
     // Dashboard
-    kpis: () => request('/api/dashboard/kpis'),
-    funnel: () => request('/api/dashboard/funnel'),
-    admisiones: () => request('/api/dashboard/admisiones'),
-    estados: () => request('/api/dashboard/estados'),
-    noUtil: () => request('/api/dashboard/no-util'),
-    admitidos: () => request('/api/dashboard/admitidos'),
+    kpis: async () => {
+        const res = await request('/api/dashboard/kpis');
+        dashboardContext.kpis = res;
+        return res;
+    },
+    funnel: async () => {
+        const res = await request('/api/dashboard/funnel');
+        dashboardContext.funnel = res;
+        return res;
+    },
+    admisiones: async () => {
+        const res = await request('/api/dashboard/admisiones');
+        dashboardContext.admisiones = res;
+        return res;
+    },
+    estados: async () => {
+        const res = await request('/api/dashboard/estados');
+        dashboardContext.estados = res;
+        return res;
+    },
+    noUtil: async () => {
+        const res = await request('/api/dashboard/no-util');
+        dashboardContext.noUtil = res;
+        return res;
+    },
+    admitidos: async () => {
+        const res = await request('/api/dashboard/admitidos');
+        dashboardContext.admitidos = res;
+        return res;
+    },
     leads: (params = {}) => {
         const q = new URLSearchParams();
         Object.entries(params).forEach(([k, v]) => { if (v) q.set(k, v); });
@@ -58,10 +84,16 @@ export const api = {
     aiChat: (message, history = []) =>
         request('/api/ai/chat', {
             method: 'POST',
-            body: JSON.stringify({ message, history }),
+            body: JSON.stringify({ message, history, context_data: dashboardContext }),
         }),
-    aiInsights: () => request('/api/ai/insights'),
-    aiPredictions: () => request('/api/ai/predictions'),
+    aiInsights: () => request('/api/ai/insights', {
+        method: 'POST',
+        body: JSON.stringify({ context_data: dashboardContext }),
+    }),
+    aiPredictions: () => request('/api/ai/predictions', {
+        method: 'POST',
+        body: JSON.stringify({ context_data: dashboardContext }),
+    }),
 };
 
 export default api;

@@ -66,12 +66,28 @@ async def _get_ai_context() -> str:
 class ChatRequest(BaseModel):
     message: str
     history: Optional[list] = []
+    context_data: Optional[dict] = {}
+
+
+class ContextRequest(BaseModel):
+    context_data: Optional[dict] = {}
 
 
 @router.post("/chat")
 async def ai_chat(body: ChatRequest, _user: str = Depends(require_auth)):
     try:
-        context = await _get_ai_context()
+        data = await cache.get_all()
+        change_summary = cache.get_changes_summary()
+        
+        # Merge local context from frontend with backend change summary
+        local_context = body.context_data or {}
+        context = {
+            **local_context,
+            "resumen_cambios_ultima_hora": change_summary,
+            "fecha_servidor": data.get("fecha_actualizacion"),
+        }
+        
+        context_str = json.dumps(context, default=str, ensure_ascii=False)
 
         messages = [
             {
@@ -98,10 +114,20 @@ async def ai_chat(body: ChatRequest, _user: str = Depends(require_auth)):
         return {"response": f"Error: {str(e)[:200]}"}
 
 
-@router.get("/insights")
-async def ai_insights(_user: str = Depends(require_auth)):
+@router.post("/insights")
+async def ai_insights(body: Optional[ContextRequest] = None, _user: str = Depends(require_auth)):
     try:
-        context = await _get_ai_context()
+        data = await cache.get_all()
+        change_summary = cache.get_changes_summary()
+        
+        local_context = body.context_data if body else {}
+        context = {
+            **local_context,
+            "resumen_cambios_ultima_hora": change_summary,
+            "fecha_servidor": data.get("fecha_actualizacion"),
+        }
+        
+        context_str = json.dumps(context, default=str, ensure_ascii=False)
 
         messages = [
             {
@@ -113,7 +139,7 @@ async def ai_insights(_user: str = Depends(require_auth)):
                     "Responde SOLO el JSON. En español."
                 ),
             },
-            {"role": "user", "content": f"Datos y cambios:\n{context}"},
+            {"role": "user", "content": f"Datos y cambios:\n{context_str}"},
         ]
 
         raw = (await _groq_chat(messages, temperature=0.5)).strip()
@@ -133,10 +159,18 @@ async def ai_insights(_user: str = Depends(require_auth)):
         return {"insights": [{"icon": "alert", "title": "Error", "description": error_msg[:100]}]}
 
 
-@router.get("/predictions")
-async def ai_predictions(_user: str = Depends(require_auth)):
+@router.post("/predictions")
+async def ai_predictions(body: Optional[ContextRequest] = None, _user: str = Depends(require_auth)):
     try:
-        context = await _get_ai_context()
+        data = await cache.get_all()
+        
+        local_context = body.context_data if body else {}
+        context = {
+            **local_context,
+            "fecha_servidor": data.get("fecha_actualizacion"),
+        }
+        
+        context_str = json.dumps(context, default=str, ensure_ascii=False)
 
         messages = [
             {
@@ -147,7 +181,7 @@ async def ai_predictions(_user: str = Depends(require_auth)):
                     "Responde SOLO el JSON."
                 ),
             },
-            {"role": "user", "content": f"Contexto histórico y actual:\n{context}"},
+            {"role": "user", "content": f"Contexto histórico y actual:\n{context_str}"},
         ]
 
         raw = (await _groq_chat(messages)).strip()
