@@ -67,7 +67,7 @@ export default function AIPanel() {
     return (
         <div className="flex flex-col h-full gap-6">
             {/* Insights Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-4">
                 {loadingInsights ? (
                     [1, 2, 3, 4].map(i => (
                         <div key={i} className="h-24 bg-white rounded-2xl animate-pulse border border-nods-border shadow-sm" />

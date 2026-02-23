@@ -68,9 +68,9 @@ export default function OverviewPage() {
                             <div className={`p-3 rounded-2xl ${card.bg}`}>
                                 <card.icon className={`w-6 h-6 ${card.color}`} />
                             </div>
-                            <div className="flex items-center gap-1 text-[10px] font-bold text-nods-text-muted uppercase tracking-widest">
+                            <div className="flex items-center gap-1 text-[11px] font-black text-nods-success uppercase tracking-widest">
                                 <span>+12%</span>
-                                <ArrowUpRight className="w-3 h-3 text-nods-success" />
+                                <ArrowUpRight className="w-3.5 h-3.5" />
                             </div>
                         </div>
 
@@ -105,7 +105,7 @@ export default function OverviewPage() {
                                         dataKey="stage"
                                         axisLine={false}
                                         tickLine={false}
-                                        tick={{ fill: '#64748B', fontSize: 12, fontWeight: 800 }}
+                                        tick={{ fill: '#0f172a', fontSize: 12, fontWeight: 900 }}
                                         width={120}
                                     />
                                     <Bar dataKey="value" radius={[0, 10, 10, 0]} barSize={40} isAnimationActive={false}>
@@ -142,8 +142,8 @@ export default function OverviewPage() {
                                     <span className="absolute text-lg font-black text-nods-text-primary">{Math.round((kpis.matriculados / kpis.total_leads) * 100)}%</span>
                                 </div>
                                 <div>
-                                    <div className="text-sm font-bold text-nods-text-primary">Tasa de Conversión</div>
-                                    <div className="text-xs text-nods-text-muted font-bold">Leads a Matriculados</div>
+                                    <div className="text-sm font-black text-nods-text-primary">Tasa de Conversión</div>
+                                    <div className="text-xs text-nods-text-primary/70 font-bold">Leads a Matriculados</div>
                                 </div>
                             </div>
                         </div>
@@ -159,8 +159,8 @@ export default function OverviewPage() {
                                     <span className="absolute text-lg font-black text-nods-text-primary">{Math.round((kpis.en_gestion / kpis.total_leads) * 100)}%</span>
                                 </div>
                                 <div>
-                                    <div className="text-sm font-bold text-nods-text-primary">Cobertura</div>
-                                    <div className="text-xs text-nods-text-muted font-bold">Leads en gestión</div>
+                                    <div className="text-sm font-black text-nods-text-primary">Cobertura</div>
+                                    <div className="text-xs text-nods-text-primary/70 font-bold">Leads en gestión</div>
                                 </div>
                             </div>
                         </div>
