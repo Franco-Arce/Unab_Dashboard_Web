@@ -63,7 +63,7 @@ class DashboardCache:
                 leads_no_util = _safe_int(r.get("leads_no_util"))
                 op_venta = _safe_int(r.get("leads_op_venta"))
                 proceso_pago = _safe_int(r.get("leads_proc_pago"))
-                en_gestion = 0
+                en_gestion = _safe_int(r.get("leads_en_gestion"))
                 toques_prom = 0.0
                 
                 # Dimension totals
@@ -139,8 +139,13 @@ class DashboardCache:
                 "pagados_25": total_pag_25,
             }
 
-            # ── Subcategorias Mock ──
-            data["no_util"] = []
+            # ── Subcategorias No Util ──
+            try:
+                no_util_rows = await fetch_all("SELECT descripcion_sub, leads_no_utiles as cnt FROM no_utiles ORDER BY cnt DESC")
+                data["no_util"] = [dict(r) for r in no_util_rows]
+            except Exception as e:
+                print(f"[Cache] Error fetching no_utiles: {e}")
+                data["no_util"] = []
             
             # Funnel for the chart
             data["funnel"] = [

@@ -58,8 +58,9 @@ export default function OverviewPage() {
                         key={i}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
+                        whileHover={{ y: -4, transition: { duration: 0.2 } }}
                         transition={{ delay: i * 0.1 }}
-                        className="bg-white border border-nods-border p-6 rounded-3xl hover:border-nods-accent/20 transition-all group relative overflow-hidden shadow-sm"
+                        className="bg-white border border-nods-border p-6 rounded-3xl hover:border-nods-accent/30 hover:shadow-lg transition-all group relative overflow-hidden shadow-sm cursor-pointer"
                     >
                         <div className={`absolute top-0 right-0 w-24 h-24 ${card.bg} blur-3xl rounded-full translate-x-12 -translate-y-12 opacity-0 group-hover:opacity-100 transition-opacity`} />
 
@@ -95,33 +96,31 @@ export default function OverviewPage() {
                             </div>
                         </div>
 
-                        <div className="py-8 w-full flex flex-col items-center justify-center gap-6 relative z-10 min-h-[400px]">
+                        <div className="py-6 w-full flex flex-col items-center justify-center gap-4 relative z-10 min-h-[320px]">
                             {funnel.map((entry, index) => (
                                 <div key={index} className="w-full flex flex-col items-center group relative cursor-pointer">
-                                    <div className="flex justify-between w-full max-w-4xl px-4 text-xs font-bold text-nods-text-muted uppercase tracking-widest mb-2">
+                                    <div className="flex justify-between w-full max-w-3xl px-4 text-[11px] font-bold text-nods-text-muted uppercase tracking-widest mb-1.5">
                                         <span>{entry.stage}</span>
                                         <span className="text-nods-accent">{entry.percent}% de conversión</span>
                                     </div>
                                     <motion.div
-                                        initial={{ opacity: 0, scaleX: 0 }}
-                                        animate={{ opacity: 1, scaleX: 1 }}
+                                        initial={{ opacity: 0, width: 0 }}
+                                        animate={{ opacity: 1, width: `${Math.max(entry.percent, 10)}%` }}
                                         transition={{
-                                            duration: 0.8,
-                                            delay: index * 0.15,
-                                            type: "spring",
-                                            bounce: 0.5
+                                            duration: 1.2,
+                                            delay: index * 0.2,
+                                            ease: "easeOut"
                                         }}
-                                        className="h-16 md:h-20 rounded-2xl flex items-center justify-center relative overflow-hidden shadow-2xl border-2 border-white/20"
+                                        className="h-10 md:h-12 rounded-2xl flex items-center justify-center relative overflow-hidden shadow-lg border border-white/20"
                                         style={{
                                             backgroundColor: entry.color,
-                                            width: `${Math.max(entry.percent, 15)}%`, // Minimum width to show text
                                             maxWidth: '100%'
                                         }}
-                                        whileHover={{ scale: 1.03, filter: "brightness(1.15)" }}
+                                        whileHover={{ scale: 1.02, filter: "brightness(1.1)" }}
                                     >
-                                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 translate-x-[-100%] group-hover:animate-[shimmer_1s_infinite]" />
+                                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 translate-x-[-100%] group-hover:animate-[shimmer_1.5s_infinite]" />
                                         <div className="absolute inset-0 bg-black/10 mix-blend-overlay"></div>
-                                        <span className="font-black text-white text-2xl md:text-3xl z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] tracking-tight">
+                                        <span className="font-extrabold text-white text-lg md:text-xl z-10 drop-shadow-md tracking-tight">
                                             {entry.value.toLocaleString()}
                                         </span>
                                     </motion.div>
