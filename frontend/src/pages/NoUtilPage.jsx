@@ -129,7 +129,5 @@ export default function NoUtilPage() {
             </div>
 
         </div>
-            </div >
-        </div >
     );
 }

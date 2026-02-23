@@ -150,7 +150,5 @@ export default function EstadosPage() {
             </div>
 
         </div>
-            </div >
-        </div >
     );
 }
