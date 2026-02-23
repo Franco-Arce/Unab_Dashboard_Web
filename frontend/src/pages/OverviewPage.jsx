@@ -95,43 +95,48 @@ export default function OverviewPage() {
                             </div>
                         </div>
 
-                        <div className="py-8 w-full flex flex-col items-center justify-center gap-3 relative z-10 min-h-[300px]">
-                            {funnel.map((entry, index) => (
-                                <div key={index} className="w-full flex flex-col items-center group relative cursor-pointer">
-                                    <motion.div
-                                        initial={{ opacity: 0, width: 0, y: -20 }}
-                                        animate={{ opacity: 1, width: `${Math.max(entry.percent, 10)}%`, y: 0 }}
-                                        transition={{ duration: 0.6, delay: index * 0.1, type: "spring", bounce: 0.4 }}
-                                        className="h-12 md:h-14 rounded-full flex items-center justify-center relative overflow-hidden shadow-lg border border-white/10"
-                                        style={{ backgroundColor: entry.color }}
-                                        whileHover={{ scale: 1.02, filter: "brightness(1.1)" }}
-                                    >
-                                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:animate-[shimmer_1.5s_infinite]" />
-                                        <span className="font-extrabold text-white sm:text-lg z-10 drop-shadow-md">
-                                            {entry.value.toLocaleString()}
-                                        </span>
-                                    </motion.div>
-                                    <motion.div
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        transition={{ delay: 0.5 + (index * 0.1) }}
-                                        className="mt-1 text-[10px] md:text-xs font-bold text-nods-text-muted uppercase tracking-widest text-center"
-                                    >
-                                        {entry.stage} <span className="text-nods-accent ml-1">({entry.percent}%)</span>
-                                    </motion.div>
-                                </div>
-                            ))}
-                        </div>
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 py-4 relative z-10 w-full min-h-[300px]">
+                            {/* Left Side: Animated Funnel Bars */}
+                            <div className="lg:col-span-2 flex flex-col justify-between gap-6">
+                                {funnel.map((entry, index) => (
+                                    <div key={`bar-${index}`} className="w-full flex-1 flex flex-col justify-center group relative cursor-pointer min-h-[60px]">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-xs font-bold text-nods-text-muted uppercase tracking-widest">{entry.stage}</span>
+                                            <span className="text-xs font-bold text-nods-text-primary">{entry.percent}%</span>
+                                        </div>
+                                        <motion.div
+                                            initial={{ opacity: 0, width: 0 }}
+                                            animate={{ opacity: 1, width: `${Math.max(entry.percent, 5)}%` }}
+                                            transition={{ duration: 0.6, delay: index * 0.1, type: "spring", bounce: 0.4 }}
+                                            className="h-10 rounded-full relative overflow-hidden shadow-md border border-white/10 flex items-center px-4"
+                                            style={{ backgroundColor: entry.color }}
+                                            whileHover={{ scale: 1.01, filter: "brightness(1.1)" }}
+                                        >
+                                            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:animate-[shimmer_1.5s_infinite]" />
+                                            <span className="font-extrabold text-white text-sm z-10 drop-shadow-md">
+                                                {entry.value.toLocaleString()}
+                                            </span>
+                                        </motion.div>
+                                    </div>
+                                ))}
+                            </div>
 
-                        {/* Funnel Details Table */}
-                        <div className="mt-8 grid grid-cols-5 gap-4">
-                            {funnel.map((f, i) => (
-                                <div key={i} className="bg-slate-50 p-4 rounded-2xl border border-nods-border shadow-sm">
-                                    <div className="text-[10px] font-bold text-nods-text-muted uppercase mb-1 tracking-wider">{f.stage}</div>
-                                    <div className="text-lg font-black text-nods-text-primary">{f.value.toLocaleString()}</div>
-                                    <div className="text-[10px] text-nods-text-muted font-bold">{f.percent}% de leads</div>
-                                </div>
-                            ))}
+                            {/* Right Side: Details Metric Squares */}
+                            <div className="flex flex-col justify-between gap-6">
+                                {funnel.map((f, i) => (
+                                    <motion.div
+                                        key={`card-${i}`}
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: i * 0.1 }}
+                                        className="bg-slate-50 p-4 rounded-2xl border border-nods-border shadow-sm flex flex-col justify-center min-h-[85px] hover:border-nods-accent transition-colors"
+                                    >
+                                        <div className="text-[10px] font-bold text-nods-text-muted uppercase mb-1 tracking-wider">{f.stage}</div>
+                                        <div className="text-xl font-black text-nods-text-primary leading-tight">{f.value.toLocaleString()}</div>
+                                        <div className="text-[10px] text-nods-text-muted font-bold mt-1">Conver: {f.percent}% de leads</div>
+                                    </motion.div>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
