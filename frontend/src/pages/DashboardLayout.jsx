@@ -141,9 +141,6 @@ export default function DashboardLayout() {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-3 mr-4">
-                            <img src={nodsDark} alt="NODS" className="h-4 w-auto opacity-40 grayscale hover:grayscale-0 transition-all cursor-help" title="Powered by NODS" />
-                        </div>
                         <div className="flex flex-col items-end">
                             <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Aliado Educativo</span>
                             <span className="font-bold text-sm text-nods-text-primary">Universidad UNAB</span>
