@@ -85,7 +85,7 @@ export default function LeadsPage() {
                                     <select
                                         value={filters.base}
                                         onChange={(e) => { setFilters({ ...filters, base: e.target.value }); setPage(1); }}
-                                        className="w-full bg-nods-bg border border-nods-border rounded-xl px-4 py-2.5 text-xs outline-none focus:border-nods-accent text-white"
+                                        className="w-full bg-nods-bg border border-nods-border rounded-xl px-4 py-2.5 text-xs outline-none focus:border-nods-accent text-nods-text-primary"
                                     >
                                         <option value="">Todas las bases</option>
                                         <option value="NEW LEADS POSGRADO 2026-01">Posgrado 2026-01</option>
@@ -99,7 +99,7 @@ export default function LeadsPage() {
                                         placeholder="Ej: Derecho..."
                                         value={filters.programa}
                                         onChange={(e) => { setFilters({ ...filters, programa: e.target.value }); setPage(1); }}
-                                        className="w-full bg-nods-bg border border-nods-border rounded-xl px-4 py-2.5 text-xs outline-none focus:border-nods-accent text-white"
+                                        className="w-full bg-nods-bg border border-nods-border rounded-xl px-4 py-2.5 text-xs outline-none focus:border-nods-accent text-nods-text-primary"
                                     />
                                 </div>
                                 <div className="pt-2 flex gap-2">

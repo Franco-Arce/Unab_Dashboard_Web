@@ -8,6 +8,8 @@ export default function AdmisionesPage() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [showFilters, setShowFilters] = useState(false);
+    const [filters, setFilters] = useState({ anio: '2026' });
 
     useEffect(() => {
         api.admisiones().then(setData).catch(console.error).finally(() => setLoading(false));
@@ -15,9 +17,11 @@ export default function AdmisionesPage() {
 
     if (loading) return <div className="h-96 bg-white animate-pulse rounded-3xl border border-nods-border shadow-2xl" />;
 
-    const filtered = data.programas.filter(p =>
-        p.programa.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filtered = data ? data.programas.filter(p => {
+        const matchesSearch = p.programa.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesAnio = filters.anio ? p.anio === filters.anio : true;
+        return matchesSearch && matchesAnio;
+    }) : [];
 
     const handleExport = () => {
         exportToCSV(data.programas, 'admisiones_unab_2026');
@@ -50,10 +54,35 @@ export default function AdmisionesPage() {
                         className="w-full bg-white border border-nods-border rounded-2xl py-2.5 pl-10 pr-4 focus:border-nods-accent outline-none transition-all text-sm text-nods-text-primary shadow-sm"
                     />
                 </div>
-                <div className="flex items-center gap-3">
-                    <button className="flex items-center gap-2 px-4 py-2.5 bg-white border border-nods-border rounded-xl text-xs font-bold text-nods-text-primary hover:bg-slate-50 transition-all shadow-sm">
+                <div className="flex items-center gap-3 relative">
+                    <button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className={`flex items-center gap-2 px-4 py-2.5 border rounded-xl text-xs font-bold transition-all shadow-sm ${showFilters ? 'bg-nods-accent text-white border-nods-accent' : 'bg-white border-nods-border text-nods-text-primary hover:bg-slate-50'}`}
+                    >
                         <Filter className="w-3 h-3" /> Filtros
                     </button>
+
+                    {showFilters && (
+                        <div className="absolute right-0 top-12 w-64 bg-white border border-nods-border rounded-2xl p-4 shadow-xl z-30 space-y-4">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-bold text-nods-text-muted uppercase tracking-widest">Año Lectivo</label>
+                                <select
+                                    value={filters.anio}
+                                    onChange={(e) => setFilters({ ...filters, anio: e.target.value })}
+                                    className="w-full bg-nods-bg border border-nods-border rounded-lg px-3 py-2 text-xs outline-none focus:border-nods-accent text-nods-text-primary"
+                                >
+                                    <option value="2026">2026</option>
+                                    <option value="2025">2025</option>
+                                </select>
+                            </div>
+                            <button
+                                onClick={() => setShowFilters(false)}
+                                className="w-full bg-slate-100 py-2 rounded-lg text-xs font-bold text-nods-text-primary hover:bg-slate-200"
+                            >
+                                Cerrar
+                            </button>
+                        </div>
+                    )}
                     <button
                         onClick={handleExport}
                         className="flex items-center gap-2 px-4 py-2.5 bg-nods-accent text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-all shadow-lg shadow-nods-accent/20"
