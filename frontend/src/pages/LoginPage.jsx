@@ -32,44 +32,44 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-black flex items-center justify-center p-4">
+        <div className="min-h-screen bg-nods-bg flex items-center justify-center p-4">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-md bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 p-8 rounded-3xl"
+                className="w-full max-w-md bg-nods-card backdrop-blur-xl border border-nods-border p-8 rounded-3xl"
             >
                 <div className="flex flex-col items-center mb-8">
-                    <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(245,188,2,0.3)]">
-                        <span className="text-black font-black text-2xl">U</span>
+                    <div className="w-16 h-16 bg-nods-accent rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(59,130,246,0.3)]">
+                        <span className="text-white font-black text-2xl">U</span>
                     </div>
-                    <h1 className="text-2xl font-bold tracking-tight">Universidad UNAB</h1>
-                    <p className="text-zinc-500 text-sm mt-1">Dashboard de Control de Campaña</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-nods-text-primary">Universidad UNAB</h1>
+                    <p className="text-nods-text-muted text-sm mt-1">Dashboard de Control de Campaña</p>
                 </div>
 
                 <form onSubmit={handleLogin} className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-zinc-400 mb-2">Usuario</label>
+                        <label className="block text-sm font-medium text-nods-text-muted mb-2">Usuario</label>
                         <div className="relative">
-                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
+                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-nods-text-muted" />
                             <input
                                 type="text"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                className="w-full bg-zinc-800/50 border border-zinc-700 rounded-xl py-3 pl-10 pr-4 focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
+                                className="w-full bg-nods-bg border border-nods-border rounded-xl py-3 pl-10 pr-4 focus:border-nods-accent focus:ring-1 focus:ring-nods-accent transition-all outline-none text-nods-text-primary font-medium"
                                 required
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-zinc-400 mb-2">Contraseña</label>
+                        <label className="block text-sm font-medium text-nods-text-muted mb-2">Contraseña</label>
                         <div className="relative">
-                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-nods-text-muted" />
                             <input
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full bg-zinc-800/50 border border-zinc-700 rounded-xl py-3 pl-10 pr-4 focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
+                                className="w-full bg-nods-bg border border-nods-border rounded-xl py-3 pl-10 pr-4 focus:border-nods-accent focus:ring-1 focus:ring-nods-accent transition-all outline-none text-nods-text-primary font-medium"
                                 required
                             />
                         </div>
@@ -85,14 +85,14 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-primary hover:bg-amber-400 text-black font-bold py-3 rounded-xl transition-all shadow-[0_4px_14px_0_rgba(245,188,2,0.2)] active:scale-[0.98] disabled:opacity-50"
+                        className="w-full bg-nods-accent hover:bg-blue-400 text-white font-bold py-3 rounded-xl transition-all shadow-[0_4px_14px_0_rgba(59,130,246,0.2)] active:scale-[0.98] disabled:opacity-50"
                     >
                         {loading ? 'Iniciando...' : 'Entrar'}
                     </button>
                 </form>
 
-                <div className="mt-8 pt-8 border-t border-zinc-800/50 flex flex-col items-center">
-                    <span className="text-zinc-600 text-xs font-bold tracking-widest uppercase">Grupo Nods</span>
+                <div className="mt-8 pt-8 border-t border-nods-border/50 flex flex-col items-center">
+                    <span className="text-nods-text-muted text-xs font-bold tracking-widest uppercase">Grupo Nods</span>
                 </div>
             </motion.div>
         </div>

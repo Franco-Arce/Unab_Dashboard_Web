@@ -15,12 +15,12 @@ export default function NoUtilPage() {
         api.noUtil().then(setData).catch(console.error).finally(() => setLoading(false));
     }, []);
 
-    if (loading) return <div className="h-96 bg-zinc-900 animate-pulse rounded-3xl" />;
+    if (loading) return <div className="h-96 bg-white animate-pulse rounded-3xl border border-nods-border shadow-2xl" />;
 
     if (!data || !data.no_util || !Array.isArray(data.no_util)) {
         return (
-            <div className="h-96 bg-zinc-900/50 rounded-3xl flex items-center justify-center border border-zinc-800">
-                <span className="text-zinc-500 font-bold uppercase tracking-widest">No hay datos de leads no útiles disponibles</span>
+            <div className="h-96 bg-white rounded-3xl flex items-center justify-center border border-nods-border shadow-2xl">
+                <span className="text-nods-text-muted font-bold uppercase tracking-widest">No hay datos de leads no útiles disponibles</span>
             </div>
         );
     }
@@ -39,19 +39,19 @@ export default function NoUtilPage() {
         <div className="space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-nods-text-muted" />
                     <input
                         type="text"
                         placeholder="Buscar subcategoría..."
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
-                        className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-2.5 pl-10 pr-4 focus:border-primary outline-none transition-all text-sm"
+                        className="w-full bg-white border border-nods-border rounded-2xl py-2.5 pl-10 pr-4 focus:border-nods-accent outline-none transition-all text-sm text-nods-text-primary shadow-sm"
                     />
                 </div>
                 <div className="flex items-center gap-3">
                     <button
                         onClick={handleExport}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-primary text-black rounded-xl text-xs font-bold hover:bg-amber-400 transition-all shadow-lg shadow-primary/10"
+                        className="flex items-center gap-2 px-4 py-2.5 bg-nods-accent text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-all shadow-lg shadow-nods-accent/20"
                     >
                         <Download className="w-3 h-3" /> Exportar
                     </button>
@@ -60,10 +60,10 @@ export default function NoUtilPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Distribution Chart */}
-                <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 flex flex-col items-center">
-                    <h3 className="text-xl font-bold mb-8 flex items-center justify-between w-full">
+                <div className="bg-white border border-nods-border rounded-3xl p-8 flex flex-col items-center shadow-xl">
+                    <h3 className="text-xl font-bold mb-8 flex items-center justify-between w-full text-nods-text-primary">
                         Distribución No Útil
-                        <XCircle className="w-5 h-5 text-red-400" />
+                        <XCircle className="w-5 h-5 text-red-500" />
                     </h3>
 
                     <div className="h-[350px] w-full">
@@ -81,45 +81,45 @@ export default function NoUtilPage() {
                                     isAnimationActive={false}
                                 >
                                     {data.no_util.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="rgba(0,0,0,0.5)" strokeWidth={2} />
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="#fff" strokeWidth={2} />
                                     ))}
                                 </Pie>
-                                <Legend verticalAlign="bottom" height={36} wrapperStyle={{ color: '#71717a', fontSize: '10px', textTransform: 'uppercase', fontWeight: 700 }} />
+                                <Legend verticalAlign="bottom" height={36} wrapperStyle={{ color: '#64748B', fontSize: '10px', textTransform: 'uppercase', fontWeight: 800 }} />
                             </PieChart>
                         </ResponsiveContainer>
                     </div>
 
-                    <div className="mt-8 text-center bg-red-400/5 p-6 rounded-3xl border border-red-400/10 w-full">
-                        <div className="text-4xl font-black text-red-400">{data.no_util_total.toLocaleString()}</div>
-                        <div className="text-xs font-bold text-zinc-500 uppercase tracking-widest mt-1">Leads No Útiles Totales</div>
+                    <div className="mt-8 text-center bg-red-50 p-6 rounded-3xl border border-red-100 w-full">
+                        <div className="text-4xl font-black text-red-600">{data.no_util_total.toLocaleString()}</div>
+                        <div className="text-xs font-bold text-nods-text-muted uppercase tracking-widest mt-1">Leads No Útiles Totales</div>
                     </div>
                 </div>
 
                 {/* Subcategories List */}
-                <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8">
-                    <h3 className="text-xl font-bold mb-8 flex items-center justify-between">
+                <div className="bg-white border border-nods-border rounded-3xl p-8 shadow-xl">
+                    <h3 className="text-xl font-bold mb-8 flex items-center justify-between text-nods-text-primary">
                         Detalle de Subcategorías
-                        <Info className="w-5 h-5 text-zinc-500" />
+                        <Info className="w-5 h-5 text-nods-text-muted" />
                     </h3>
 
                     <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                         {filtered.map((item, idx) => {
                             const porcentaje = Math.round((item.cnt / data.no_util_total) * 100) || 0;
                             return (
-                                <div key={idx} className="bg-black/30 p-4 rounded-2xl border border-zinc-800/50 hover:border-primary/20 transition-all group">
+                                <div key={idx} className="bg-slate-50 p-4 rounded-2xl border border-nods-border hover:border-nods-accent/20 transition-all group shadow-sm">
                                     <div className="flex justify-between items-center mb-2">
-                                        <span className="font-bold text-zinc-200 group-hover:text-primary transition-colors">{item.descripcion_sub}</span>
-                                        <span className="text-xs font-black text-red-400 bg-red-400/10 px-2 py-0.5 rounded-lg">{porcentaje}%</span>
+                                        <span className="font-bold text-nods-text-primary group-hover:text-nods-accent transition-colors">{item.descripcion_sub}</span>
+                                        <span className="text-xs font-black text-red-600 bg-red-50 px-2 py-0.5 rounded-lg border border-red-100">{porcentaje}%</span>
                                     </div>
-                                    <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
+                                    <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden shadow-inner">
                                         <motion.div
                                             initial={{ width: 0 }}
                                             animate={{ width: `${porcentaje}%` }}
                                             transition={{ duration: 1, delay: idx * 0.05 }}
-                                            className="h-full bg-zinc-400 group-hover:bg-primary transition-all"
+                                            className="h-full bg-slate-400 group-hover:bg-nods-accent transition-all"
                                         />
                                     </div>
-                                    <div className="mt-2 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                                    <div className="mt-2 text-[10px] font-bold text-nods-text-muted uppercase tracking-widest">
                                         {item.cnt} Leads
                                     </div>
                                 </div>
