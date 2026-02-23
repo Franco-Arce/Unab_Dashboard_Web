@@ -69,7 +69,7 @@ export default function DashboardLayout() {
     return (
         <div className="flex min-h-screen bg-nods-bg text-nods-text-primary font-sans">
             {/* Sidebar ... (no changes needed) */}
-            <aside className="w-64 border-r border-nods-border bg-nods-sidebar flex flex-col sticky top-0 h-screen transition-all duration-300">
+            <aside className="w-64 flex-shrink-0 border-r border-nods-border bg-nods-sidebar flex flex-col sticky top-0 h-screen transition-all duration-300">
                 <div className="p-6">
                     <div className="flex items-center gap-4 mb-10 px-2">
                         <img src={nodsWhite} alt="NODS" className="h-6 w-auto opacity-90" />
@@ -118,7 +118,7 @@ export default function DashboardLayout() {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 min-h-screen">
+            <main className="flex-1 min-w-0 min-h-screen">
                 {/* Header */}
                 <header className="h-20 border-b border-nods-border/50 bg-nods-card/80 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-20">
                     <div>

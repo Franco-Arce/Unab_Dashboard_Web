@@ -43,7 +43,7 @@ export default function EstadosPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Gauge / Cumplimiento Section */}
-                <div className="bg-white border border-nods-border rounded-3xl p-8 flex flex-col items-center shadow-xl">
+                <div className="bg-white border border-nods-border rounded-3xl p-8 flex flex-col items-center shadow-xl min-w-0">
                     <h3 className="text-xl font-bold mb-8 text-center w-full flex items-center justify-between text-nods-text-primary">
                         Cumplimiento Objetivo Matrículas
                         <Target className="w-5 h-5 text-nods-accent" />
@@ -76,7 +76,7 @@ export default function EstadosPage() {
                 </div>
 
                 {/* Gestion Distribution */}
-                <div className="bg-white border border-nods-border rounded-3xl p-8 shadow-xl">
+                <div className="bg-white border border-nods-border rounded-3xl p-8 shadow-xl min-w-0">
                     <h3 className="text-xl font-bold mb-8 flex items-center justify-between text-nods-text-primary">
                         Estados de Gestión
                         <CheckCircle2 className="w-5 h-5 text-nods-success" />
