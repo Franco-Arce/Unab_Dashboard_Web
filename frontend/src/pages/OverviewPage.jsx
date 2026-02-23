@@ -117,7 +117,7 @@ export default function OverviewPage() {
                         </div>
 
                         {/* Funnel Details Table */}
-                        <div className="mt-8 grid grid-cols-4 gap-4">
+                        <div className="mt-8 grid grid-cols-5 gap-4">
                             {funnel.map((f, i) => (
                                 <div key={i} className="bg-slate-50 p-4 rounded-2xl border border-nods-border shadow-sm">
                                     <div className="text-[10px] font-bold text-nods-text-muted uppercase mb-1 tracking-wider">{f.stage}</div>
