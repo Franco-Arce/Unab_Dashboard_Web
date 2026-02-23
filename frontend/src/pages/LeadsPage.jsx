@@ -167,7 +167,7 @@ export default function LeadsPage() {
                                                     {lead.txtnombreapellido?.[0] || 'U'}
                                                 </div>
                                                 <div>
-                                                    <div className="font-bold text-nods-text-primary">{lead.txtnombreapellido}</div>
+                                                    <div className="font-bold text-slate-200">{lead.txtnombreapellido}</div>
                                                     <div className="text-xs text-nods-text-muted flex items-center gap-1">
                                                         <Mail className="w-3 h-3" /> {lead.emlmail}
                                                     </div>
@@ -175,7 +175,7 @@ export default function LeadsPage() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="text-xs font-medium text-nods-text-primary max-w-[200px] truncate">{lead.txtprogramainteres}</div>
+                                            <div className="text-xs font-medium text-slate-200 max-w-[200px] truncate">{lead.txtprogramainteres}</div>
                                             <div className="text-[10px] text-nods-text-muted uppercase tracking-widest font-bold">{lead.base}</div>
                                         </td>
                                         <td className="px-6 py-4">
@@ -191,7 +191,7 @@ export default function LeadsPage() {
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-1.5">
                                                 <div className="h-2 w-2 rounded-full bg-nods-accent shadow-[0_0_8px_rgba(37,99,235,0.4)]" />
-                                                <span className="font-bold text-nods-text-primary">{lead.cant_toques_call_crm || 0}</span>
+                                                <span className="font-bold text-slate-200">{lead.cant_toques_call_crm || 0}</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
@@ -221,9 +221,9 @@ export default function LeadsPage() {
                         <button
                             onClick={() => setPage(p => Math.max(1, p - 1))}
                             disabled={page === 1}
-                            className="p-2 border border-nods-border bg-white rounded-xl disabled:opacity-30 disabled:grayscale hover:bg-slate-50 transition-all font-bold shadow-sm"
+                            className="p-2 border border-zinc-700 bg-zinc-900 rounded-xl disabled:opacity-30 disabled:grayscale hover:bg-zinc-800 transition-all font-bold shadow-sm"
                         >
-                            <ChevronLeft className="w-4 h-4 text-nods-text-primary" />
+                            <ChevronLeft className="w-4 h-4 text-slate-200" />
                         </button>
                         <div className="flex items-center gap-1 px-2">
                             {[...Array(Math.min(5, totalPages))].map((_, i) => {
@@ -232,7 +232,7 @@ export default function LeadsPage() {
                                     <button
                                         key={i}
                                         onClick={() => setPage(pNum)}
-                                        className={`w-8 h-8 rounded-lg text-xs font-black transition-all ${page === pNum ? 'bg-nods-accent text-white shadow-md shadow-nods-accent/20' : 'text-nods-text-muted hover:text-nods-accent hover:bg-slate-100'}`}
+                                        className={`w-8 h-8 rounded-lg text-xs font-black transition-all ${page === pNum ? 'bg-nods-accent text-white shadow-md shadow-nods-accent/20' : 'text-nods-text-muted hover:text-white hover:bg-zinc-800'}`}
                                     >
                                         {pNum}
                                     </button>
@@ -242,9 +242,9 @@ export default function LeadsPage() {
                         <button
                             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                             disabled={page === totalPages}
-                            className="p-2 border border-nods-border bg-white rounded-xl disabled:opacity-30 disabled:grayscale hover:bg-slate-50 transition-all font-bold shadow-sm"
+                            className="p-2 border border-zinc-700 bg-zinc-900 rounded-xl disabled:opacity-30 disabled:grayscale hover:bg-zinc-800 transition-all font-bold shadow-sm"
                         >
-                            <ChevronRight className="w-4 h-4 text-nods-text-primary" />
+                            <ChevronRight className="w-4 h-4 text-slate-200" />
                         </button>
                     </div>
                 </div>
