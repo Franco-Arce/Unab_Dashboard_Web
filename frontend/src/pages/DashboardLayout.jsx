@@ -117,7 +117,7 @@ export default function DashboardLayout() {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 ml-64 min-h-screen">
+            <main className="flex-1 min-h-screen">
                 {/* Header */}
                 <header className="h-20 border-b border-nods-border/50 bg-nods-card/80 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-20">
                     <div>
