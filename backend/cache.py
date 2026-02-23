@@ -33,164 +33,135 @@ class DashboardCache:
 
             data = {}
 
-            # ── KPIs from dim_contactos ──
-            kpi_row = await fetch_one("""
-                SELECT
-                    COUNT(*) AS total_leads,
-                    COUNT(*) FILTER (WHERE ultima_mejor_subcat_string IS NOT NULL
-                                     AND ultima_mejor_subcat_string != '') AS en_gestion
-                FROM dim_contactos
-            """)
-            data["total_leads"] = kpi_row["total_leads"]
-            data["en_gestion"] = kpi_row["en_gestion"]
+            # ── Get All Data From Single Table ──
+            agg_rows = await fetch_all("SELECT * FROM agg_dim_contactos_leads")
+            
+            merged_programs = []
+            
+            total_leads = 0
+            total_en_gestion = 0
+            total_op_venta = 0
+            total_proceso_pago = 0
+            total_no_util = 0
 
-            # ── Admisiones from fact_unab_sheet2 (consolidated view) ──
-            admisiones = await fetch_all("""
-                SELECT programa, metas, solicitados, admitidos, pagados,
-                       solicitados_aa, admitidos_aa, pagados_aa,
-                       solicitados_var, admitidos_var, pagados_var,
-                       fecha, fecha_pos, anio
-                FROM fact_unab_sheet2
-                WHERE anio = '2026'
-                ORDER BY programa
-            """)
-            data["admisiones"] = [_serialize_row(r) for r in admisiones]
+            total_sol = 0
+            total_adm = 0
+            total_pag = 0
+            total_meta = 0
+            total_sol_25 = 0
+            total_adm_25 = 0
+            total_pag_25 = 0
+            
+            latest_fecha = None
+            latest_fecha_pos = None
 
-            # ── Totals from admisiones ──
-            total_sol = sum(_safe_int(r.get("solicitados")) for r in admisiones)
-            total_adm = sum(_safe_int(r.get("admitidos")) for r in admisiones)
-            total_pag = sum(_safe_int(r.get("pagados")) for r in admisiones)
-            total_meta = sum(_safe_int(r.get("metas")) for r in admisiones)
+            for r in agg_rows:
+                prog = str(r.get("programa", "")).strip().upper()
+                
+                # Metric fields
+                leads = _safe_int(r.get("leads"))
+                leads_no_util = _safe_int(r.get("leads_no_util"))
+                op_venta = _safe_int(r.get("leads_op_venta"))
+                proceso_pago = _safe_int(r.get("leads_proc_pago"))
+                en_gestion = 0
+                toques_prom = 0.0
+                
+                # Dimension totals
+                total_leads += leads
+                total_en_gestion += en_gestion
+                total_op_venta += op_venta
+                total_proceso_pago += proceso_pago
+                total_no_util += leads_no_util
+
+                # Admission fields
+                sol = _safe_int(r.get("solicitados"))
+                adm_val = _safe_int(r.get("admitidos"))
+                pag = _safe_int(r.get("pagados"))
+                meta = _safe_int(r.get("metas"))
+                
+                sol_25 = _safe_int(r.get("solicitados_aa"))
+                adm_25 = _safe_int(r.get("admitidos_aa"))
+                pag_25 = _safe_int(r.get("pagados_aa"))
+
+                total_sol += sol
+                total_adm += adm_val
+                total_pag += pag
+                total_meta += meta
+                
+                total_sol_25 += sol_25
+                total_adm_25 += adm_25
+                total_pag_25 += pag_25
+                
+                # Fetch dates to find latest
+                if r.get("fecha"):
+                    if latest_fecha is None or r.get("fecha") > latest_fecha:
+                        latest_fecha = r.get("fecha")
+                if r.get("fecha_pos"):
+                    if latest_fecha_pos is None or r.get("fecha_pos") > latest_fecha_pos:
+                        latest_fecha_pos = r.get("fecha_pos")
+                
+                merged_programs.append({
+                    "programa": prog,
+                    "leads": leads,
+                    "en_gestion": en_gestion,
+                    "no_util": leads_no_util,
+                    "op_venta": op_venta,
+                    "proceso_pago": proceso_pago,
+                    "toques_prom": toques_prom,
+                    "solicitados": sol,
+                    "admitidos": adm_val,
+                    "pagados": pag,
+                    "meta": meta,
+                    "solicitados_25": sol_25,
+                    "admitidos_25": adm_25,
+                    "pagados_25": pag_25,
+                    "solicitados_var": _safe_int(r.get("solicitados_var")),
+                    "admitidos_var": _safe_int(r.get("admitidos_var")),
+                    "pagados_var": _safe_int(r.get("pagados_var"))
+                })
+                
+            data["merged_programs"] = merged_programs
+            
+            # KPI Totals
+            data["total_leads"] = total_leads
+            data["en_gestion"] = total_en_gestion
+            data["op_venta"] = total_op_venta
+            data["proceso_pago"] = total_proceso_pago
+            data["no_util_total"] = total_no_util
+
             data["totals"] = {
                 "solicitados": total_sol,
                 "admitidos": total_adm,
                 "pagados": total_pag,
                 "metas": total_meta,
+                "solicitados_25": total_sol_25,
+                "admitidos_25": total_adm_25,
+                "pagados_25": total_pag_25,
             }
 
-            # ── Admitidos status from fact_unab_sheet_admitidos ──
-            admitidos_status = await fetch_one("""
-                SELECT
-                    COUNT(*) AS total,
-                    SUM(CASE WHEN matricula = '1' THEN 1 ELSE 0 END) AS matriculados,
-                    SUM(CASE WHEN proceso_de_pago = '1' THEN 1 ELSE 0 END) AS proceso_pago,
-                    SUM(CASE WHEN pendiente_firmas = '1' THEN 1 ELSE 0 END) AS pendiente_firmas,
-                    SUM(CASE WHEN declinado = '1' THEN 1 ELSE 0 END) AS declinados,
-                    SUM(CASE WHEN no_contesta = '1' THEN 1 ELSE 0 END) AS no_contesta
-                FROM fact_unab_sheet_admitidos
-            """)
-            data["admitidos_status"] = _serialize_row(admitidos_status)
+            # ── Subcategorias Mock ──
+            data["no_util"] = []
+            
+            # Funnel for the chart
+            data["funnel"] = [
+                {"stage": "Total Leads", "value": data["total_leads"], "color": "#f59e0b"},
+                {"stage": "En Gestión", "value": data["en_gestion"], "color": "#d97706"},
+                {"stage": "Oportunidad de Venta", "value": data["op_venta"], "color": "#ea580c"},
+                {"stage": "Proceso Pago", "value": data["proceso_pago"], "color": "#dc2626"},
+                {"stage": "Matriculados", "value": total_pag, "color": "#16a34a"}, 
+            ]
 
-            # ── Admitidos by programa ──
-            admitidos_by_prog = await fetch_all("""
-                SELECT programa,
-                    COUNT(*) AS total,
-                    SUM(CASE WHEN matricula = '1' THEN 1 ELSE 0 END) AS matriculados,
-                    SUM(CASE WHEN proceso_de_pago = '1' THEN 1 ELSE 0 END) AS proceso_pago,
-                    SUM(CASE WHEN declinado = '1' THEN 1 ELSE 0 END) AS declinados,
-                    SUM(CASE WHEN no_contesta = '1' THEN 1 ELSE 0 END) AS no_contesta
-                FROM fact_unab_sheet_admitidos
-                GROUP BY programa
-                ORDER BY total DESC
-            """)
-            data["admitidos_by_programa"] = [_serialize_row(r) for r in admitidos_by_prog]
-
-            # ── Admitidos motivo (no útil reasons) ──
-            admitidos_motivo = await fetch_all("""
-                SELECT motivo, COUNT(*) AS cnt
-                FROM fact_unab_sheet_admitidos
-                WHERE motivo IS NOT NULL AND motivo != ''
-                      AND motivo NOT LIKE '%%REF%%'
-                GROUP BY motivo
-                ORDER BY cnt DESC
-            """)
-            data["admitidos_motivo"] = [_serialize_row(r) for r in admitidos_motivo]
-
-            # ── Estados de gestión from dim_subcategorias + fact_contactos_subcategorias ──
-            estados_gestion = await fetch_all("""
-                SELECT
-                    ds.gestion,
-                    ds.proceso,
-                    COUNT(*) AS total
-                FROM fact_contactos_subcategorias fcs
-                JOIN dim_subcategorias ds ON fcs.subcategoria::int = ds.subcategoria
-                WHERE ds.gestion IS NOT NULL
-                GROUP BY ds.gestion, ds.proceso
-                ORDER BY total DESC
-            """)
-            data["estados_gestion"] = [_serialize_row(r) for r in estados_gestion]
-
-            # ── No útil subcategories ──
-            no_util = await fetch_all("""
-                SELECT
-                    ds.descripcion_sub,
-                    COUNT(*) AS cnt
-                FROM fact_contactos_subcategorias fcs
-                JOIN dim_subcategorias ds ON fcs.subcategoria::int = ds.subcategoria
-                WHERE ds.estado ILIKE '%%no útil%%'
-                GROUP BY ds.descripcion_sub
-                ORDER BY cnt DESC
-            """)
-            data["no_util"] = [_serialize_row(r) for r in no_util]
-
-            # ── Total no util count ──
-            no_util_total = await fetch_one("""
-                SELECT COUNT(*) AS total
-                FROM fact_contactos_subcategorias fcs
-                JOIN dim_subcategorias ds ON fcs.subcategoria::int = ds.subcategoria
-                WHERE ds.estado ILIKE '%%no útil%%'
-            """)
-            data["no_util_total"] = no_util_total["total"] if no_util_total else 0
-
-            # ── Funnel: Leads → En Gestión → Op. Venta → Proceso Pago ──
-            funnel_data = await fetch_all("""
-                SELECT
-                    ds.proceso,
-                    COUNT(DISTINCT fcs.idinterno) AS total
-                FROM fact_contactos_subcategorias fcs
-                JOIN dim_subcategorias ds ON fcs.subcategoria::int = ds.subcategoria
-                WHERE ds.proceso IS NOT NULL
-                GROUP BY ds.proceso, ds.proceso_number
-                ORDER BY ds.proceso_number
-            """)
-            data["funnel"] = [_serialize_row(r) for r in funnel_data]
-
-            # ── Estados breakdown by programa (for Estados page) ──
-            estados_by_programa = await fetch_all("""
-                SELECT
-                    fcs.txtprogramainteres AS programa,
-                    COUNT(*) AS leads,
-                    COUNT(*) FILTER (WHERE ds.gestion IS NOT NULL) AS en_gestion,
-                    COUNT(*) FILTER (WHERE ds.estado ILIKE '%%no útil%%') AS no_util,
-                    COUNT(*) FILTER (WHERE ds.proceso = 'Oportunidad de Venta') AS op_venta,
-                    COUNT(*) FILTER (WHERE ds.proceso = 'Proceso Pago') AS proceso_pago
-                FROM fact_contactos_subcategorias fcs
-                JOIN dim_subcategorias ds ON fcs.subcategoria::int = ds.subcategoria
-                WHERE fcs.txtprogramainteres IS NOT NULL AND fcs.txtprogramainteres != ''
-                GROUP BY fcs.txtprogramainteres
-                ORDER BY leads DESC
-            """)
-            data["estados_by_programa"] = [_serialize_row(r) for r in estados_by_programa]
-
-            # ── Leads count for pagination info ──
-            leads_count = await fetch_one("SELECT COUNT(*) AS total FROM dim_contactos")
-            data["leads_total"] = leads_count["total"] if leads_count else 0
-
-            # ── Last update date from fact_unab_sheet2 ──
-            fecha_row = await fetch_one("""
-                SELECT MAX(fecha_pos) AS fecha_pos, MAX(fecha) AS fecha
-                FROM fact_unab_sheet2
-            """)
-            if fecha_row and fecha_row.get("fecha_pos"):
-                data["fecha_actualizacion"] = fecha_row["fecha_pos"].strftime("%d/%m/%Y %H:%M")
-            elif "fecha" in fecha_row:
-                data["fecha_actualizacion"] = fecha_row["fecha"].strftime("%d/%m/%Y %H:%M")
+            # ── Last update date ──
+            if latest_fecha_pos:
+                data["fecha_actualizacion"] = latest_fecha_pos.strftime("%d/%m/%Y %H:%M")
+            elif latest_fecha:
+                data["fecha_actualizacion"] = latest_fecha.strftime("%d/%m/%Y %H:%M")
             else:
                 data["fecha_actualizacion"] = datetime.now().strftime("%d/%m/%Y %H:%M")
 
             self.data = data
             self.last_refresh = datetime.now(timezone.utc)
-            print(f"[Cache] Refreshed at {self.last_refresh.isoformat()} — {data['total_leads']} leads loaded")
+            print(f"[Cache] Refreshed at {self.last_refresh.isoformat()} — {data.get('total_leads', 0)} leads loaded")
 
     async def get(self, key: str, default=None):
         if self.is_stale:
@@ -229,13 +200,6 @@ class DashboardCache:
         if diff_leads != 0:
             changes.append(f"- Total de leads: {prev_leads} → {curr_leads} ({'+' if diff_leads > 0 else ''}{diff_leads})")
 
-        # Compare matriculados
-        prev_mat = prev.get("admitidos_status", {}).get("matriculados", 0)
-        curr_mat = curr.get("admitidos_status", {}).get("matriculados", 0)
-        diff_mat = _safe_int(curr_mat) - _safe_int(prev_mat)
-        if diff_mat != 0:
-            changes.append(f"- Matriculados: {prev_mat} → {curr_mat} ({'+' if diff_mat > 0 else ''}{diff_mat})")
-
         if not changes:
             return "Sin cambios significativos desde la última actualización."
 
@@ -251,16 +215,14 @@ def _safe_int(val) -> int:
     except (ValueError, TypeError):
         return 0
 
-
-def _serialize_row(row: dict) -> dict:
-    """Convert a row dict so all values are JSON-serializable."""
-    result = {}
-    for k, v in row.items():
-        if isinstance(v, datetime):
-            result[k] = v.isoformat()
-        else:
-            result[k] = v
-    return result
+def _safe_float(val) -> float:
+    """Safely convert a value to float, returning 0.0 for None/empty/non-numeric."""
+    if val is None or val == "" or val == "None":
+        return 0.0
+    try:
+        return float(val)
+    except (ValueError, TypeError):
+        return 0.0
 
 
 # Global singleton

@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
-import { XCircle, Info, Filter, Download, Search } from 'lucide-react';
+import { Download, Search } from 'lucide-react';
 import api from '../api';
 import { exportToCSV } from '../utils/export';
 
@@ -16,26 +14,39 @@ export default function NoUtilPage() {
 
     if (loading) return <div className="h-96 bg-white animate-pulse rounded-3xl border border-nods-border shadow-2xl" />;
 
-    if (!data || !data.no_util || !Array.isArray(data.no_util)) {
+    if (!data || !data.no_util) {
         return (
-            <div className="h-96 bg-white rounded-3xl flex items-center justify-center border border-nods-border shadow-2xl">
-                <span className="text-nods-text-muted font-bold uppercase tracking-widest">No hay datos de leads no útiles disponibles</span>
+            <div className="h-96 bg-zinc-950 rounded-3xl flex items-center justify-center border border-zinc-800 shadow-2xl">
+                <span className="text-zinc-500 font-bold uppercase tracking-widest">No hay datos de leads no útiles disponibles</span>
             </div>
         );
     }
 
     const filtered = data.no_util.filter(item =>
-        (item.descripcion_sub || '').toLowerCase().includes(searchTerm.toLowerCase())
+        (item.subcategoria || item.descripcion_sub || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const handleExport = () => {
         exportToCSV(data.no_util, 'leads_no_util_unab_2026');
     };
 
-    const COLORS = ['#f5bc02', '#3b82f6', '#10b981', '#f43f5e', '#ec4899', '#a855f7', '#fb923c', '#94a3b8'];
+    let tLeads = 0;
+    let tLeads7 = 0;
+    let tLeads14 = 0;
+
+    filtered.forEach(p => {
+        tLeads += p.leads || 0;
+        tLeads7 += p.leads_7d || 0;
+        tLeads14 += p.leads_14d || 0;
+    });
+
+    const formatPercent = (val, total) => {
+        if (!total || total === 0) return '0.00%';
+        return `${((val / total) * 100).toFixed(2)}%`;
+    };
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6 max-w-5xl mx-auto">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="relative flex-1 max-w-md">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-nods-text-muted" />
@@ -47,7 +58,7 @@ export default function NoUtilPage() {
                         className="w-full bg-white border border-nods-border rounded-2xl py-2.5 pl-10 pr-4 focus:border-nods-accent outline-none transition-all text-sm text-nods-text-primary shadow-sm"
                     />
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 relative">
                     <button
                         onClick={handleExport}
                         className="flex items-center gap-2 px-4 py-2.5 bg-nods-accent text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-all shadow-lg shadow-nods-accent/20"
@@ -57,77 +68,55 @@ export default function NoUtilPage() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Distribution Chart */}
-                <div className="bg-white border border-nods-border rounded-3xl p-8 flex flex-col items-center shadow-xl">
-                    <h3 className="text-xl font-bold mb-8 flex items-center justify-between w-full text-nods-text-primary">
-                        Distribución No Útil
-                        <XCircle className="w-5 h-5 text-red-500" />
-                    </h3>
-
-                    <div className="h-[350px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={data.no_util.slice(0, 10)}
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={80}
-                                    outerRadius={120}
-                                    paddingAngle={5}
-                                    dataKey="cnt"
-                                    nameKey="descripcion_sub"
-                                    isAnimationActive={false}
-                                >
-                                    {data.no_util.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="#fff" strokeWidth={2} />
-                                    ))}
-                                </Pie>
-                                <Legend verticalAlign="bottom" height={36} wrapperStyle={{ color: '#64748B', fontSize: '10px', textTransform: 'uppercase', fontWeight: 800 }} />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-
-                    <div className="mt-8 text-center bg-red-50 p-6 rounded-3xl border border-red-100 w-full">
-                        <div className="text-4xl font-black text-red-600">{data.no_util_total.toLocaleString()}</div>
-                        <div className="text-xs font-bold text-nods-text-muted uppercase tracking-widest mt-1">Leads No Útiles Totales</div>
-                    </div>
-                </div>
-
-                {/* Subcategories List */}
-                <div className="bg-white border border-nods-border rounded-3xl p-8 shadow-xl">
-                    <h3 className="text-xl font-bold mb-8 flex items-center justify-between text-nods-text-primary">
-                        Detalle de Subcategorías
-                        <Info className="w-5 h-5 text-nods-text-muted" />
-                    </h3>
-
-                    <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                        {filtered.map((item, idx) => {
-                            const porcentaje = Math.round((item.cnt / data.no_util_total) * 100) || 0;
-                            return (
-                                <div key={idx} className="bg-slate-50 p-4 rounded-2xl border border-nods-border hover:border-nods-accent/20 transition-all group shadow-sm">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <span className="font-bold text-nods-text-primary group-hover:text-nods-accent transition-colors">{item.descripcion_sub}</span>
-                                        <span className="text-xs font-black text-red-600 bg-red-50 px-2 py-0.5 rounded-lg border border-red-100">{porcentaje}%</span>
-                                    </div>
-                                    <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden shadow-inner">
-                                        <motion.div
-                                            initial={{ width: 0 }}
-                                            animate={{ width: `${porcentaje}%` }}
-                                            transition={{ duration: 1, delay: idx * 0.05 }}
-                                            className="h-full bg-slate-400 group-hover:bg-nods-accent transition-all"
-                                        />
-                                    </div>
-                                    <div className="mt-2 text-[10px] font-bold text-nods-text-muted uppercase tracking-widest">
-                                        {item.cnt} Leads
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
+            <div className="bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl p-6">
+                <div className="overflow-x-auto rounded-xl border border-zinc-700">
+                    <table className="w-full text-left text-sm whitespace-nowrap">
+                        <thead>
+                            <tr className="bg-zinc-900 border-b border-zinc-700 text-[11px] font-bold text-zinc-300">
+                                <th className="px-4 py-3 min-w-[200px]">Subcategoría</th>
+                                <th className="px-4 py-3 text-center text-amber-500">Leads No Útiles ▼</th>
+                                <th className="px-4 py-3 text-center text-amber-500">% No Útil</th>
+                                <th className="px-4 py-3 text-center">Leads 7 días</th>
+                                <th className="px-4 py-3 text-center">% No Útil</th>
+                                <th className="px-4 py-3 text-center">Leads 14 días</th>
+                                <th className="px-4 py-3 text-center">% No Útil</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-zinc-800 -mt-px">
+                            {filtered.length === 0 && (
+                                <tr>
+                                    <td colSpan={7} className="px-4 py-8 text-center text-zinc-500 text-xs font-bold">Sin datos para la tabla</td>
+                                </tr>
+                            )}
+                            {filtered.map((item, idx) => (
+                                <tr key={idx} className="hover:bg-zinc-800/50 transition-colors">
+                                    <td className="px-4 py-2 text-xs text-zinc-200 font-medium">
+                                        <span className="text-zinc-500 inline-block mr-2 w-3">+</span>
+                                        {item.subcategoria || item.descripcion_sub}
+                                    </td>
+                                    <td className="px-4 py-2 text-center text-xs text-amber-500">{item.leads || 0}</td>
+                                    <td className="px-4 py-2 text-center text-xs text-amber-500">{formatPercent(item.leads, tLeads)}</td>
+                                    <td className="px-4 py-2 text-center text-xs text-zinc-300">{item.leads_7d || 0}</td>
+                                    <td className="px-4 py-2 text-center text-xs text-zinc-300">{formatPercent(item.leads_7d, tLeads7)}</td>
+                                    <td className="px-4 py-2 text-center text-xs text-zinc-300">{item.leads_14d || 0}</td>
+                                    <td className="px-4 py-2 text-center text-xs text-zinc-300">{formatPercent(item.leads_14d, tLeads14)}</td>
+                                </tr>
+                            ))}
+                            {filtered.length > 0 && (
+                                <tr className="bg-transparent border-t-2 border-zinc-700">
+                                    <td className="px-4 py-3 text-sm font-bold text-white">Total</td>
+                                    <td className="px-4 py-3 text-center text-sm font-bold text-amber-500">{tLeads.toLocaleString()}</td>
+                                    <td className="px-4 py-3 text-center text-sm font-bold text-amber-500">100.00%</td>
+                                    <td className="px-4 py-3 text-center text-sm font-bold text-white">{tLeads7.toLocaleString()}</td>
+                                    <td className="px-4 py-3 text-center text-sm font-bold text-white">{tLeads7 > 0 ? '100.00%' : '0.00%'}</td>
+                                    <td className="px-4 py-3 text-center text-sm font-bold text-white">{tLeads14.toLocaleString()}</td>
+                                    <td className="px-4 py-3 text-center text-sm font-bold text-white">{tLeads14 > 0 ? '100.00%' : '0.00%'}</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
         </div>
     );
 }

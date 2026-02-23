@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis } from 'recharts';
-import { Target, CheckCircle2, Download, Filter } from 'lucide-react';
+import { Download, Filter } from 'lucide-react';
 import api from '../api';
 import { exportToCSV } from '../utils/export';
 
@@ -21,46 +20,34 @@ export default function EstadosPage() {
         exportToCSV(data.estados_by_programa, 'estados_gestion_unab_2026');
     };
 
-    const getProgressionColor = (val, meta) => {
-        const perc = (val / meta) * 100;
-        if (perc >= 100) return 'text-nods-success';
-        if (perc >= 70) return 'text-nods-accent';
-        if (perc >= 40) return 'text-nods-warning';
-        return 'text-red-600';
+    const formatPercent = (val) => {
+        if (!val || isNaN(val) || val === Infinity) return '0.00%';
+        return `${(val * 100).toFixed(2)}%`;
     };
+
+    // Calculate totals for the footer row
+    let tLeads = 0, tGestion = 0, tNoUtil = 0, tOpVenta = 0, tProcPago = 0;
+    let tSol = 0, tAdm = 0, tPag = 0, tMeta = 0, tToques = 0;
+    
+    if (data?.estados_by_programa) {
+        data.estados_by_programa.forEach(p => {
+            tLeads += p.leads || 0;
+            tGestion += p.en_gestion || 0;
+            tNoUtil += p.no_util || 0;
+            tOpVenta += p.op_venta || 0;
+            tProcPago += p.proceso_pago || 0;
+            tSol += p.solicitados || 0;
+            tAdm += p.admitidos || 0;
+            tPag += p.pagados || 0;
+            tMeta += p.meta || 0;
+            tToques += p.toques_prom || 0;
+        });
+        if (data.estados_by_programa.length > 0) tToques /= data.estados_by_programa.length; // Average of averages
+    }
 
     return (
         <div className="space-y-8">
             <div className="flex justify-end gap-3 relative">
-                <button
-                    onClick={() => setShowFilters(!showFilters)}
-                    className={`flex items-center gap-2 px-4 py-2.5 border rounded-xl text-xs font-bold transition-all shadow-sm ${showFilters ? 'bg-nods-accent text-white border-nods-accent' : 'bg-white border-nods-border text-nods-text-primary hover:bg-slate-50'}`}
-                >
-                    <Filter className="w-3 h-3" /> Filtros
-                </button>
-
-                {showFilters && (
-                    <div className="absolute right-32 top-12 w-64 bg-white border border-nods-border rounded-2xl p-4 shadow-xl z-30 space-y-4">
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-bold text-nods-text-muted uppercase tracking-widest">Base de Datos</label>
-                            <select
-                                value={filters.base}
-                                onChange={(e) => setFilters({ ...filters, base: e.target.value })}
-                                className="w-full bg-nods-bg border border-nods-border rounded-lg px-3 py-2 text-xs outline-none focus:border-nods-accent text-nods-text-primary"
-                            >
-                                <option value="">Todas las bases</option>
-                                <option value="NEW LEADS POSGRADO 2026-01">Posgrado 2026-01</option>
-                                <option value="NEW LEADS PREGRADO 2026-1">Pregrado 2026-1</option>
-                            </select>
-                        </div>
-                        <button
-                            onClick={() => setShowFilters(false)}
-                            className="w-full bg-slate-100 py-2 rounded-lg text-xs font-bold text-nods-text-primary hover:bg-slate-200"
-                        >
-                            Cerrar
-                        </button>
-                    </div>
-                )}
                 <button
                     onClick={handleExport}
                     className="flex items-center gap-2 px-4 py-2.5 bg-nods-accent text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-all shadow-lg shadow-nods-accent/20"
@@ -69,114 +56,71 @@ export default function EstadosPage() {
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Gauge / Cumplimiento Section */}
-                <div className="bg-white border border-nods-border rounded-3xl p-8 flex flex-col items-center shadow-xl min-w-0">
-                    <h3 className="text-xl font-bold mb-8 text-center w-full flex items-center justify-between text-nods-text-primary">
-                        Cumplimiento Objetivo Matrículas
-                        <Target className="w-5 h-5 text-nods-accent" />
-                    </h3>
-
-                    <div className="relative w-64 h-32 overflow-hidden mb-6">
-                        <div className="absolute inset-x-0 top-0 w-64 h-64 border-[24px] border-slate-100 rounded-full" />
-                        <motion.div
-                            initial={{ rotate: -90 }}
-                            animate={{ rotate: -90 + (180 * Math.min(data.totals.pagados / data.totals.metas, 1)) }}
-                            transition={{ duration: 1.5, ease: "easeOut" }}
-                            className="absolute inset-x-0 top-0 w-64 h-64 border-[24px] border-nods-accent border-t-transparent border-l-transparent rounded-full"
-                        />
-                        <div className="absolute bottom-0 inset-x-0 flex flex-col items-center">
-                            <span className="text-4xl font-black text-nods-text-primary">{data.totals.pagados}</span>
-                            <span className="text-xs font-bold text-nods-text-muted uppercase tracking-widest mt-1">Matriculados de {data.totals.metas}</span>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-8 w-full mt-4">
-                        <div className="bg-slate-50 p-4 rounded-2xl border border-nods-border text-center shadow-sm">
-                            <div className="text-2xl font-black text-nods-accent">{Math.round((data.totals.pagados / data.totals.metas) * 100)}%</div>
-                            <div className="text-[10px] font-bold text-nods-text-muted uppercase tracking-tighter">Alcance Objetivo</div>
-                        </div>
-                        <div className="bg-slate-50 p-4 rounded-2xl border border-nods-border text-center shadow-sm">
-                            <div className="text-2xl font-black text-nods-success">{data.totals.metas - data.totals.pagados}</div>
-                            <div className="text-[10px] font-bold text-nods-text-muted uppercase tracking-tighter">Restantes para Meta</div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Gestion Distribution */}
-                <div className="bg-white border border-nods-border rounded-3xl p-8 shadow-xl min-w-0">
-                    <h3 className="text-xl font-bold mb-8 flex items-center justify-between text-nods-text-primary">
-                        Estados de Gestión
-                        <CheckCircle2 className="w-5 h-5 text-nods-success" />
-                    </h3>
-
-                    <div className="h-[300px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={data.estados_gestion.slice(0, 8)} layout="vertical">
-                                <XAxis type="number" hide />
-                                <YAxis dataKey="gestion" type="category" axisLine={false} tickLine={false} tick={{ fill: '#64748B', fontSize: 11, fontWeight: 700 }} width={120} />
-                                <Bar dataKey="total" radius={[0, 4, 4, 0]} fill="#2563EB" barSize={15} isAnimationActive={false} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-            </div>
-
-            {/* Programs Detailed States */}
-            <div className="bg-white border border-nods-border rounded-3xl overflow-hidden shadow-2xl">
-                <div className="p-6 border-b border-nods-border flex items-center justify-between bg-slate-50">
-                    <h3 className="text-sm font-black uppercase tracking-widest text-nods-text-primary">Desglose por Programa</h3>
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-nods-text-muted">
-                        <span className="w-2 h-2 rounded-full bg-nods-accent" /> En Gestión
-                        <span className="w-2 h-2 rounded-full bg-red-600 ml-2" /> No Útil
-                        <span className="w-2 h-2 rounded-full bg-nods-success ml-2" /> Pagados
-                    </div>
-                </div>
+            {/* Programs Detailed States (Matches PowerBI Layout) */}
+            <div className="bg-zinc-950 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl pb-4">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm whitespace-nowrap">
                         <thead>
-                            <tr className="bg-slate-50 border-b border-nods-border text-[10px] font-bold text-nods-text-muted uppercase tracking-widest">
-                                <th className="px-6 py-4">Programa</th>
-                                <th className="px-6 py-4 text-center">Leads</th>
-                                <th className="px-6 py-4 text-center">Gestión</th>
-                                <th className="px-6 py-4 text-center">No Útil</th>
-                                <th className="px-6 py-4 text-center">Op. Venta</th>
-                                <th className="px-6 py-4 text-center">Págados</th>
-                                <th className="px-6 py-4 text-center">Avance</th>
+                            <tr className="border-b border-zinc-800 text-[11px] font-bold text-zinc-300">
+                                <th className="px-4 py-4 w-1/4">Programas</th>
+                                <th className="px-2 py-4 text-center">Leads</th>
+                                <th className="px-2 py-4 text-center">En Gestión</th>
+                                <th className="px-2 py-4 text-center">No Útil</th>
+                                <th className="px-2 py-4 text-center">Op. Venta</th>
+                                <th className="px-2 py-4 text-center">Proc. Pago</th>
+                                <th className="px-2 py-4 text-center text-amber-500">Solicitados</th>
+                                <th className="px-2 py-4 text-center text-amber-500">Admitidos</th>
+                                <th className="px-2 py-4 text-center text-amber-500">Pagados</th>
+                                <th className="px-2 py-4 text-center text-amber-500">Meta</th>
+                                <th className="px-2 py-4 text-center text-amber-500">Avance</th>
+                                <th className="px-2 py-4 text-center text-amber-500">Conversión</th>
+                                <th className="px-4 py-4 text-center">Toques Prom.</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-nods-border">
-                            {data.estados_by_programa.map((item, idx) => {
-                                const meta = 50;
+                        <tbody className="divide-y divide-zinc-800/60">
+                            {data?.estados_by_programa.map((item, idx) => {
+                                const avance = item.meta ? (item.pagados / item.meta) : 0;
+                                const conversion = item.leads ? (item.pagados / item.leads) : 0;
                                 return (
-                                    <tr key={idx} className="hover:bg-slate-50 transition-colors">
-                                        <td className="px-6 py-4 font-bold text-nods-text-primary">{item.programa}</td>
-                                        <td className="px-6 py-4 text-center font-bold text-nods-text-primary">{item.leads}</td>
-                                        <td className="px-6 py-4 text-center font-bold text-nods-accent">{item.en_gestion}</td>
-                                        <td className="px-6 py-4 text-center font-bold text-red-600">{item.no_util}</td>
-                                        <td className="px-6 py-4 text-center font-bold text-nods-text-primary">{item.op_venta}</td>
-                                        <td className="px-6 py-4 text-center font-black text-nods-success">{item.proceso_pago}</td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden shadow-inner">
-                                                    <div
-                                                        className="h-full bg-nods-accent"
-                                                        style={{ width: `${Math.min((item.proceso_pago / meta) * 100, 100)}%` }}
-                                                    />
-                                                </div>
-                                                <span className={`text-[10px] font-bold w-10 text-right ${getProgressionColor(item.proceso_pago, meta)}`}>
-                                                    {Math.round((item.proceso_pago / meta) * 100)}%
-                                                </span>
-                                            </div>
-                                        </td>
+                                    <tr key={idx} className="hover:bg-zinc-900 transition-colors">
+                                        <td className="px-4 py-3 text-xs font-semibold text-zinc-100 whitespace-normal min-w-[200px] leading-tight break-words">{item.programa}</td>
+                                        <td className="px-2 py-3 text-center text-xs text-zinc-300">{item.leads || ''}</td>
+                                        <td className="px-2 py-3 text-center text-xs text-zinc-300">{item.en_gestion || ''}</td>
+                                        <td className="px-2 py-3 text-center text-xs text-zinc-300">{item.no_util || ''}</td>
+                                        <td className="px-2 py-3 text-center text-xs text-zinc-300">{item.op_venta || ''}</td>
+                                        <td className="px-2 py-3 text-center text-xs text-zinc-300">{item.proceso_pago || ''}</td>
+                                        <td className="px-2 py-3 text-center text-xs text-amber-500 font-medium">{item.solicitados || ''}</td>
+                                        <td className="px-2 py-3 text-center text-xs text-amber-500 font-medium">{item.admitidos || ''}</td>
+                                        <td className="px-2 py-3 text-center text-xs text-amber-500 font-medium">{item.pagados || ''}</td>
+                                        <td className="px-2 py-3 text-center text-xs text-amber-500 font-medium">{item.meta || ''}</td>
+                                        <td className="px-2 py-3 text-center text-xs text-amber-500 font-medium">{formatPercent(avance)}</td>
+                                        <td className="px-2 py-3 text-center text-xs text-amber-500 font-medium">{formatPercent(conversion)}</td>
+                                        <td className="px-4 py-3 text-center text-xs text-zinc-300">{(item.toques_prom || 0).toFixed(2)}</td>
                                     </tr>
                                 );
                             })}
+                            {/* Totals Row */}
+                            {data?.estados_by_programa.length > 0 && (
+                                <tr className="bg-zinc-900 border-t-2 border-zinc-700">
+                                    <td className="px-4 py-4 text-sm font-bold text-white">Total</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-white">{tLeads.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-white">{tGestion.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-white">{tNoUtil.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-white">{tOpVenta.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-white">{tProcPago === 0 ? '' : tProcPago.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-500">{tSol.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-500">{tAdm.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-500">{tPag.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-500">{tMeta.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-500">{formatPercent(tPag/tMeta)}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-500">{formatPercent(tPag/tLeads)}</td>
+                                    <td className="px-4 py-4 text-center text-sm font-bold text-white">{tToques.toFixed(2)}</td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
             </div>
-
         </div>
     );
 }

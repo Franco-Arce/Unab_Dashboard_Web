@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, Download, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Search, Download, CheckCircle, AlertTriangle, XCircle, Minus } from 'lucide-react';
 import api from '../api';
 import { exportToCSV } from '../utils/export';
 
@@ -8,8 +8,6 @@ export default function AdmisionesPage() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const [showFilters, setShowFilters] = useState(false);
-    const [filters, setFilters] = useState({ anio: '2026' });
 
     useEffect(() => {
         api.admisiones().then(setData).catch(console.error).finally(() => setLoading(false));
@@ -18,31 +16,38 @@ export default function AdmisionesPage() {
     if (loading) return <div className="h-96 bg-white animate-pulse rounded-3xl border border-nods-border shadow-2xl" />;
 
     const filtered = data ? data.programas.filter(p => {
-        const matchesSearch = p.programa.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesAnio = filters.anio ? p.anio === filters.anio : true;
-        return matchesSearch && matchesAnio;
+        return p.programa.toLowerCase().includes(searchTerm.toLowerCase());
     }) : [];
 
     const handleExport = () => {
         exportToCSV(data.programas, 'admisiones_unab_2026');
     };
 
-    const getVarIndicator = (val) => {
+    const StatusIcon = ({ val }) => {
         const v = parseInt(val) || 0;
-        if (v > 0) return <div className="p-1 bg-emerald-50 rounded-lg"><TrendingUp className="w-3 h-3 text-emerald-600" /></div>;
-        if (v < 0) return <div className="p-1 bg-red-50 rounded-lg"><TrendingDown className="w-3 h-3 text-red-600" /></div>;
-        return <div className="p-1 bg-slate-50 rounded-lg"><Minus className="w-3 h-3 text-nods-text-muted" /></div>;
+        if (v > 0) return <CheckCircle className="w-4 h-4 text-emerald-500" />;
+        if (v === 0) return <AlertTriangle className="w-4 h-4 text-amber-500" />;
+        return <XCircle className="w-4 h-4 text-red-500" />;
     };
 
-    const getVarColor = (val) => {
-        const v = parseInt(val) || 0;
-        if (v > 0) return 'text-emerald-600 font-bold';
-        if (v < 0) return 'text-red-600 font-bold';
-        return 'text-nods-text-muted';
-    };
+    let tSol = 0, tAdm = 0, tPag = 0;
+    let tSol25 = 0, tAdm25 = 0, tPag25 = 0;
+    let tSolVar = 0, tAdmVar = 0, tPagVar = 0;
+
+    filtered.forEach(p => {
+        tSol += p.solicitados || 0;
+        tAdm += p.admitidos || 0;
+        tPag += p.pagados || 0;
+        tSol25 += p.solicitados_25 || 0;
+        tAdm25 += p.admitidos_25 || 0;
+        tPag25 += p.pagados_25 || 0;
+        tSolVar += p.solicitados_var || 0;
+        tAdmVar += p.admitidos_var || 0;
+        tPagVar += p.pagados_var || 0;
+    });
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="relative flex-1 max-w-md">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-nods-text-muted" />
@@ -56,34 +61,6 @@ export default function AdmisionesPage() {
                 </div>
                 <div className="flex items-center gap-3 relative">
                     <button
-                        onClick={() => setShowFilters(!showFilters)}
-                        className={`flex items-center gap-2 px-4 py-2.5 border rounded-xl text-xs font-bold transition-all shadow-sm ${showFilters ? 'bg-nods-accent text-white border-nods-accent' : 'bg-white border-nods-border text-nods-text-primary hover:bg-slate-50'}`}
-                    >
-                        <Filter className="w-3 h-3" /> Filtros
-                    </button>
-
-                    {showFilters && (
-                        <div className="absolute right-0 top-12 w-64 bg-white border border-nods-border rounded-2xl p-4 shadow-xl z-30 space-y-4">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-bold text-nods-text-muted uppercase tracking-widest">Año Lectivo</label>
-                                <select
-                                    value={filters.anio}
-                                    onChange={(e) => setFilters({ ...filters, anio: e.target.value })}
-                                    className="w-full bg-nods-bg border border-nods-border rounded-lg px-3 py-2 text-xs outline-none focus:border-nods-accent text-nods-text-primary"
-                                >
-                                    <option value="2026">2026</option>
-                                    <option value="2025">2025</option>
-                                </select>
-                            </div>
-                            <button
-                                onClick={() => setShowFilters(false)}
-                                className="w-full bg-slate-100 py-2 rounded-lg text-xs font-bold text-nods-text-primary hover:bg-slate-200"
-                            >
-                                Cerrar
-                            </button>
-                        </div>
-                    )}
-                    <button
                         onClick={handleExport}
                         className="flex items-center gap-2 px-4 py-2.5 bg-nods-accent text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-all shadow-lg shadow-nods-accent/20"
                     >
@@ -92,71 +69,71 @@ export default function AdmisionesPage() {
                 </div>
             </div>
 
-            <div className="bg-nods-card border border-nods-border rounded-3xl p-8 relative overflow-hidden group shadow-2xl">
+            <div className="bg-zinc-950 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl pb-4">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm whitespace-nowrap">
                         <thead>
-                            <tr className="bg-slate-50 border-b border-nods-border text-[10px] font-bold text-nods-text-muted uppercase tracking-widest">
-                                <th className="px-6 py-4">Programa</th>
-                                <th className="px-6 py-4 text-center">Solicitados</th>
-                                <th className="px-6 py-4 text-center">Admitidos</th>
-                                <th className="px-6 py-4 text-center">Pagados</th>
-                                <th className="px-6 py-4 text-center text-nods-accent">Solicitados AA</th>
-                                <th className="px-6 py-4 text-center text-nods-accent">Admitidos AA</th>
-                                <th className="px-6 py-4 text-center text-nods-accent">Pagados AA</th>
-                                <th className="px-6 py-4 text-center bg-slate-100/30">Var Sol.</th>
-                                <th className="px-6 py-4 text-center bg-slate-100/30">Var Adm.</th>
-                                <th className="px-6 py-4 text-center bg-slate-100/30">Var Pag.</th>
+                            <tr className="border-b border-zinc-800 text-[11px] font-bold text-zinc-300">
+                                <th className="px-4 py-4 w-1/4">Programas</th>
+                                <th className="px-2 py-4 text-center border-l-2 border-zinc-800">Solicitados</th>
+                                <th className="px-2 py-4 text-center">Admitidos</th>
+                                <th className="px-2 py-4 text-center">Pagados</th>
+                                <th className="px-2 py-4 text-center border-l-2 border-zinc-800 text-amber-500">Solicitados 25</th>
+                                <th className="px-2 py-4 text-center text-amber-500">Admitidos 25</th>
+                                <th className="px-2 py-4 text-center text-amber-500">Pagados 25</th>
+                                <th className="px-2 py-4 text-center border-l-2 border-zinc-800">Solicitados VAR</th>
+                                <th className="px-2 py-4 text-center">Admitidos VAR</th>
+                                <th className="px-2 py-4 text-center">Pagados VAR</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-zinc-800/50">
+                        <tbody className="divide-y divide-zinc-800/60">
                             {filtered.map((item, idx) => (
-                                <motion.tr
-                                    key={idx}
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ delay: idx * 0.05 }}
-                                    className="hover:bg-slate-50 transition-colors group"
-                                >
-                                    <td className="px-6 py-4">
-                                        <div className="font-bold text-nods-text-primary group-hover:text-nods-accent transition-colors">{item.programa}</div>
-                                        <div className="text-[10px] text-nods-text-muted mt-1 uppercase font-bold tracking-wider">{item.anio} Meta: {item.metas}</div>
-                                    </td>
-                                    <td className="px-6 py-4 text-center font-medium text-nods-text-primary">{item.solicitados || 0}</td>
-                                    <td className="px-6 py-4 text-center font-medium text-nods-text-primary">{item.admitidos || 0}</td>
-                                    <td className="px-6 py-4 text-center font-bold text-emerald-600">{item.pagados || 0}</td>
-                                    <td className="px-6 py-4 text-center text-nods-text-muted">{item.solicitados_aa || '-'}</td>
-                                    <td className="px-6 py-4 text-center text-nods-text-muted">{item.admitidos_aa || '-'}</td>
-                                    <td className="px-6 py-4 text-center text-nods-text-muted">{item.pagados_aa || '-'}</td>
-                                    <td className="px-6 py-4 bg-slate-50/50">
+                                <tr key={idx} className="hover:bg-zinc-900 transition-colors">
+                                    <td className="px-4 py-3 text-xs font-semibold text-zinc-100 whitespace-normal min-w-[200px] leading-tight break-words">{item.programa}</td>
+                                    <td className="px-2 py-3 text-center text-xs text-zinc-300 border-l-2 border-zinc-800">{item.solicitados || ''}</td>
+                                    <td className="px-2 py-3 text-center text-xs text-zinc-300">{item.admitidos || ''}</td>
+                                    <td className="px-2 py-3 text-center text-xs text-zinc-300">{item.pagados || ''}</td>
+
+                                    <td className="px-2 py-3 text-center text-xs text-amber-500 font-medium border-l-2 border-zinc-800">{item.solicitados_25 || ''}</td>
+                                    <td className="px-2 py-3 text-center text-xs text-amber-500 font-medium">{item.admitidos_25 || ''}</td>
+                                    <td className="px-2 py-3 text-center text-xs text-amber-500 font-medium">{item.pagados_25 || ''}</td>
+
+                                    <td className="px-2 py-3 border-l-2 border-zinc-800">
                                         <div className="flex items-center justify-center gap-2">
-                                            <span className={`text-xs font-bold ${getVarColor(item.solicitados_var)}`}>{item.solicitados_var || 0}</span>
-                                            {getVarIndicator(item.solicitados_var)}
+                                            <StatusIcon val={item.solicitados_var} />
+                                            <span className="text-xs text-zinc-300 w-6 text-right">{item.solicitados_var || 0}</span>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 bg-slate-50">
+                                    <td className="px-2 py-3">
                                         <div className="flex items-center justify-center gap-2">
-                                            <span className={`text-xs font-bold ${getVarColor(item.admitidos_var)}`}>{item.admitidos_var || 0}</span>
-                                            {getVarIndicator(item.admitidos_var)}
+                                            <StatusIcon val={item.admitidos_var} />
+                                            <span className="text-xs text-zinc-300 w-6 text-right">{item.admitidos_var || 0}</span>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 bg-slate-50/50">
+                                    <td className="px-2 py-3">
                                         <div className="flex items-center justify-center gap-2">
-                                            <span className={`text-xs font-bold ${getVarColor(item.pagados_var)}`}>{item.pagados_var || 0}</span>
-                                            {getVarIndicator(item.pagados_var)}
+                                            <StatusIcon val={item.pagados_var} />
+                                            <span className="text-xs text-zinc-300 w-6 text-right">{item.pagados_var || 0}</span>
                                         </div>
                                     </td>
-                                </motion.tr>
+                                </tr>
                             ))}
-                            {/* Totals Row */}
-                            <tr className="bg-slate-50 font-black text-nods-text-primary border-t-2 border-nods-border shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
-                                <td className="px-6 py-5 uppercase tracking-widest text-[10px]">Total General</td>
-                                <td className="px-6 py-5 text-center text-lg">{data.totals.solicitados}</td>
-                                <td className="px-6 py-5 text-center text-lg">{data.totals.admitidos}</td>
-                                <td className="px-6 py-5 text-center text-nods-accent">{data.totals.pagados}</td>
-                                <td className="px-6 py-5 text-center text-nods-text-muted" colSpan={3}></td>
-                                <td className="px-6 py-5 text-center bg-slate-100/50" colSpan={3}>Meta Total: {data.totals.metas}</td>
-                            </tr>
+                            {filtered.length > 0 && (
+                                <tr className="bg-zinc-900 border-t-2 border-zinc-700">
+                                    <td className="px-4 py-4 text-sm font-bold text-white">Total</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-white border-l-2 border-zinc-800">{tSol.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-white">{tAdm.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-white">{tPag.toLocaleString()}</td>
+
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-500 border-l-2 border-zinc-800">{tSol25 === 0 ? '' : tSol25.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-500">{tAdm25 === 0 ? '' : tAdm25.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-500">{tPag25 === 0 ? '' : tPag25.toLocaleString()}</td>
+
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-white border-l-2 border-zinc-800">{tSolVar.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-white">{tAdmVar.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-white">{tPagVar.toLocaleString()}</td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
