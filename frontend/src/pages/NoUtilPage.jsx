@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Download, Search, AlertOctagon, Calendar, Clock, Filter, PieChart as PieIcon } from 'lucide-react';
+import { Download, Search, AlertOctagon, Calendar, Clock, Filter } from 'lucide-react';
 import api from '../api';
 import { exportToCSV } from '../utils/export';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -77,15 +77,11 @@ export default function NoUtilPage() {
     }
 
     const tLeads = filtered.reduce((acc, curr) => acc + (curr.leads || 0), 0);
-    const tLeads7 = filtered.reduce((acc, curr) => acc + (curr.leads_7d || 0), 0);
-    const tLeads14 = filtered.reduce((acc, curr) => acc + (curr.leads_14d || 0), 0);
 
     const trends = data?.trends || {};
 
     const cards = [
         { id: 1, label: 'Total No Útiles', value: tLeads, trend: trends.no_util, color: 'from-rose-600 to-rose-900', icon: AlertOctagon, fill: 'h-[40%]' },
-        { id: 2, label: 'Últimos 7 Días', value: tLeads7, trend: 0, color: 'from-orange-500 to-rose-600', icon: Calendar, fill: 'h-[35%]' },
-        { id: 3, label: 'Últimos 14 Días', value: tLeads14, trend: 0, color: 'from-amber-400 to-orange-500', icon: Clock, fill: 'h-[30%]' },
     ];
 
     const handleExport = () => {
@@ -131,15 +127,15 @@ export default function NoUtilPage() {
                     </button>
                     <div className="h-10 w-px bg-zinc-800 mx-2 hidden md:block" />
                     <div className="flex items-center gap-2 px-4 py-2 bg-rose-500/10 rounded-xl border border-rose-500/20">
-                        <div className="w-2 h-2 bg-rose-500 rounded-full animate-pulse" />
-                        <span className="text-[10px] font-bold text-rose-500 uppercase tracking-wider">Live View</span>
+                        <div className="w-2 h-2 bg-rose-500 rounded-full" />
+                        <span className="text-[10px] font-bold text-rose-500 uppercase tracking-wider">Última Actualización</span>
                     </div>
                 </div>
             </header>
 
             {/* KPI Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div className="lg:col-span-1">
                     {cards.map((card, i) => (
                         <motion.div
                             key={card.id}
@@ -156,15 +152,11 @@ export default function NoUtilPage() {
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="bg-[#0f1115] border border-zinc-800 rounded-3xl p-6 relative overflow-hidden group"
+                    className="lg:col-span-3 bg-[#0f1115] border border-zinc-800 rounded-3xl p-6 relative overflow-hidden group"
                 >
-                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-                        <PieIcon className="w-32 h-32 text-white" />
-                    </div>
-
                     <h3 className="text-xs font-black text-zinc-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-rose-500 rounded-full" />
-                        Distribución
+                        Distribución de Categorías
                     </h3>
 
                     <div className="h-64 w-full relative">
@@ -174,8 +166,8 @@ export default function NoUtilPage() {
                                     data={chartData}
                                     cx="50%"
                                     cy="50%"
-                                    innerRadius={60}
-                                    outerRadius={80}
+                                    innerRadius={70}
+                                    outerRadius={90}
                                     paddingAngle={5}
                                     dataKey="value"
                                     stroke="none"
@@ -188,7 +180,7 @@ export default function NoUtilPage() {
                             </PieChart>
                         </ResponsiveContainer>
                         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                            <span className="text-2xl font-black text-white">{tLeads.toLocaleString()}</span>
+                            <span className="text-3xl font-black text-white">{tLeads.toLocaleString()}</span>
                             <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest text-center leading-tight px-4">
                                 Leads<br />Totales
                             </span>
@@ -224,8 +216,6 @@ export default function NoUtilPage() {
                                     <th className="px-8 py-5">Subcategoría</th>
                                     <th className="px-6 py-5 text-center">Leads Totales</th>
                                     <th className="px-6 py-5 text-center">% Participación</th>
-                                    <th className="px-6 py-5 text-center">7 Días</th>
-                                    <th className="px-6 py-5 text-center">14 Días</th>
                                     <th className="px-6 py-5 text-right pr-10">Estado</th>
                                 </tr>
                             </thead>
@@ -261,7 +251,7 @@ export default function NoUtilPage() {
                                                     <span className="text-xs font-bold text-zinc-400">
                                                         {item.porcentaje}%
                                                     </span>
-                                                    <div className="w-20 h-1 bg-zinc-800 rounded-full overflow-hidden">
+                                                    <div className="w-24 h-1 bg-zinc-800 rounded-full overflow-hidden">
                                                         <motion.div
                                                             initial={{ width: 0 }}
                                                             animate={{ width: `${item.porcentaje}%` }}
@@ -269,21 +259,6 @@ export default function NoUtilPage() {
                                                         />
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <div className="flex items-center justify-center gap-2">
-                                                    <span className="text-xs font-medium text-zinc-400">
-                                                        {item.leads_7d || 0}
-                                                    </span>
-                                                    {(item.leads_7d || 0) > 0 && (
-                                                        <div className="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]" />
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <span className="text-xs font-medium text-zinc-400">
-                                                    {item.leads_14d || 0}
-                                                </span>
                                             </td>
                                             <td className="px-6 py-4 text-right pr-10">
                                                 <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border ${item.leads > 100
