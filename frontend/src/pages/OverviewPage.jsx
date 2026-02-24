@@ -155,13 +155,6 @@ export default function OverviewPage() {
                                 return (
                                     <div key={index} className="relative">
                                         <div className="flex items-center gap-4 group">
-                                            {/* Left: Step Circle */}
-                                            <div
-                                                className="w-12 h-12 md:w-14 md:h-14 rounded-full flex-shrink-0 flex items-center justify-center text-white font-black text-lg shadow-sm transition-transform group-hover:scale-105"
-                                                style={{ backgroundColor: barColor }}
-                                            >
-                                                {index + 1}
-                                            </div>
 
                                             {/* Main Bar with Parallax Liquid */}
                                             <div className="flex-1 flex items-center gap-4 bg-slate-100/50 rounded-2xl border border-slate-200/50 pr-6 h-16 relative overflow-hidden group">
