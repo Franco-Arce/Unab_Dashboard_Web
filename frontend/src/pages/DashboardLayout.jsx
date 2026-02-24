@@ -72,14 +72,13 @@ export default function DashboardLayout() {
             {/* Sidebar Redesign */}
             <aside className="w-72 flex-shrink-0 bg-[#0a0f18] flex flex-col sticky top-0 h-screen transition-all duration-300 border-r border-slate-800/30">
                 <div className="p-8 flex flex-col h-full">
-                    {/* Logo Section - Compact "N" */}
+                    {/* Logo Section - Fixed Rendering */}
                     <div className="flex items-center justify-center mb-12 px-2">
-                        <div className="flex items-center justify-center p-3 bg-white/5 rounded-2xl border border-white/10 shadow-inner">
+                        <div className="flex items-center justify-center p-2.5 bg-white/5 rounded-2xl border border-white/10">
                             <img
                                 src={logoNods}
-                                alt="N"
-                                className="h-8 w-auto filter brightness-110 contrast-125 saturate-0 invert"
-                                style={{ mixBlendMode: 'screen' }}
+                                alt="NODS"
+                                className="h-8 w-auto invert brightness-200"
                             />
                         </div>
                     </div>
