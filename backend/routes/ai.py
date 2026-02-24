@@ -139,6 +139,12 @@ async def ai_chat(body: ChatRequest, _user: str = Depends(require_auth)):
             }
         ]
 
+        g_key = os.getenv("GROQ_API_KEY")
+        o_key = os.getenv("OPENAI_API_KEY")
+        
+        if not g_key and not o_key:
+            return {"response": "Configuración de IA incompleta (faltan API Keys)."}
+
         for h in (body.history or [])[-6:]:
             messages.append({"role": h.get("role", "user"), "content": h.get("content", "")})
 
@@ -150,18 +156,20 @@ async def ai_chat(body: ChatRequest, _user: str = Depends(require_auth)):
             print("[AI] Groq chat successful")
         except Exception as e:
             print(f"[AI] Groq failed, switching to OpenAI fallback: {e}")
+            if not o_key:
+                return {"response": "Groq ocupado y OpenAI no está configurado como respaldo."}
+                
             try:
                 content = await _openai_chat(messages)
                 print("[AI] OpenAI fallback successful")
             except Exception as oe:
                 print(f"[AI] OpenAI fallback also failed: {oe}")
-                raise oe
+                return {"response": "Todos los servicios de IA están ocupados en este momento. Por favor, intenta de nuevo en unos minutos."}
             
         return {"response": content}
     except Exception as e:
-        error_msg = str(e)
-        print(f"[AI Chat Final Error] {error_msg}")
-        return {"response": f"Error de IA (Groq y OpenAI fallaron): {error_msg[:200]}"}
+        print(f"[AI Chat Overall Error] {e}")
+        return {"response": "Hubo un error inesperado al procesar tu solicitud de IA."}
 
 
 @router.post("/insights")
@@ -215,9 +223,11 @@ async def ai_insights(body: Optional[ContextRequest] = None, _user: str = Depend
             return {"insights": [{"icon": "alert", "title": "Dashboard", "description": "Datos actualizados, pero no se pudieron procesar los insights."}]}
     except Exception as e:
         error_msg = str(e)
-        if "429" in error_msg:
-            return {"insights": [{"icon": "alert", "title": "IA Ocupada", "description": "Límite de peticiones alcanzado. Por favor, intenta de nuevo en unos minutos."}]}
-        return {"insights": [{"icon": "alert", "title": "Error", "description": error_msg[:100]}]}
+        title = "IA Ocupada" if "429" in error_msg else "Error de IA"
+        # Be more specific if it's the fallback that failed
+        desc = "Límite de peticiones alcanzado en ambos servicios (Groq y OpenAI)." if "429" in error_msg else error_msg[:100]
+        
+        return {"insights": [{"icon": "alert", "title": title, "description": desc}]}
 
 
 @router.post("/predictions")
