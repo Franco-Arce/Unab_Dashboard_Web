@@ -40,3 +40,52 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #444;
 }
+
+/* Fluid Animations & Parallax */
+@keyframes liquid1 {
+  0% {
+    transform: translateX(-100%) translateY(-5%) rotate(45deg);
+  }
+
+  100% {
+    transform: translateX(100%) translateY(5%) rotate(45deg);
+  }
+}
+
+@keyframes liquid2 {
+  0% {
+    transform: translateX(100%) translateY(5%) rotate(-45deg);
+  }
+
+  100% {
+    transform: translateX(-100%) translateY(-5%) rotate(-45deg);
+  }
+}
+
+@keyframes bubbleUp {
+  0% {
+    transform: translateY(100%) scale(0.5);
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translateY(-100%) scale(1.5);
+    opacity: 0;
+  }
+}
+
+.animate-liquid-1 {
+  animation: liquid1 4s infinite linear;
+}
+
+.animate-liquid-2 {
+  animation: liquid2 6s infinite linear;
+}
+
+.animate-bubble {
+  animation: bubbleUp linear infinite;
+}

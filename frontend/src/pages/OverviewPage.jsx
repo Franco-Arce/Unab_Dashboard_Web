@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
     Users,
     UserPlus,
@@ -12,6 +12,34 @@ import {
 import { motion } from 'framer-motion';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell, AreaChart, Area, CartesianGrid } from 'recharts';
 import api from '../api';
+
+// Floating bubbles component for liquid effect
+const FloatingBubbles = ({ count = 6 }) => {
+    const bubbles = useMemo(() => Array.from({ length: count }), [count]);
+
+    return (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
+            {bubbles.map((_, i) => (
+                <motion.div
+                    key={i}
+                    initial={{ y: 40, x: Math.random() * 100 + "%", opacity: 0 }}
+                    animate={{
+                        y: -20,
+                        opacity: [0, 0.4, 0],
+                        x: (Math.random() * 100) + (Math.random() * 10 - 5) + "%"
+                    }}
+                    transition={{
+                        duration: 2 + Math.random() * 3,
+                        repeat: Infinity,
+                        delay: Math.random() * 5,
+                        ease: "linear"
+                    }}
+                    className="absolute w-1 h-1 bg-white rounded-full shadow-[0_0_5px_white]"
+                />
+            ))}
+        </div>
+    );
+};
 
 export default function OverviewPage() {
     const [kpis, setKpis] = useState(null);
@@ -120,63 +148,101 @@ export default function OverviewPage() {
                                     efficiency = ((entry.value / funnel[index - 1].value) * 100).toFixed(1);
                                 }
 
+                                // Updated colors to match the user's latest blue-teal-green theme preference
+                                const themeColors = ["#1e3a8a", "#2563eb", "#3b82f6", "#06b6d4", "#10b981"];
+                                const barColor = themeColors[index] || entry.color;
+
                                 return (
-                                    <React.Fragment key={index}>
-                                        <div className="w-full flex items-center justify-between gap-4 group">
-                                            {/* Container for the filled bar */}
-                                            <div className="relative flex-grow h-14 bg-[#f8f9fa] rounded-2xl overflow-hidden border border-slate-100 shadow-inner flex items-center">
-                                                <motion.div
-                                                    initial={{ width: 0 }}
-                                                    animate={{ width: `${Math.max(entry.percent, 5)}%` }}
-                                                    transition={{
-                                                        duration: 1.2,
-                                                        delay: 0.5 + (index * 0.15),
-                                                        type: "spring", bounce: 0.1
-                                                    }}
-                                                    className="absolute top-0 left-0 h-full rounded-2xl shadow-sm"
-                                                    style={{ backgroundColor: entry.color }}
-                                                />
-                                                {/* Text inside/over the bar */}
-                                                <div className="relative z-10 px-5 flex items-center gap-4 w-full">
-                                                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-black shadow-sm" style={{ backgroundColor: entry.color }}>
-                                                        <span className="text-xs">{index + 1}</span>
-                                                    </div>
-                                                    <div>
-                                                        <div className="text-[10px] font-bold text-nods-text-muted uppercase tracking-widest mb-0.5">
-                                                            Paso {index + 1}
-                                                        </div>
-                                                        <div className="text-sm font-black text-nods-text-primary drop-shadow-sm">
-                                                            {entry.stage}
-                                                        </div>
-                                                    </div>
+                                    <div key={index} className="relative">
+                                        <div className="flex items-center gap-4 group">
+                                            {/* Step Badge */}
+                                            <div className="hidden md:flex flex-col items-center">
+                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Paso</span>
+                                                <div className="w-10 h-10 rounded-2xl bg-[#0f172a] flex items-center justify-center text-white text-xs font-black shadow-lg">
+                                                    0{index + 1}
                                                 </div>
                                             </div>
 
-                                            {/* Right: Value & Badge */}
-                                            <div className="flex-shrink-0 flex items-center justify-end gap-4 w-32 md:w-48 bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
-                                                <div className="text-xl md:text-2xl font-black text-nods-text-primary tracking-tight">
-                                                    {entry.value.toLocaleString()}
-                                                </div>
-                                                <div className="px-2.5 py-1 bg-[#1a1f2c] rounded-lg text-[10px] font-bold text-white shadow-sm flex-shrink-0">
-                                                    {entry.percent}%
+                                            {/* Main Bar with Parallax Liquid */}
+                                            <div className="flex-1 flex items-center gap-4 bg-slate-100/50 rounded-2xl border border-slate-200/50 pr-6 h-16 relative overflow-hidden group">
+
+                                                {/* Progress Fill */}
+                                                <motion.div
+                                                    initial={{ width: 0 }}
+                                                    animate={{ width: `${Math.max(entry.percent, 3)}%` }}
+                                                    transition={{ duration: 1.8, delay: index * 0.1, ease: [0.34, 1.56, 0.64, 1] }}
+                                                    className="h-full flex items-center px-6 relative z-10 shadow-[5px_0_20px_rgba(0,0,0,0.15)] overflow-hidden"
+                                                    style={{ backgroundColor: barColor }}
+                                                >
+                                                    {/* CAPA 1: Ondas Rápidas (Efecto base) */}
+                                                    <div
+                                                        className="absolute inset-0 opacity-10 pointer-events-none animate-liquid-1"
+                                                        style={{
+                                                            backgroundImage: `repeating-linear-gradient(-45deg, transparent, transparent 20px, white 20px, white 40px)`,
+                                                            width: '300%'
+                                                        }}
+                                                    />
+
+                                                    {/* CAPA 2: Ondas de Paralaje (Nueva - Lenta y opuesta) */}
+                                                    <div
+                                                        className="absolute inset-0 opacity-[0.07] pointer-events-none animate-liquid-2"
+                                                        style={{
+                                                            backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 30px, white 30px, white 60px)`,
+                                                            width: '300%'
+                                                        }}
+                                                    />
+
+                                                    {/* CAPA 3: Burbujas Cinéticas (Nueva) */}
+                                                    <FloatingBubbles count={entry.percent > 50 ? 8 : 4} />
+
+                                                    {/* Reflejo superior estático para realismo */}
+                                                    <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent pointer-events-none z-20" />
+
+                                                    <span className="font-black whitespace-nowrap text-white text-sm relative z-30 tracking-tight uppercase italic drop-shadow-md">
+                                                        {entry.stage}
+                                                    </span>
+                                                </motion.div>
+
+                                                {/* Fallback label para barras ultra-cortas */}
+                                                {entry.percent < 28 && (
+                                                    <span className="text-[#1e3a8a] font-black text-xs ml-2 z-20 uppercase italic pointer-events-none">
+                                                        {entry.stage}
+                                                    </span>
+                                                )}
+
+                                                {/* Metadata Section */}
+                                                <div className="ml-auto flex items-center gap-6 z-20">
+                                                    <div className="text-right">
+                                                        <div className="text-2xl font-black text-slate-900 leading-none tracking-tighter">
+                                                            {entry.value.toLocaleString()}
+                                                        </div>
+                                                        <div className="text-[9px] font-black text-blue-600/60 uppercase tracking-widest mt-1">Volumen</div>
+                                                    </div>
+                                                    <div className="bg-white border border-slate-200 text-blue-900 px-3 py-2 rounded-xl text-xs font-black min-w-[60px] text-center shadow-sm group-hover:bg-blue-900 group-hover:text-white transition-colors duration-300">
+                                                        {entry.percent}%
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        {/* Inter-step efficiency pill */}
+                                        {/* Efficiency Divider */}
                                         {efficiency !== null && (
-                                            <div className="flex justify-center -my-2 relative z-20">
+                                            <div className="flex justify-center my-1 relative h-8">
                                                 <motion.div
                                                     initial={{ opacity: 0, scale: 0.8 }}
                                                     animate={{ opacity: 1, scale: 1 }}
-                                                    transition={{ delay: 1 + (index * 0.1) }}
-                                                    className="bg-white border border-slate-200 px-3 py-1 rounded-full text-[9px] font-bold text-slate-500 shadow-sm flex items-center gap-1 uppercase tracking-wider"
+                                                    transition={{ delay: 1 + index * 0.1 }}
+                                                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 bg-slate-900 text-white px-4 py-1.5 rounded-full shadow-lg z-30"
                                                 >
-                                                    Eficiencia: <span className="text-nods-accent">{efficiency}%</span> ↓
+                                                    <span className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5">
+                                                        <ArrowUpRight className="w-3 h-3 text-emerald-400" />
+                                                        Eficiencia: <span className="text-emerald-400">{efficiency}%</span>
+                                                    </span>
                                                 </motion.div>
+                                                <div className="w-px h-full border-l-2 border-dotted border-slate-200 mx-auto" />
                                             </div>
                                         )}
-                                    </React.Fragment>
+                                    </div>
                                 );
                             })}
                         </div>
