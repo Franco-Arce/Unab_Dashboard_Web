@@ -22,6 +22,7 @@ async def get_kpis(_user: str = Depends(require_auth)):
         "proceso_pago": data.get("proceso_pago", 0),
         "no_util_total": data.get("no_util_total", 0),
         "fecha_actualizacion": data.get("fecha_actualizacion", ""),
+        "trends": data.get("trends", {})
     }
 
 

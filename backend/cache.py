@@ -5,6 +5,7 @@ Stores pre-computed dashboard data to avoid hitting PostgreSQL on every request.
 import asyncio
 import json
 import copy
+import os
 from datetime import datetime, timezone
 from database import fetch_all, fetch_one
 
@@ -15,6 +16,16 @@ class DashboardCache:
         self.data = {}
         self.last_refresh: datetime | None = None
         self.previous_snapshot: dict | None = None
+        self.snapshot_file = "last_snapshot.json"
+        
+        # Try to load persistent snapshot on boot
+        if os.path.exists(self.snapshot_file):
+            try:
+                with open(self.snapshot_file, "r") as f:
+                    self.previous_snapshot = json.load(f)
+            except Exception as e:
+                print(f"[Cache] Failed to load snapshot: {e}")
+                
         self._lock = asyncio.Lock()
 
     @property
@@ -27,9 +38,16 @@ class DashboardCache:
     async def refresh(self):
         """Pull fresh data from PostgreSQL and store in memory."""
         async with self._lock:
-            # Save previous snapshot for change detection
+            # Save previous snapshot for change detection and persistent trends
             if self.data:
                 self.previous_snapshot = copy.deepcopy(self.data)
+                try:
+                    # Filter out non-serializable elements before saving
+                    snap_to_save = {k: v for k, v in self.previous_snapshot.items() if k != "fecha_actualizacion"}
+                    with open(self.snapshot_file, "w") as f:
+                        json.dump(snap_to_save, f)
+                except Exception as e:
+                    print(f"[Cache] Could not save snapshot to file: {e}")
 
             data = {}
 
@@ -174,6 +192,23 @@ class DashboardCache:
             else:
                 data["fecha_actualizacion"] = datetime.now().strftime("%d/%m/%Y %H:%M")
 
+            # Calculate actual update trends
+            trends = {
+                "total_leads": 0, "matriculados": 0, "en_gestion": 0, "pagados": 0
+            }
+            if self.previous_snapshot:
+                def calc_trend(prev_v, curr_v):
+                    if not prev_v or prev_v == 0: return 0.0
+                    return round(((curr_v - prev_v) / prev_v) * 100, 1)
+
+                prev = self.previous_snapshot
+                trends["total_leads"] = calc_trend(prev.get("total_leads", 0), data["total_leads"])
+                trends["matriculados"] = calc_trend(prev.get("totals", {}).get("admitidos", 0), data["totals"]["admitidos"])
+                trends["en_gestion"] = calc_trend(prev.get("en_gestion", 0), data["en_gestion"])
+                trends["pagados"] = calc_trend(prev.get("totals", {}).get("pagados", 0), data["totals"]["pagados"])
+            
+            data["trends"] = trends
+            
             self.data = data
             self.last_refresh = datetime.now(timezone.utc)
             print(f"[Cache] Refreshed at {self.last_refresh.isoformat()} — {data.get('total_leads', 0)} leads loaded")

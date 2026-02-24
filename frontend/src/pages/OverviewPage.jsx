@@ -46,11 +46,13 @@ export default function OverviewPage() {
         </motion.div>
     );
 
+    const trends = kpis.trends || { total_leads: 0, matriculados: 0, en_gestion: 0, pagados: 0 };
+
     const cards = [
-        { label: 'Total Leads', value: kpis.total_leads, icon: Users, color: 'text-nods-accent', bg: 'bg-nods-accent/10' },
-        { label: 'Matriculados', value: kpis.matriculados, icon: UserPlus, color: 'text-nods-success', bg: 'bg-nods-success/10' },
-        { label: 'En Gestión', value: kpis.en_gestion, icon: Target, color: 'text-nods-accent', bg: 'bg-nods-accent/10' },
-        { label: 'Pagados', value: kpis.pagados, icon: CreditCard, color: 'text-nods-warning', bg: 'bg-nods-warning/10' },
+        { label: 'Total Leads', value: kpis.total_leads, trend: trends.total_leads, icon: Users, color: 'text-nods-accent', bg: 'bg-nods-accent/10' },
+        { label: 'Matriculados', value: kpis.matriculados, trend: trends.matriculados, icon: UserPlus, color: 'text-nods-success', bg: 'bg-nods-success/10' },
+        { label: 'En Gestión', value: kpis.en_gestion, trend: trends.en_gestion, icon: Target, color: 'text-nods-accent', bg: 'bg-nods-accent/10' },
+        { label: 'Pagados', value: kpis.pagados, trend: trends.pagados, icon: CreditCard, color: 'text-nods-warning', bg: 'bg-nods-warning/10' },
     ];
 
     return (
@@ -77,9 +79,9 @@ export default function OverviewPage() {
                             <div className={`p-3 rounded-2xl ${card.bg}`}>
                                 <card.icon className={`w-6 h-6 ${card.color}`} />
                             </div>
-                            <div className="flex items-center gap-1 text-[11px] font-black text-nods-success uppercase tracking-widest">
-                                <span>+12%</span>
-                                <ArrowUpRight className="w-3.5 h-3.5" />
+                            <div className={`flex items-center gap-1 text-[11px] font-black uppercase tracking-widest ${card.trend >= 0 ? 'text-nods-success' : 'text-[#ef4444]'}`}>
+                                <span>{card.trend > 0 ? '+' : ''}{card.trend}%</span>
+                                {card.trend >= 0 ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
                             </div>
                         </div>
 
@@ -136,14 +138,14 @@ export default function OverviewPage() {
                                                 />
                                                 {/* Text inside/over the bar */}
                                                 <div className="relative z-10 px-5 flex items-center gap-4 w-full">
-                                                    <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white/90">
-                                                        <span className="text-xs font-black">{index + 1}</span>
+                                                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-black shadow-sm" style={{ backgroundColor: entry.color }}>
+                                                        <span className="text-xs">{index + 1}</span>
                                                     </div>
                                                     <div>
-                                                        <div className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-0.5">
+                                                        <div className="text-[10px] font-bold text-nods-text-muted uppercase tracking-widest mb-0.5">
                                                             Paso {index + 1}
                                                         </div>
-                                                        <div className="text-sm font-black text-white drop-shadow-sm">
+                                                        <div className="text-sm font-black text-nods-text-primary drop-shadow-sm">
                                                             {entry.stage}
                                                         </div>
                                                     </div>
