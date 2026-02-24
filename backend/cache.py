@@ -141,7 +141,7 @@ class DashboardCache:
 
             # ── Subcategorias No Util ──
             try:
-                no_util_rows = await fetch_all("SELECT descripcion_sub, leads_no_utiles as cnt FROM agg_no_utiles ORDER BY cnt DESC")
+                no_util_rows = await fetch_all("SELECT descripcion_sub, leads_no_utiles as leads, leads_7_dias as leads_7d, leads_14_dias as leads_14d FROM agg_no_utiles ORDER BY leads DESC")
                 data["no_util"] = [dict(r) for r in no_util_rows]
             except Exception as e:
                 print(f"[Cache] Error fetching no_utiles: {e}")

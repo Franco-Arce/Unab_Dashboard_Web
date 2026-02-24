@@ -14,7 +14,7 @@ async def get_schema(table_name):
     print()
 
 async def main():
-    await get_schema('fact_unab_sheet_2')
+    await get_schema('fact_unab_sheet2')
     await get_schema('agg_dim_contactos_leads')
 
 if __name__ == "__main__":

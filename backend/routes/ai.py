@@ -11,6 +11,33 @@ router = APIRouter(prefix="/api/ai", tags=["ai"])
 
 MODEL = "llama-3.3-70b-versatile"
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
+OPENAI_MODEL = "gpt-4o-mini"
+OPENAI_URL = "https://api.openai.com/v1/chat/completions"
+
+async def _openai_chat(messages: list, temperature: float = 0.3, max_tokens: int = 1000) -> str:
+    """Fallback: Call OpenAI API directly."""
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise Exception("OPENAI_API_KEY no configurada en el servidor")
+
+    async with httpx.AsyncClient() as client:
+        resp = await client.post(
+            OPENAI_URL,
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": OPENAI_MODEL,
+                "messages": messages,
+                "temperature": temperature,
+                "max_tokens": max_tokens,
+            },
+            timeout=30.0,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        return data["choices"][0]["message"]["content"]
 
 
 async def _groq_chat(messages: list, temperature: float = 0.3, max_tokens: int = 1000) -> str:
@@ -107,11 +134,16 @@ async def ai_chat(body: ChatRequest, _user: str = Depends(require_auth)):
 
         messages.append({"role": "user", "content": body.message})
 
-        content = await _groq_chat(messages)
+        try:
+            content = await _groq_chat(messages)
+        except Exception as e:
+            print(f"[AI Chat Groq Fallback] {e}")
+            content = await _openai_chat(messages)
+            
         return {"response": content}
     except Exception as e:
         print(f"[AI Chat Error] {e}")
-        return {"response": f"Error: {str(e)[:200]}"}
+        return {"response": f"Error (OpenAI Fallback también falló): {str(e)[:200]}"}
 
 
 @router.post("/insights")
@@ -142,7 +174,11 @@ async def ai_insights(body: Optional[ContextRequest] = None, _user: str = Depend
             {"role": "user", "content": f"Datos y cambios:\n{context_str}"},
         ]
 
-        raw = (await _groq_chat(messages, temperature=0.5)).strip()
+        try:
+            raw = (await _groq_chat(messages, temperature=0.5)).strip()
+        except Exception as e:
+            print(f"[AI Insights Groq Fallback] {e}")
+            raw = (await _openai_chat(messages, temperature=0.5)).strip()
         try:
             if "```" in raw:
                 raw = raw.split("```")[1]
@@ -184,7 +220,11 @@ async def ai_predictions(body: Optional[ContextRequest] = None, _user: str = Dep
             {"role": "user", "content": f"Contexto histórico y actual:\n{context_str}"},
         ]
 
-        raw = (await _groq_chat(messages)).strip()
+        try:
+            raw = (await _groq_chat(messages)).strip()
+        except Exception as e:
+            print(f"[AI Predictions Groq Fallback] {e}")
+            raw = (await _openai_chat(messages)).strip()
         try:
             if "```" in raw:
                 raw = raw.split("```")[1]

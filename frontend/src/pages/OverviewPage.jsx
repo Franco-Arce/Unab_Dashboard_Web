@@ -34,12 +34,16 @@ export default function OverviewPage() {
     }, []);
 
     if (loading) return (
-        <div className="space-y-8 animate-pulse">
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="space-y-8 animate-pulse"
+        >
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[1, 2, 3, 4].map(i => <div key={i} className="h-32 bg-white rounded-3xl border border-nods-border" />)}
+                {[1, 2, 3, 4].map(i => <div key={i} className="h-32 bg-white rounded-3xl border border-zinc-100 shadow-sm" />)}
             </div>
-            <div className="h-[400px] bg-white rounded-3xl border border-nods-border" />
-        </div>
+            <div className="h-[400px] bg-white rounded-3xl border border-zinc-100 shadow-sm" />
+        </motion.div>
     );
 
     const cards = [
@@ -52,14 +56,19 @@ export default function OverviewPage() {
     return (
         <div className="space-y-8">
             {/* KPI Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ staggerChildren: 0.1, delayChildren: 0.1 }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+            >
                 {cards.map((card, i) => (
                     <motion.div
                         key={i}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                        transition={{ delay: i * 0.1 }}
+                        initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        whileHover={{ y: -6, scale: 1.02, transition: { type: "spring", stiffness: 300, damping: 20 } }}
+                        transition={{ duration: 0.5, type: 'spring', bounce: 0.4, delay: i * 0.1 }}
                         className="bg-white border border-nods-border p-6 rounded-3xl hover:border-nods-accent/30 hover:shadow-lg transition-all group relative overflow-hidden shadow-sm cursor-pointer"
                     >
                         <div className={`absolute top-0 right-0 w-24 h-24 ${card.bg} blur-3xl rounded-full translate-x-12 -translate-y-12 opacity-0 group-hover:opacity-100 transition-opacity`} />
@@ -80,11 +89,16 @@ export default function OverviewPage() {
                         </div>
                     </motion.div>
                 ))}
-            </div>
+            </motion.div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Funnel Section */}
-                <div className="lg:col-span-2 space-y-6">
+                <motion.div
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6, delay: 0.4, type: "spring" }}
+                    className="lg:col-span-2 space-y-6"
+                >
                     <div className="bg-white border border-nods-border rounded-3xl p-8 relative overflow-hidden group shadow-xl">
                         <div className="flex justify-between items-end mb-10 relative z-10">
                             <div>
@@ -96,43 +110,63 @@ export default function OverviewPage() {
                             </div>
                         </div>
 
-                        <div className="py-6 w-full flex flex-col items-center justify-center gap-4 relative z-10 min-h-[320px]">
+                        <div className="py-6 w-full flex flex-col gap-3 relative z-10 min-h-[320px]">
                             {funnel.map((entry, index) => (
-                                <div key={index} className="w-full flex flex-col items-center group relative cursor-pointer">
-                                    <div className="flex justify-between w-full max-w-3xl px-4 text-[11px] font-bold text-nods-text-muted uppercase tracking-widest mb-1.5">
-                                        <span>{entry.stage}</span>
-                                        <span className="text-nods-accent">{entry.percent}% de conversión</span>
+                                <motion.div
+                                    key={index}
+                                    className="w-full bg-slate-50/50 hover:bg-slate-50 border border-transparent hover:border-nods-border/60 transition-colors p-4 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 group cursor-pointer"
+                                >
+                                    {/* Left: Stage Name */}
+                                    <div className="md:w-1/4 flex-shrink-0">
+                                        <div className="text-xs font-bold text-nods-text-muted uppercase tracking-widest mb-1 group-hover:text-nods-accent transition-colors">
+                                            Paso {index + 1}
+                                        </div>
+                                        <div className="text-sm font-black text-nods-text-primary">
+                                            {entry.stage}
+                                        </div>
                                     </div>
-                                    <motion.div
-                                        initial={{ opacity: 0, width: 0 }}
-                                        animate={{ opacity: 1, width: `${Math.max(entry.percent, 10)}%` }}
-                                        transition={{
-                                            duration: 1.2,
-                                            delay: index * 0.2,
-                                            ease: "easeOut"
-                                        }}
-                                        className="h-10 md:h-12 rounded-2xl flex items-center justify-center relative overflow-hidden shadow-lg border border-white/20"
-                                        style={{
-                                            backgroundColor: entry.color,
-                                            maxWidth: '100%'
-                                        }}
-                                        whileHover={{ scale: 1.02, filter: "brightness(1.1)" }}
-                                    >
-                                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 translate-x-[-100%] group-hover:animate-[shimmer_1.5s_infinite]" />
-                                        <div className="absolute inset-0 bg-black/10 mix-blend-overlay"></div>
-                                        <span className="font-extrabold text-white text-lg md:text-xl z-10 drop-shadow-md tracking-tight">
+
+                                    {/* Center: Progress Bar */}
+                                    <div className="w-full md:flex-grow relative h-6 bg-slate-200/50 rounded-full overflow-hidden shadow-inner flex items-center">
+                                        <motion.div
+                                            initial={{ opacity: 0, width: 0 }}
+                                            animate={{ opacity: 1, width: `${Math.max(entry.percent, 3)}%` }}
+                                            transition={{
+                                                duration: 1.2,
+                                                delay: 0.6 + (index * 0.15),
+                                                type: "spring", bounce: 0.15
+                                            }}
+                                            className="h-full rounded-full relative"
+                                            style={{ backgroundColor: entry.color }}
+                                        >
+                                            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:animate-[shimmer_1.5s_infinite]" />
+                                        </motion.div>
+                                    </div>
+
+                                    {/* Right: Value & Badge */}
+                                    <div className="md:w-1/5 flex-shrink-0 flex items-center justify-end gap-3 w-full md:w-auto">
+                                        <div className="text-xl font-black text-nods-text-primary tracking-tight">
                                             {entry.value.toLocaleString()}
-                                        </span>
-                                    </motion.div>
-                                </div>
+                                        </div>
+                                        <div className="px-2 py-1 bg-white border border-nods-border rounded-lg text-[10px] font-bold text-nods-text-muted shadow-sm select-none">
+                                            {entry.percent}%
+                                        </div>
+                                    </div>
+                                </motion.div>
                             ))}
                         </div>
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Right Column: Quick Stats vertically stacked */}
                 <div className="flex flex-col space-y-6 justify-center">
-                    <div className="bg-white border border-nods-border rounded-3xl p-6 shadow-lg w-full">
+                    <motion.div
+                        initial={{ opacity: 0, x: 30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.6, delay: 0.6, type: "spring" }}
+                        whileHover={{ scale: 1.02, y: -4 }}
+                        className="bg-white border border-nods-border rounded-3xl p-6 shadow-lg w-full cursor-pointer"
+                    >
                         <h4 className="text-sm font-bold uppercase tracking-widest text-nods-text-muted mb-6">Eficiencia</h4>
                         <div className="flex items-center gap-6">
                             <div className="relative w-24 h-24 flex items-center justify-center shrink-0">
@@ -147,9 +181,15 @@ export default function OverviewPage() {
                                 <div className="text-xs text-nods-text-primary/70 font-bold mt-1">Leads a Matriculados</div>
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
 
-                    <div className="bg-white border border-nods-border rounded-3xl p-6 shadow-lg w-full">
+                    <motion.div
+                        initial={{ opacity: 0, x: 30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.6, delay: 0.7, type: "spring" }}
+                        whileHover={{ scale: 1.02, y: -4 }}
+                        className="bg-white border border-nods-border rounded-3xl p-6 shadow-lg w-full cursor-pointer"
+                    >
                         <h4 className="text-sm font-bold uppercase tracking-widest text-nods-text-muted mb-6">Salud de Base</h4>
                         <div className="flex items-center gap-6">
                             <div className="relative w-24 h-24 flex items-center justify-center shrink-0">
@@ -164,7 +204,7 @@ export default function OverviewPage() {
                                 <div className="text-xs text-nods-text-primary/70 font-bold mt-1">Leads en gestión</div>
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
             </div>
         </div>
