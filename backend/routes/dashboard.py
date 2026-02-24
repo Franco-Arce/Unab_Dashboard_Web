@@ -70,11 +70,13 @@ async def get_no_util(_user: str = Depends(require_auth)):
 
     result = []
     for item in no_util:
-        cnt = item.get("cnt", 0)
+        leads = item.get("leads", 0)
         result.append({
             "subcategoria": item.get("descripcion_sub", ""),
-            "leads": cnt,
-            "porcentaje": round(cnt / total * 100, 2) if total else 0,
+            "leads": leads,
+            "leads_7d": item.get("leads_7d", 0),
+            "leads_14d": item.get("leads_14d", 0),
+            "porcentaje": round(leads / total * 100, 2) if total else 0,
         })
 
     return {"no_util": result, "no_util_total": total, "trends": data.get("trends", {})}

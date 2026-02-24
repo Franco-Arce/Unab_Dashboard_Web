@@ -8,8 +8,8 @@ async def main():
             SELECT 
                 descrip_subcat,
                 COUNT(*) AS cnt,
-                SUM(CASE WHEN fecha_a_utilizar >= NOW() - INTERVAL '7 days' THEN 1 ELSE 0 END) AS leads_7d,
-                SUM(CASE WHEN fecha_a_utilizar >= NOW() - INTERVAL '14 days' THEN 1 ELSE 0 END) AS leads_14d
+                SUM(CASE WHEN fecha_a_utilizar::timestamp >= NOW() - INTERVAL '7 days' THEN 1 ELSE 0 END) AS leads_7d,
+                SUM(CASE WHEN fecha_a_utilizar::timestamp >= NOW() - INTERVAL '14 days' THEN 1 ELSE 0 END) AS leads_14d
             FROM dim_contactos
             WHERE descrip_estado_crm ILIKE '%no util%'
                OR descrip_estado_crm ILIKE '%descarte%'
