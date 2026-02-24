@@ -111,49 +111,72 @@ export default function OverviewPage() {
                         </div>
 
                         <div className="py-6 w-full flex flex-col gap-3 relative z-10 min-h-[320px]">
-                            {funnel.map((entry, index) => (
-                                <motion.div
-                                    key={index}
-                                    className="w-full bg-slate-50/50 hover:bg-slate-50 border border-transparent hover:border-nods-border/60 transition-colors p-4 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 group cursor-pointer"
-                                >
-                                    {/* Left: Stage Name */}
-                                    <div className="md:w-1/4 flex-shrink-0">
-                                        <div className="text-xs font-bold text-nods-text-muted uppercase tracking-widest mb-1 group-hover:text-nods-accent transition-colors">
-                                            Paso {index + 1}
-                                        </div>
-                                        <div className="text-sm font-black text-nods-text-primary">
-                                            {entry.stage}
-                                        </div>
-                                    </div>
+                            {funnel.map((entry, index) => {
+                                // Calculate efficiency vs previous step
+                                let efficiency = null;
+                                if (index > 0 && funnel[index - 1].value > 0) {
+                                    efficiency = ((entry.value / funnel[index - 1].value) * 100).toFixed(1);
+                                }
 
-                                    {/* Center: Progress Bar */}
-                                    <div className="w-full md:flex-grow relative h-6 bg-slate-200/50 rounded-full overflow-hidden shadow-inner flex items-center">
-                                        <motion.div
-                                            initial={{ opacity: 0, width: 0 }}
-                                            animate={{ opacity: 1, width: `${Math.max(entry.percent, 3)}%` }}
-                                            transition={{
-                                                duration: 1.2,
-                                                delay: 0.6 + (index * 0.15),
-                                                type: "spring", bounce: 0.15
-                                            }}
-                                            className="h-full rounded-full relative"
-                                            style={{ backgroundColor: entry.color }}
-                                        >
-                                            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:animate-[shimmer_1.5s_infinite]" />
-                                        </motion.div>
-                                    </div>
+                                return (
+                                    <React.Fragment key={index}>
+                                        <div className="w-full flex items-center justify-between gap-4 group">
+                                            {/* Container for the filled bar */}
+                                            <div className="relative flex-grow h-14 bg-[#f8f9fa] rounded-2xl overflow-hidden border border-slate-100 shadow-inner flex items-center">
+                                                <motion.div
+                                                    initial={{ width: 0 }}
+                                                    animate={{ width: `${Math.max(entry.percent, 5)}%` }}
+                                                    transition={{
+                                                        duration: 1.2,
+                                                        delay: 0.5 + (index * 0.15),
+                                                        type: "spring", bounce: 0.1
+                                                    }}
+                                                    className="absolute top-0 left-0 h-full rounded-2xl shadow-sm"
+                                                    style={{ backgroundColor: entry.color }}
+                                                />
+                                                {/* Text inside/over the bar */}
+                                                <div className="relative z-10 px-5 flex items-center gap-4 w-full">
+                                                    <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white/90">
+                                                        <span className="text-xs font-black">{index + 1}</span>
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-0.5">
+                                                            Paso {index + 1}
+                                                        </div>
+                                                        <div className="text-sm font-black text-white drop-shadow-sm">
+                                                            {entry.stage}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                                    {/* Right: Value & Badge */}
-                                    <div className="md:w-1/5 flex-shrink-0 flex items-center justify-end gap-3 w-full md:w-auto">
-                                        <div className="text-xl font-black text-nods-text-primary tracking-tight">
-                                            {entry.value.toLocaleString()}
+                                            {/* Right: Value & Badge */}
+                                            <div className="flex-shrink-0 flex items-center justify-end gap-4 w-32 md:w-48 bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
+                                                <div className="text-xl md:text-2xl font-black text-nods-text-primary tracking-tight">
+                                                    {entry.value.toLocaleString()}
+                                                </div>
+                                                <div className="px-2.5 py-1 bg-[#1a1f2c] rounded-lg text-[10px] font-bold text-white shadow-sm flex-shrink-0">
+                                                    {entry.percent}%
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="px-2 py-1 bg-white border border-nods-border rounded-lg text-[10px] font-bold text-nods-text-muted shadow-sm select-none">
-                                            {entry.percent}%
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            ))}
+
+                                        {/* Inter-step efficiency pill */}
+                                        {efficiency !== null && (
+                                            <div className="flex justify-center -my-2 relative z-20">
+                                                <motion.div
+                                                    initial={{ opacity: 0, scale: 0.8 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    transition={{ delay: 1 + (index * 0.1) }}
+                                                    className="bg-white border border-slate-200 px-3 py-1 rounded-full text-[9px] font-bold text-slate-500 shadow-sm flex items-center gap-1 uppercase tracking-wider"
+                                                >
+                                                    Eficiencia: <span className="text-nods-accent">{efficiency}%</span> ↓
+                                                </motion.div>
+                                            </div>
+                                        )}
+                                    </React.Fragment>
+                                );
+                            })}
                         </div>
                     </div>
                 </motion.div>
