@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Download, Search } from 'lucide-react';
+import { Download, Search, AlertOctagon, Calendar, Clock } from 'lucide-react';
 import api from '../api';
 import { exportToCSV } from '../utils/export';
+import { motion } from 'framer-motion';
+import { MetricCard } from '../components/MetricCard';
 
 export default function NoUtilPage() {
     const [data, setData] = useState(null);
@@ -45,9 +47,36 @@ export default function NoUtilPage() {
         return `${((val / total) * 100).toFixed(2)}%`;
     };
 
+    const cards = [
+        { id: 1, label: 'Total No Útiles', value: tLeads, trend: '+0%', color: 'from-rose-600 to-rose-800', icon: AlertOctagon, fill: 'h-[40%]' },
+        { id: 2, label: 'Últimos 7 días', value: tLeads7, trend: '+0%', color: 'from-orange-500 to-rose-600', icon: Calendar, fill: 'h-[35%]' },
+        { id: 3, label: 'Últimos 14 días', value: tLeads14, trend: '+0%', color: 'from-amber-500 to-orange-600', icon: Clock, fill: 'h-[30%]' },
+    ];
+
     return (
-        <div className="space-y-6 max-w-5xl mx-auto">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-8 max-w-5xl mx-auto">
+            <header className="flex justify-between items-end">
+                <div>
+                    <h2 className="text-sm font-black text-rose-900 uppercase tracking-[0.3em] mb-2 italic">Leads No Útiles</h2>
+                    <div className="h-1 w-20 bg-gradient-to-r from-rose-900 to-transparent rounded-full" />
+                </div>
+            </header>
+
+            {/* KPI Cards */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ staggerChildren: 0.1 }}
+                className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            >
+                {cards.map((card, i) => (
+                    <motion.div key={card.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
+                        <MetricCard data={card} />
+                    </motion.div>
+                ))}
+            </motion.div>
+
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4">
                 <div className="relative flex-1 max-w-md">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-nods-text-muted" />
                     <input

@@ -13,10 +13,12 @@ import {
     ExternalLink,
     Copy,
     X,
-    Check
+    Check,
+    Users
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api';
+import { MetricCard } from '../components/MetricCard';
 
 export default function LeadsPage() {
     const [leads, setLeads] = useState([]);
@@ -83,9 +85,23 @@ export default function LeadsPage() {
         setPage(1);
     };
 
+    const card = { id: 1, label: 'Resultados Encontrados', value: total, trend: '+0%', color: 'from-blue-600 to-indigo-700', icon: Users, fill: 'h-[30%]' };
+
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div className="space-y-8">
+            <header className="flex justify-between items-end">
+                <div>
+                    <h2 className="text-sm font-black text-blue-900 uppercase tracking-[0.3em] mb-2 italic">Explorador de Leads</h2>
+                    <div className="h-1 w-20 bg-gradient-to-r from-blue-900 to-transparent rounded-full" />
+                </div>
+            </header>
+
+            {/* KPI Section */}
+            <div className="max-w-xs transition-all duration-500">
+                <MetricCard data={card} />
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-4 items-center justify-between pt-4">
                 <div className="relative w-full md:max-w-md">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-nods-text-muted" />
                     <input
@@ -153,10 +169,6 @@ export default function LeadsPage() {
                             </motion.div>
                         )}
                     </AnimatePresence>
-
-                    <div className="flex items-center gap-2 bg-white border border-nods-border rounded-2xl px-4 py-3 shadow-sm">
-                        <span className="text-xs font-bold text-nods-text-muted uppercase tracking-widest">{total.toLocaleString()} leads</span>
-                    </div>
                 </div>
             </div>
 
@@ -359,8 +371,8 @@ export default function LeadsPage() {
                                 <button
                                     onClick={handleCopyInfo}
                                     className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${copied
-                                            ? 'bg-nods-success text-white shadow-lg shadow-nods-success/20'
-                                            : 'bg-nods-accent text-white hover:bg-blue-600 shadow-lg shadow-nods-accent/20'
+                                        ? 'bg-nods-success text-white shadow-lg shadow-nods-success/20'
+                                        : 'bg-nods-accent text-white hover:bg-blue-600 shadow-lg shadow-nods-accent/20'
                                         }`}
                                 >
                                     {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}

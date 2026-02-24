@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Download, Filter } from 'lucide-react';
+import { Download, Filter, Users, Target, CreditCard, UserCheck } from 'lucide-react';
 import api from '../api';
 import { exportToCSV } from '../utils/export';
+import { MetricCard } from '../components/MetricCard';
 
 export default function EstadosPage() {
     const [data, setData] = useState(null);
@@ -43,9 +44,37 @@ export default function EstadosPage() {
         });
     }
 
+    const cards = [
+        { id: 1, label: 'Total Leads', value: tLeads, trend: '+0%', color: 'from-blue-600 to-blue-800', icon: Users, fill: 'h-[40%]' },
+        { id: 2, label: 'En Gestión', value: tGestion, trend: '+0%', color: 'from-indigo-600 to-blue-700', icon: UserCheck, fill: 'h-[35%]' },
+        { id: 3, label: 'Op. Venta', value: tOpVenta, trend: '+0%', color: 'from-blue-400 to-indigo-500', icon: Target, fill: 'h-[30%]' },
+        { id: 4, label: 'Pagados', value: tPag, trend: '+0%', color: 'from-emerald-500 to-teal-600', icon: CreditCard, fill: 'h-[25%]' },
+    ];
+
     return (
         <div className="space-y-8">
-            <div className="flex justify-end gap-3 relative">
+            <header className="flex justify-between items-end">
+                <div>
+                    <h2 className="text-sm font-black text-blue-900 uppercase tracking-[0.3em] mb-2 italic">Estados de Gestión</h2>
+                    <div className="h-1 w-20 bg-gradient-to-r from-blue-900 to-transparent rounded-full" />
+                </div>
+            </header>
+
+            {/* KPI Cards */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ staggerChildren: 0.1 }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+            >
+                {cards.map((card, i) => (
+                    <motion.div key={card.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
+                        <MetricCard data={card} />
+                    </motion.div>
+                ))}
+            </motion.div>
+
+            <div className="flex justify-end gap-3 relative pt-4">
                 <button
                     onClick={handleExport}
                     className="flex items-center gap-2 px-4 py-2.5 bg-nods-accent text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-all shadow-lg shadow-nods-accent/20"

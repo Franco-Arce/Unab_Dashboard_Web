@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Download, CheckCircle, AlertTriangle, XCircle, Minus } from 'lucide-react';
+import { Search, Download, CheckCircle, AlertTriangle, XCircle, Minus, Users, UserPlus, CreditCard } from 'lucide-react';
 import api from '../api';
 import { exportToCSV } from '../utils/export';
+import { MetricCard } from '../components/MetricCard';
 
 export default function AdmisionesPage() {
     const [data, setData] = useState(null);
@@ -46,9 +47,44 @@ export default function AdmisionesPage() {
         tPagVar += p.pagados_var || 0;
     });
 
+    const calcTrend = (val, total) => {
+        const prev = total - val;
+        if (prev <= 0) return '+0%';
+        const p = ((val / prev) * 100).toFixed(1);
+        return p > 0 ? `+${p}%` : `${p}%`;
+    };
+
+    const cards = [
+        { id: 1, label: 'Solicitados', value: tSol, trend: calcTrend(tSolVar, tSol), color: 'from-blue-600 to-blue-800', icon: Users, fill: 'h-[40%]' },
+        { id: 2, label: 'Admitidos', value: tAdm, trend: calcTrend(tAdmVar, tAdm), color: 'from-indigo-600 to-blue-700', icon: UserPlus, fill: 'h-[35%]' },
+        { id: 3, label: 'Pagados', value: tPag, trend: calcTrend(tPagVar, tPag), color: 'from-emerald-500 to-teal-600', icon: CreditCard, fill: 'h-[30%]' },
+        { id: 4, label: 'Pagados 25', value: tPag25, trend: '+0%', color: 'from-cyan-500 to-blue-500', icon: CreditCard, fill: 'h-[25%]' },
+    ];
+
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-8">
+            <header className="flex justify-between items-end">
+                <div>
+                    <h2 className="text-sm font-black text-blue-900 uppercase tracking-[0.3em] mb-2 italic">Admisiones & Metas</h2>
+                    <div className="h-1 w-20 bg-gradient-to-r from-blue-900 to-transparent rounded-full" />
+                </div>
+            </header>
+
+            {/* KPI Cards */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ staggerChildren: 0.1 }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+            >
+                {cards.map((card, i) => (
+                    <motion.div key={card.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
+                        <MetricCard data={card} />
+                    </motion.div>
+                ))}
+            </motion.div>
+
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4">
                 <div className="relative flex-1 max-w-md">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-nods-text-muted" />
                     <input

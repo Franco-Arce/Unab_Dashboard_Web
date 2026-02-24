@@ -7,11 +7,14 @@ import {
     ArrowUpRight,
     ArrowDownRight,
     Search,
-    Filter
+    Filter,
+    GraduationCap,
+    UserCheck
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell, AreaChart, Area, CartesianGrid } from 'recharts';
 import api from '../api';
+import { MetricCard } from '../components/MetricCard';
 
 // Floating bubbles component for liquid effect
 const FloatingBubbles = ({ count = 6 }) => {
@@ -74,13 +77,19 @@ export default function OverviewPage() {
         </motion.div>
     );
 
+    const formatTrend = (val) => {
+        if (!val) return '0%';
+        if (val > 0) return `+${val}%`;
+        return `${val}%`;
+    };
+
     const trends = kpis.trends || { total_leads: 0, matriculados: 0, en_gestion: 0, pagados: 0 };
 
     const cards = [
-        { label: 'Total Leads', value: kpis.total_leads, trend: trends.total_leads, icon: Users, color: 'text-nods-accent', bg: 'bg-nods-accent/10' },
-        { label: 'Matriculados', value: kpis.matriculados, trend: trends.matriculados, icon: UserPlus, color: 'text-nods-success', bg: 'bg-nods-success/10' },
-        { label: 'En Gestión', value: kpis.en_gestion, trend: trends.en_gestion, icon: Target, color: 'text-nods-accent', bg: 'bg-nods-accent/10' },
-        { label: 'Pagados', value: kpis.pagados, trend: trends.pagados, icon: CreditCard, color: 'text-nods-warning', bg: 'bg-nods-warning/10' },
+        { id: 1, label: 'Total Leads', value: kpis.total_leads, trend: formatTrend(trends.total_leads), color: 'from-blue-600 to-blue-800', icon: Users, fill: 'h-[40%]' },
+        { id: 2, label: 'Matriculados', value: kpis.matriculados, trend: formatTrend(trends.matriculados), color: 'from-emerald-500 to-teal-600', icon: GraduationCap, fill: 'h-[30%]' },
+        { id: 3, label: 'En Gestión', value: kpis.en_gestion, trend: formatTrend(trends.en_gestion), color: 'from-indigo-500 to-blue-700', icon: UserCheck, fill: 'h-[35%]' },
+        { id: 4, label: 'Pagados', value: kpis.pagados, trend: formatTrend(trends.pagados), color: 'from-cyan-500 to-blue-500', icon: CreditCard, fill: 'h-[25%]' },
     ];
 
     return (
@@ -93,30 +102,8 @@ export default function OverviewPage() {
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
             >
                 {cards.map((card, i) => (
-                    <motion.div
-                        key={i}
-                        initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        whileHover={{ y: -6, scale: 1.02, transition: { type: "spring", stiffness: 300, damping: 20 } }}
-                        transition={{ duration: 0.5, type: 'spring', bounce: 0.4, delay: i * 0.1 }}
-                        className="bg-white border border-nods-border p-6 rounded-3xl hover:border-nods-accent/30 hover:shadow-lg transition-all group relative overflow-hidden shadow-sm cursor-pointer"
-                    >
-                        <div className={`absolute top-0 right-0 w-24 h-24 ${card.bg} blur-3xl rounded-full translate-x-12 -translate-y-12 opacity-0 group-hover:opacity-100 transition-opacity`} />
-
-                        <div className="flex justify-between items-start mb-4 relative z-10">
-                            <div className={`p-3 rounded-2xl ${card.bg}`}>
-                                <card.icon className={`w-6 h-6 ${card.color}`} />
-                            </div>
-                            <div className={`flex items-center gap-1 text-[11px] font-black uppercase tracking-widest ${card.trend >= 0 ? 'text-nods-success' : 'text-[#ef4444]'}`}>
-                                <span>{card.trend > 0 ? '+' : ''}{card.trend}%</span>
-                                {card.trend >= 0 ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
-                            </div>
-                        </div>
-
-                        <div className="relative z-10">
-                            <h3 className="text-nods-text-muted text-xs font-bold uppercase tracking-widest mb-1">{card.label}</h3>
-                            <div className="text-3xl font-black text-nods-text-primary">{card.value?.toLocaleString()}</div>
-                        </div>
+                    <motion.div key={card.id || i} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
+                        <MetricCard data={card} />
                     </motion.div>
                 ))}
             </motion.div>
@@ -142,10 +129,16 @@ export default function OverviewPage() {
 
                         <div className="py-6 w-full flex flex-col gap-3 relative z-10 min-h-[320px]">
                             {funnel.map((entry, index) => {
-                                // Calculate efficiency vs previous step
+                                // Calculate efficiency vs a previous step that makes mathematical sense (>= current value)
                                 let efficiency = null;
-                                if (index > 0 && funnel[index - 1].value > 0) {
-                                    efficiency = ((entry.value / funnel[index - 1].value) * 100).toFixed(1);
+                                if (index > 0) {
+                                    let prevIdx = index - 1;
+                                    while (prevIdx >= 0 && funnel[prevIdx].value < entry.value) {
+                                        prevIdx--;
+                                    }
+                                    if (prevIdx >= 0 && funnel[prevIdx].value > 0) {
+                                        efficiency = ((entry.value / funnel[prevIdx].value) * 100).toFixed(1);
+                                    }
                                 }
 
                                 // Updated colors to match the user's latest blue-teal-green theme preference
