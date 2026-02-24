@@ -53,9 +53,8 @@ export const MetricCard = ({ data }) => {
             className="relative bg-white rounded-[2.5rem] p-6 shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden group h-48 flex flex-col justify-between"
         >
             {/* CAPA 1: Fondo Líquido (Marea) */}
-            <motion.div
+            <div
                 className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t ${color} opacity-10 transition-all duration-700 ease-in-out ${fill}`}
-                animate={isHovered ? { height: '100%', opacity: 0.15 } : {}}
             />
 
             {/* CAPA 2: Ondas en la superficie del agua (Solo visible en hover o base) */}
@@ -67,7 +66,7 @@ export const MetricCard = ({ data }) => {
             />
 
             {/* CAPA 3: Partículas/Burbujas */}
-            <InteractiveBubbles count={isHovered ? 12 : 6} isHovered={isHovered} />
+            <InteractiveBubbles count={isHovered ? 20 : 6} isHovered={isHovered} />
 
             {/* CONTENIDO SUPERIOR: Icono y Trend */}
             <div className="relative z-10 flex justify-between items-start">
@@ -105,15 +104,16 @@ export const MetricCard = ({ data }) => {
                 className="absolute top-4 right-4 pointer-events-none flex flex-col items-end z-20"
             >
                 <div className={`
-                    px-3 py-1.5 rounded-xl backdrop-blur-lg border shadow-xl flex flex-col items-end
+                    px-2 py-1 rounded-lg backdrop-blur-md border shadow-lg flex flex-col items-end transform transition-all duration-300
+                    ${isHovered ? 'scale-110' : 'scale-100'}
                     ${isPositiveTrend ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-700' :
                         isNegativeTrend ? 'bg-rose-500/20 border-rose-500/30 text-rose-700' :
                             'bg-slate-500/20 border-slate-500/30 text-slate-700'}
                 `}>
-                    <span className="text-lg font-black tracking-tighter leading-none mb-0.5">
+                    <span className="text-[10px] font-black tracking-tighter leading-none mb-0.5">
                         {trend}
                     </span>
-                    <span className="text-[7px] font-black uppercase tracking-[0.1em] opacity-70 whitespace-nowrap">
+                    <span className="text-[6px] font-black uppercase tracking-[0.1em] opacity-70 whitespace-nowrap leading-none">
                         vs update
                     </span>
                 </div>
