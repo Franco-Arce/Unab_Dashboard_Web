@@ -10,10 +10,8 @@ from cache import cache
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
 
-MODEL = "llama-3.3-70b-versatile"
-GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
-OPENAI_MODEL = "gpt-4o-mini"
-OPENAI_URL = "https://api.openai.com/v1/chat/completions"
+MODEL = "gpt-4o-mini"
+URL = "https://api.openai.com/v1/chat/completions"
 
 LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "ai_usage.log")
 
@@ -32,13 +30,13 @@ async def _openai_chat(messages: list, temperature: float = 0.3, max_tokens: int
 
     async with httpx.AsyncClient() as client:
         resp = await client.post(
-            OPENAI_URL,
+            URL,
             headers={
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json",
             },
             json={
-                "model": OPENAI_MODEL,
+                "model": MODEL,
                 "messages": messages,
                 "temperature": temperature,
                 "max_tokens": max_tokens,
@@ -54,35 +52,6 @@ async def _openai_chat(messages: list, temperature: float = 0.3, max_tokens: int
         return data["choices"][0]["message"]["content"]
 
 
-async def _groq_chat(messages: list, temperature: float = 0.3, max_tokens: int = 1000) -> str:
-    """Call Groq API directly."""
-    api_key = os.getenv("GROQ_API_KEY")
-    if not api_key:
-        print("[AI] Warning: GROQ_API_KEY is missing")
-        raise Exception("GROQ_API_KEY no configurada")
-
-    async with httpx.AsyncClient() as client:
-        resp = await client.post(
-            GROQ_URL,
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model": MODEL,
-                "messages": messages,
-                "temperature": temperature,
-                "max_tokens": max_tokens,
-            },
-            timeout=30.0,
-        )
-        if resp.status_code != 200:
-            err_body = resp.text
-            print(f"[AI] Groq Error {resp.status_code}: {err_body}")
-            raise Exception(f"Groq API Error {resp.status_code}: {err_body}")
-            
-        data = resp.json()
-        return data["choices"][0]["message"]["content"]
 
 
 async def _get_ai_context() -> str:
@@ -148,37 +117,21 @@ async def ai_chat(body: ChatRequest, _user: str = Depends(require_auth)):
             }
         ]
 
-        g_key = os.getenv("GROQ_API_KEY")
-        o_key = os.getenv("OPENAI_API_KEY")
-        
-        if not g_key and not o_key:
-            return {"response": "Configuración de IA incompleta (faltan API Keys)."}
-
         for h in (body.history or [])[-6:]:
             messages.append({"role": h.get("role", "user"), "content": h.get("content", "")})
 
         messages.append({"role": "user", "content": body.message})
 
         try:
-            log_ai("Attempting Groq chat...")
-            content = await _groq_chat(messages)
-            log_ai("Groq chat successful")
-            source = "Groq"
+            log_ai("Requesting OpenAI chat...")
+            content = await _openai_chat(messages)
+            log_ai("OpenAI chat successful")
+            return {"response": content}
         except Exception as e:
-            log_ai(f"Groq failed, switching to OpenAI fallback: {e}")
-            if not o_key:
-                log_ai("OpenAI fallback failed (API Key missing)")
-                return {"response": "Groq está saturado y no hay respaldo de OpenAI configurado."}
-                
-            try:
-                content = await _openai_chat(messages)
-                log_ai("OpenAI fallback successful")
-                source = "OpenAI"
-            except Exception as oe:
-                log_ai(f"OpenAI fallback also failed: {oe}")
-                return {"response": "Todos los servicios de IA (Groq y OpenAI) están saturados. Por favor, intenta de nuevo en un momento."}
-            
-        return {"response": f"{content}\n\n[Analizado con {source}]"}
+            log_ai(f"OpenAI service error: {e}")
+            if "429" in str(e):
+                return {"response": "El servicio de IA de OpenAI está saturado en este momento. Por favor, intenta de nuevo en un momento."}
+            return {"response": f"Error en el servicio de IA: {str(e)[:100]}"}
     except Exception as e:
         log_ai(f"Unexpected error in ai_chat: {e}")
         return {"response": "Error inesperado en el analista de IA."}
@@ -213,17 +166,13 @@ async def ai_insights(body: Optional[ContextRequest] = None, _user: str = Depend
         ]
 
         try:
-            log_ai("Attempting Groq insights...")
-            raw = (await _groq_chat(messages, temperature=0.5)).strip()
-            log_ai("Groq insights successful")
+            log_ai("Requesting OpenAI insights...")
+            raw = (await _openai_chat(messages, temperature=0.5)).strip()
+            log_ai("OpenAI insights successful")
         except Exception as e:
-            log_ai(f"Groq insights failed, switching to OpenAI: {e}")
-            try:
-                raw = (await _openai_chat(messages, temperature=0.5)).strip()
-                log_ai("OpenAI insights successful")
-            except Exception as oe:
-                log_ai(f"OpenAI insights also failed: {oe}")
-                raise oe
+            log_ai(f"OpenAI insights failed: {e}")
+            raise e
+
         try:
             if "```" in raw:
                 raw = raw.split("```")[1]
@@ -236,9 +185,7 @@ async def ai_insights(body: Optional[ContextRequest] = None, _user: str = Depend
     except Exception as e:
         error_msg = str(e)
         title = "IA Ocupada" if "429" in error_msg else "Error de IA"
-        # Be more specific if it's the fallback that failed
-        desc = "Límite de peticiones alcanzado en ambos servicios (Groq y OpenAI)." if "429" in error_msg else error_msg[:100]
-        
+        desc = "Servicio de OpenAI saturado." if "429" in error_msg else error_msg[:100]
         return {"insights": [{"icon": "alert", "title": title, "description": desc}]}
 
 
@@ -268,17 +215,12 @@ async def ai_predictions(body: Optional[ContextRequest] = None, _user: str = Dep
         ]
 
         try:
-            log_ai("Attempting Groq predictions...")
-            raw = (await _groq_chat(messages)).strip()
-            log_ai("Groq predictions successful")
+            log_ai("Requesting OpenAI predictions...")
+            raw = (await _openai_chat(messages)).strip()
+            log_ai("OpenAI predictions successful")
         except Exception as e:
-            log_ai(f"Groq predictions failed, switching to OpenAI: {e}")
-            try:
-                raw = (await _openai_chat(messages)).strip()
-                log_ai("OpenAI predictions successful")
-            except Exception as oe:
-                log_ai(f"OpenAI predictions also failed: {oe}")
-                raise oe
+            log_ai(f"OpenAI predictions failed: {e}")
+            raise e
         try:
             if "```" in raw:
                 raw = raw.split("```")[1]
