@@ -72,19 +72,15 @@ export default function DashboardLayout() {
             {/* Sidebar Redesign */}
             <aside className="w-72 flex-shrink-0 bg-[#0a0f18] flex flex-col sticky top-0 h-screen transition-all duration-300 border-r border-slate-800/30">
                 <div className="p-8 flex flex-col h-full">
-                    {/* Logo Section */}
-                    <div className="flex items-center gap-3 mb-12 px-2">
-                        <div className="flex items-center justify-center py-1">
+                    {/* Logo Section - Compact "N" */}
+                    <div className="flex items-center justify-center mb-12 px-2">
+                        <div className="flex items-center justify-center p-3 bg-white/5 rounded-2xl border border-white/10 shadow-inner">
                             <img
                                 src={logoNods}
-                                alt="NODS"
-                                className="h-7 w-auto filter brightness-110 contrast-125"
-                                style={{ mixBlendMode: 'lighten' }}
+                                alt="N"
+                                className="h-8 w-auto filter brightness-110 contrast-125 saturate-0 invert"
+                                style={{ mixBlendMode: 'screen' }}
                             />
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.4em] leading-none mb-1">UNAB</span>
-                            <span className="text-sm font-black text-white tracking-[0.2em] italic uppercase opacity-90 leading-none">DASHBOARD</span>
                         </div>
                     </div>
 
@@ -98,21 +94,21 @@ export default function DashboardLayout() {
                                 className={({ isActive }) => `
                                     relative flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-500 group overflow-hidden
                                     ${isActive
-                                        ? 'text-white shadow-2xl shadow-blue-500/10'
+                                        ? 'text-white shadow-2xl shadow-blue-900/40'
                                         : 'text-slate-500 hover:text-slate-200'}
                                 `}
                             >
                                 {({ isActive }) => (
                                     <>
-                                        {/* Background active highlight (Glassmorphism + Liquid) ... (keep existing) */}
+                                        {/* Background active highlight (Matches Total Leads Blue) */}
                                         {isActive && (
                                             <motion.div
                                                 layoutId="activeNav"
-                                                className="absolute inset-0 bg-blue-600 z-0 overflow-hidden"
+                                                className="absolute inset-0 z-0 overflow-hidden"
                                                 initial={false}
                                                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                             >
-                                                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-800 opacity-90" />
+                                                <div className="absolute inset-0 bg-gradient-to-br from-[#1e3a8a] to-[#1e40af] opacity-100" />
                                                 <div className="absolute inset-0 opacity-20 animate-liquid-1 filter blur-sm"
                                                     style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, white 0%, transparent 50%)', backgroundSize: '100% 100%' }} />
                                                 <div className="absolute inset-0 opacity-10 animate-liquid-2 filter blur-md"
