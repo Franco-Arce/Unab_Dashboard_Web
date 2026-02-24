@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Lock, User, AlertCircle } from 'lucide-react';
 import api from '../api';
 import { motion } from 'framer-motion';
-import logoUnab from '../assets/logo-unab.png';
-import nodsDark from '../assets/nods-dark.png';
+import logoUnab from '../assets/unab-logo.jpg';
+import logoNods from '../assets/logo-nods.ico';
 
 export default function LoginPage() {
     const [username, setUsername] = useState('Admin'); // Default for convenience
@@ -94,7 +94,7 @@ export default function LoginPage() {
                 </form>
 
                 <div className="mt-8 pt-8 border-t border-nods-border/50 flex flex-col items-center">
-                    <img src={nodsDark} alt="NODS" className="h-4 w-auto opacity-30 grayscale" />
+                    <img src={logoNods} alt="NODS" className="h-4 w-auto opacity-30 grayscale" />
                 </div>
             </motion.div>
         </div>

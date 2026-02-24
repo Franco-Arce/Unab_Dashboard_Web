@@ -14,8 +14,8 @@ import {
 } from 'lucide-react';
 import AIPanel from '../components/AIPanel';
 import api from '../api';
-import logoUnab from '../assets/logo-unab.png';
-import nodsWhite from '../assets/nods-white.png';
+import logoUnab from '../assets/unab-logo.jpg';
+import logoNods from '../assets/logo-nods.ico';
 import nodsDark from '../assets/nods-dark.png';
 
 export default function DashboardLayout() {
@@ -74,8 +74,8 @@ export default function DashboardLayout() {
                 <div className="p-8 flex flex-col h-full">
                     {/* Logo Section */}
                     <div className="flex items-center gap-4 mb-12 px-2">
-                        <div className="p-2.5 bg-gradient-to-br from-blue-600 to-indigo-800 rounded-2xl shadow-lg shadow-blue-500/20">
-                            <img src={nodsWhite} alt="NODS" className="h-4 w-auto" />
+                        <div className="p-2.5 bg-white/10 rounded-2xl shadow-lg">
+                            <img src={logoNods} alt="NODS" className="h-6 w-auto" />
                         </div>
                         <span className="text-xl font-black text-white tracking-tighter italic uppercase opacity-90">Dashboard</span>
                     </div>
