@@ -163,23 +163,25 @@ async def ai_chat(body: ChatRequest, _user: str = Depends(require_auth)):
             log_ai("Attempting Groq chat...")
             content = await _groq_chat(messages)
             log_ai("Groq chat successful")
+            source = "Groq"
         except Exception as e:
             log_ai(f"Groq failed, switching to OpenAI fallback: {e}")
             if not o_key:
                 log_ai("OpenAI fallback failed (API Key missing)")
-                return {"response": "Groq ocupado y OpenAI no está configurado como respaldo."}
+                return {"response": "Groq está saturado y no hay respaldo de OpenAI configurado."}
                 
             try:
                 content = await _openai_chat(messages)
                 log_ai("OpenAI fallback successful")
+                source = "OpenAI"
             except Exception as oe:
                 log_ai(f"OpenAI fallback also failed: {oe}")
-                return {"response": "Todos los servicios de IA están ocupados en este momento. Por favor, intenta de nuevo en unos minutos."}
+                return {"response": "Todos los servicios de IA (Groq y OpenAI) están saturados. Por favor, intenta de nuevo en un momento."}
             
-        return {"response": content}
+        return {"response": f"{content}\n\n[Analizado con {source}]"}
     except Exception as e:
-        print(f"[AI Chat Overall Error] {e}")
-        return {"response": "Hubo un error inesperado al procesar tu solicitud de IA."}
+        log_ai(f"Unexpected error in ai_chat: {e}")
+        return {"response": "Error inesperado en el analista de IA."}
 
 
 @router.post("/insights")
