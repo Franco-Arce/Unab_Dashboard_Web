@@ -141,7 +141,17 @@ class DashboardCache:
 
             # ── Subcategorias No Util ──
             try:
-                no_util_rows = await fetch_all("SELECT descripcion_sub, leads_no_utiles as leads, leads_7_dias as leads_7d, leads_14_dias as leads_14d FROM agg_no_utiles ORDER BY leads DESC")
+                no_util_rows = await fetch_all("""
+                    SELECT 
+                        descrip_subcat AS descripcion_sub,
+                        COUNT(*) AS leads,
+                        SUM(CASE WHEN fecha_a_utilizar::timestamp >= NOW() - INTERVAL '7 days' THEN 1 ELSE 0 END) AS leads_7d,
+                        SUM(CASE WHEN fecha_a_utilizar::timestamp >= NOW() - INTERVAL '14 days' THEN 1 ELSE 0 END) AS leads_14d
+                    FROM dim_contactos
+                    WHERE descrip_cat ILIKE '%no util%' OR descrip_cat ILIKE '%descarte%'
+                    GROUP BY descrip_subcat
+                    ORDER BY leads DESC
+                """)
                 data["no_util"] = [dict(r) for r in no_util_rows]
             except Exception as e:
                 print(f"[Cache] Error fetching no_utiles: {e}")
