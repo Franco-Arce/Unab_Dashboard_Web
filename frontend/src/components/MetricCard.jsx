@@ -99,12 +99,17 @@ export const MetricCard = ({ data }) => {
                 </div>
             </div>
 
-            {/* Decoración de esquina interactiva */}
+            {/* Decoración de esquina interactiva: Muestra el trend comparado a la última actualización */}
             <motion.div
-                animate={isHovered ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.5 }}
-                className="absolute top-4 right-4 text-blue-900/10 pointer-events-none"
+                animate={isHovered ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.8, y: 20 }}
+                className="absolute top-6 right-8 text-blue-900/10 pointer-events-none flex flex-col items-end"
             >
-                <ArrowUpRight size={48} />
+                <span className="text-6xl font-black tracking-tighter leading-none">
+                    {trend}
+                </span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] mt-2 opacity-50 italic">
+                    vs ult. actualización
+                </span>
             </motion.div>
         </motion.div>
     );
