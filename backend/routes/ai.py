@@ -4,6 +4,7 @@ import httpx
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 from routes.auth import require_auth
 from cache import cache
 
@@ -13,6 +14,14 @@ MODEL = "llama-3.3-70b-versatile"
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 OPENAI_MODEL = "gpt-4o-mini"
 OPENAI_URL = "https://api.openai.com/v1/chat/completions"
+
+LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "ai_usage.log")
+
+def log_ai(message: str):
+    """Write log with timestamp to a file."""
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(LOG_FILE, "a", encoding="utf-8") as f:
+        f.write(f"[{timestamp}] {message}\n")
 
 async def _openai_chat(messages: list, temperature: float = 0.3, max_tokens: int = 1000) -> str:
     """Fallback: Call OpenAI API directly."""
@@ -151,19 +160,20 @@ async def ai_chat(body: ChatRequest, _user: str = Depends(require_auth)):
         messages.append({"role": "user", "content": body.message})
 
         try:
-            print("[AI] Attempting Groq chat...")
+            log_ai("Attempting Groq chat...")
             content = await _groq_chat(messages)
-            print("[AI] Groq chat successful")
+            log_ai("Groq chat successful")
         except Exception as e:
-            print(f"[AI] Groq failed, switching to OpenAI fallback: {e}")
+            log_ai(f"Groq failed, switching to OpenAI fallback: {e}")
             if not o_key:
+                log_ai("OpenAI fallback failed (API Key missing)")
                 return {"response": "Groq ocupado y OpenAI no está configurado como respaldo."}
                 
             try:
                 content = await _openai_chat(messages)
-                print("[AI] OpenAI fallback successful")
+                log_ai("OpenAI fallback successful")
             except Exception as oe:
-                print(f"[AI] OpenAI fallback also failed: {oe}")
+                log_ai(f"OpenAI fallback also failed: {oe}")
                 return {"response": "Todos los servicios de IA están ocupados en este momento. Por favor, intenta de nuevo en unos minutos."}
             
         return {"response": content}
@@ -201,16 +211,16 @@ async def ai_insights(body: Optional[ContextRequest] = None, _user: str = Depend
         ]
 
         try:
-            print("[AI] Attempting Groq insights...")
+            log_ai("Attempting Groq insights...")
             raw = (await _groq_chat(messages, temperature=0.5)).strip()
-            print("[AI] Groq insights successful")
+            log_ai("Groq insights successful")
         except Exception as e:
-            print(f"[AI] Groq insights failed, switching to OpenAI: {e}")
+            log_ai(f"Groq insights failed, switching to OpenAI: {e}")
             try:
                 raw = (await _openai_chat(messages, temperature=0.5)).strip()
-                print("[AI] OpenAI insights successful")
+                log_ai("OpenAI insights successful")
             except Exception as oe:
-                print(f"[AI] OpenAI insights also failed: {oe}")
+                log_ai(f"OpenAI insights also failed: {oe}")
                 raise oe
         try:
             if "```" in raw:
@@ -256,16 +266,16 @@ async def ai_predictions(body: Optional[ContextRequest] = None, _user: str = Dep
         ]
 
         try:
-            print("[AI] Attempting Groq predictions...")
+            log_ai("Attempting Groq predictions...")
             raw = (await _groq_chat(messages)).strip()
-            print("[AI] Groq predictions successful")
+            log_ai("Groq predictions successful")
         except Exception as e:
-            print(f"[AI] Groq predictions failed, switching to OpenAI: {e}")
+            log_ai(f"Groq predictions failed, switching to OpenAI: {e}")
             try:
                 raw = (await _openai_chat(messages)).strip()
-                print("[AI] OpenAI predictions successful")
+                log_ai("OpenAI predictions successful")
             except Exception as oe:
-                print(f"[AI] OpenAI predictions also failed: {oe}")
+                log_ai(f"OpenAI predictions also failed: {oe}")
                 raise oe
         try:
             if "```" in raw:
