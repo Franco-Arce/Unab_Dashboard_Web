@@ -46,6 +46,7 @@ async def get_admisiones(_user: str = Depends(require_auth)):
     return {
         "programas": data.get("merged_programs", []),
         "totals": data.get("totals", {}),
+        "trends": data.get("trends", {}),
     }
 
 
@@ -55,6 +56,7 @@ async def get_estados(_user: str = Depends(require_auth)):
     return {
         "estados_by_programa": data.get("merged_programs", []),
         "totals": data.get("totals", {}),
+        "trends": data.get("trends", {}),
         "admitidos_status": {}, # Dropped old detail statuses
         "estados_gestion": []
     }
@@ -75,7 +77,7 @@ async def get_no_util(_user: str = Depends(require_auth)):
             "porcentaje": round(cnt / total * 100, 2) if total else 0,
         })
 
-    return {"no_util": result, "no_util_total": total}
+    return {"no_util": result, "no_util_total": total, "trends": data.get("trends", {})}
 
 
 @router.get("/admitidos")

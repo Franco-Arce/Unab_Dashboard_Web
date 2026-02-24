@@ -44,11 +44,19 @@ export default function EstadosPage() {
         });
     }
 
+    const formatTrend = (val) => {
+        if (!val) return '0%';
+        if (val > 0) return `+${val}%`;
+        return `${val}%`;
+    };
+
+    const trends = data?.trends || {};
+
     const cards = [
-        { id: 1, label: 'Total Leads', value: tLeads, trend: '+0%', color: 'from-blue-600 to-blue-800', icon: Users, fill: 'h-[40%]' },
-        { id: 2, label: 'En Gestión', value: tGestion, trend: '+0%', color: 'from-indigo-600 to-blue-700', icon: UserCheck, fill: 'h-[35%]' },
-        { id: 3, label: 'Op. Venta', value: tOpVenta, trend: '+0%', color: 'from-blue-400 to-indigo-500', icon: Target, fill: 'h-[30%]' },
-        { id: 4, label: 'Pagados', value: tPag, trend: '+0%', color: 'from-emerald-500 to-teal-600', icon: CreditCard, fill: 'h-[25%]' },
+        { id: 1, label: 'Total Leads', value: tLeads, trend: formatTrend(trends.total_leads), color: 'from-blue-600 to-blue-800', icon: Users, fill: 'h-[40%]' },
+        { id: 2, label: 'En Gestión', value: tGestion, trend: formatTrend(trends.en_gestion), color: 'from-indigo-600 to-blue-700', icon: UserCheck, fill: 'h-[35%]' },
+        { id: 3, label: 'Op. Venta', value: tOpVenta, trend: formatTrend(trends.op_venta), color: 'from-blue-400 to-indigo-500', icon: Target, fill: 'h-[30%]' },
+        { id: 4, label: 'Pagados', value: tPag, trend: formatTrend(trends.pagados), color: 'from-emerald-500 to-teal-600', icon: CreditCard, fill: 'h-[25%]' },
     ];
 
     return (

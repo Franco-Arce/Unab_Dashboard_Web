@@ -47,15 +47,18 @@ export default function NoUtilPage() {
         return `${((val / total) * 100).toFixed(2)}%`;
     };
 
-    const getIncidence = (val, total) => {
-        if (!total) return '0%';
-        return ((val / total) * 100).toFixed(1) + '%';
+    const formatTrend = (val) => {
+        if (!val) return '0%';
+        if (val > 0) return `+${val}%`;
+        return `${val}%`;
     };
 
+    const trends = data?.trends || {};
+
     const cards = [
-        { id: 1, label: 'Total No Útiles', value: tLeads, trend: '+0%', color: 'from-rose-600 to-rose-800', icon: AlertOctagon, fill: 'h-[40%]' },
-        { id: 2, label: 'Incidencia (7d)', value: getIncidence(tLeads7, tLeads), trend: `vs Total`, color: 'from-orange-500 to-rose-600', icon: Calendar, fill: 'h-[35%]', unit: null },
-        { id: 3, label: 'Incidencia (14d)', value: getIncidence(tLeads14, tLeads), trend: `vs Total`, color: 'from-amber-500 to-orange-600', icon: Clock, fill: 'h-[30%]', unit: null },
+        { id: 1, label: 'Total No Útiles', value: tLeads, trend: formatTrend(trends.no_util), color: 'from-rose-600 to-rose-800', icon: AlertOctagon, fill: 'h-[40%]' },
+        { id: 2, label: '7 Días', value: tLeads7, trend: formatTrend(trends.no_util), color: 'from-orange-500 to-rose-600', icon: Calendar, fill: 'h-[35%]' },
+        { id: 3, label: '14 Días', value: tLeads14, trend: formatTrend(trends.no_util), color: 'from-amber-500 to-orange-600', icon: Clock, fill: 'h-[30%]' },
     ];
 
     return (

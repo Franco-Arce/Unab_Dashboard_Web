@@ -43,8 +43,16 @@ class DashboardCache:
             if self.data:
                 self.previous_snapshot = copy.deepcopy(self.data)
                 try:
-                    # Filter out non-serializable elements before saving
-                    snap_to_save = {k: v for k, v in self.previous_snapshot.items() if k != "fecha_actualizacion"}
+                    # Filter out non-serializable elements (sometimes dates aren't enough)
+                    # We save the baseline data to last_snapshot.json
+                    snap_to_save = {
+                        "total_leads": self.data.get("total_leads"),
+                        "en_gestion": self.data.get("en_gestion"),
+                        "op_venta": self.data.get("op_venta"),
+                        "proceso_pago": self.data.get("proceso_pago"),
+                        "no_util_total": self.data.get("no_util_total"),
+                        "totals": self.data.get("totals"),
+                    }
                     with open(self.snapshot_file, "w") as f:
                         json.dump(snap_to_save, f)
                 except Exception as e:
@@ -202,7 +210,8 @@ class DashboardCache:
 
             # Calculate actual update trends
             trends = {
-                "total_leads": 0, "matriculados": 0, "en_gestion": 0, "pagados": 0
+                "total_leads": 0, "matriculados": 0, "en_gestion": 0, "pagados": 0,
+                "op_venta": 0, "proceso_pago": 0, "no_util": 0
             }
             
             def calc_trend(prev_v, curr_v):
@@ -212,15 +221,21 @@ class DashboardCache:
             if self.previous_snapshot:
                 prev = self.previous_snapshot
                 trends["total_leads"] = calc_trend(prev.get("total_leads", 0), data["total_leads"])
-                trends["matriculados"] = calc_trend(prev.get("totals", {}).get("pagados", 0), data["totals"]["pagados"])
                 trends["en_gestion"] = calc_trend(prev.get("en_gestion", 0), data["en_gestion"])
-                trends["pagados"] = calc_trend(prev.get("totals", {}).get("pagados", 0), data["totals"]["pagados"])
+                trends["op_venta"] = calc_trend(prev.get("op_venta", 0), data["op_venta"])
+                trends["proceso_pago"] = calc_trend(prev.get("proceso_pago", 0), data["proceso_pago"])
+                trends["no_util"] = calc_trend(prev.get("no_util_total", 0), data["no_util_total"])
+                
+                prev_totals = prev.get("totals", {})
+                trends["matriculados"] = calc_trend(prev_totals.get("pagados", 0), data["totals"]["pagados"])
+                trends["pagados"] = calc_trend(prev_totals.get("pagados", 0), data["totals"]["pagados"])
             elif data.get("totals"):
                 # Fallback to DB variance columns if no snapshot exists
                 t = data["totals"]
+                # For Pagados/Matriculados we have _var
                 trends["matriculados"] = calc_trend(t.get("pagados", 0) - t.get("pagados_var", 0), t.get("pagados", 0))
-                trends["pagados"] = calc_trend(t.get("pagados", 0) - t.get("pagados_var", 0), t.get("pagados", 0))
-                # Note: admitidos_var could be used if we added an Admitidos card to Overview
+                trends["pagados"] = trends["matriculados"]
+                # Others don't have _var, they stay at 0 until next refresh
             
             data["trends"] = trends
             

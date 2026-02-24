@@ -101,20 +101,20 @@ export const MetricCard = ({ data }) => {
 
             {/* Decoración de esquina interactiva: Muestra el trend comparado a la última actualización */}
             <motion.div
-                animate={isHovered ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.8, y: 10 }}
-                className="absolute top-6 right-6 pointer-events-none flex flex-col items-end z-20"
+                animate={isHovered ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.8, y: 5 }}
+                className="absolute top-4 right-4 pointer-events-none flex flex-col items-end z-20"
             >
                 <div className={`
-                    px-4 py-2 rounded-2xl backdrop-blur-md border shadow-lg flex flex-col items-end
-                    ${isPositiveTrend ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600' :
-                        isNegativeTrend ? 'bg-rose-500/10 border-rose-500/20 text-rose-600' :
-                            'bg-slate-500/10 border-slate-500/20 text-slate-600'}
+                    px-3 py-1.5 rounded-xl backdrop-blur-lg border shadow-xl flex flex-col items-end
+                    ${isPositiveTrend ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-700' :
+                        isNegativeTrend ? 'bg-rose-500/20 border-rose-500/30 text-rose-700' :
+                            'bg-slate-500/20 border-slate-500/30 text-slate-700'}
                 `}>
-                    <span className="text-3xl font-black tracking-tighter leading-none mb-1">
+                    <span className="text-lg font-black tracking-tighter leading-none mb-0.5">
                         {trend}
                     </span>
-                    <span className="text-[8px] font-black uppercase tracking-[0.2em] opacity-80 whitespace-nowrap">
-                        vs ult. actualización
+                    <span className="text-[7px] font-black uppercase tracking-[0.1em] opacity-70 whitespace-nowrap">
+                        vs update
                     </span>
                 </div>
             </motion.div>
