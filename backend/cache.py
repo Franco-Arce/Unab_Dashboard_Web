@@ -16,9 +16,10 @@ class DashboardCache:
         self.data = {}
         self.last_refresh: datetime | None = None
         self.previous_snapshot: dict | None = None
-        self.snapshot_file = "last_snapshot.json"
-        
         # Try to load persistent snapshot on boot
+        backend_dir = os.path.dirname(os.path.abspath(__file__))
+        self.snapshot_file = os.path.join(backend_dir, "last_snapshot.json")
+        
         if os.path.exists(self.snapshot_file):
             try:
                 with open(self.snapshot_file, "r") as f:
@@ -66,9 +67,10 @@ class DashboardCache:
             total_adm = 0
             total_pag = 0
             total_meta = 0
-            total_sol_25 = 0
-            total_adm_25 = 0
             total_pag_25 = 0
+            total_sol_var = 0
+            total_adm_var = 0
+            total_pag_var = 0
             
             latest_fecha = None
             latest_fecha_pos = None
@@ -109,6 +111,9 @@ class DashboardCache:
                 total_sol_25 += sol_25
                 total_adm_25 += adm_25
                 total_pag_25 += pag_25
+                total_sol_var += _safe_int(r.get("solicitados_var"))
+                total_adm_var += _safe_int(r.get("admitidos_var"))
+                total_pag_var += _safe_int(r.get("pagados_var"))
                 
                 # Fetch dates to find latest
                 if r.get("fecha"):
@@ -155,6 +160,9 @@ class DashboardCache:
                 "solicitados_25": total_sol_25,
                 "admitidos_25": total_adm_25,
                 "pagados_25": total_pag_25,
+                "solicitados_var": total_sol_var,
+                "admitidos_var": total_adm_var,
+                "pagados_var": total_pag_var,
             }
 
             # ── Subcategorias No Util ──
@@ -196,16 +204,23 @@ class DashboardCache:
             trends = {
                 "total_leads": 0, "matriculados": 0, "en_gestion": 0, "pagados": 0
             }
-            if self.previous_snapshot:
-                def calc_trend(prev_v, curr_v):
-                    if not prev_v or prev_v == 0: return 0.0
-                    return round(((curr_v - prev_v) / prev_v) * 100, 1)
+            
+            def calc_trend(prev_v, curr_v):
+                if not prev_v or prev_v == 0: return 0.0
+                return round(((curr_v - prev_v) / prev_v) * 100, 1)
 
+            if self.previous_snapshot:
                 prev = self.previous_snapshot
                 trends["total_leads"] = calc_trend(prev.get("total_leads", 0), data["total_leads"])
-                trends["matriculados"] = calc_trend(prev.get("totals", {}).get("admitidos", 0), data["totals"]["admitidos"])
+                trends["matriculados"] = calc_trend(prev.get("totals", {}).get("pagados", 0), data["totals"]["pagados"])
                 trends["en_gestion"] = calc_trend(prev.get("en_gestion", 0), data["en_gestion"])
                 trends["pagados"] = calc_trend(prev.get("totals", {}).get("pagados", 0), data["totals"]["pagados"])
+            elif data.get("totals"):
+                # Fallback to DB variance columns if no snapshot exists
+                t = data["totals"]
+                trends["matriculados"] = calc_trend(t.get("pagados", 0) - t.get("pagados_var", 0), t.get("pagados", 0))
+                trends["pagados"] = calc_trend(t.get("pagados", 0) - t.get("pagados_var", 0), t.get("pagados", 0))
+                # Note: admitidos_var could be used if we added an Admitidos card to Overview
             
             data["trends"] = trends
             

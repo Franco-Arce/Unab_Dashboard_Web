@@ -101,15 +101,22 @@ export const MetricCard = ({ data }) => {
 
             {/* Decoración de esquina interactiva: Muestra el trend comparado a la última actualización */}
             <motion.div
-                animate={isHovered ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.8, y: 20 }}
-                className="absolute top-6 right-8 text-blue-900/10 pointer-events-none flex flex-col items-end"
+                animate={isHovered ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.8, y: 10 }}
+                className="absolute top-6 right-6 pointer-events-none flex flex-col items-end z-20"
             >
-                <span className="text-6xl font-black tracking-tighter leading-none">
-                    {trend}
-                </span>
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] mt-2 opacity-50 italic">
-                    vs ult. actualización
-                </span>
+                <div className={`
+                    px-4 py-2 rounded-2xl backdrop-blur-md border shadow-lg flex flex-col items-end
+                    ${isPositiveTrend ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600' :
+                        isNegativeTrend ? 'bg-rose-500/10 border-rose-500/20 text-rose-600' :
+                            'bg-slate-500/10 border-slate-500/20 text-slate-600'}
+                `}>
+                    <span className="text-3xl font-black tracking-tighter leading-none mb-1">
+                        {trend}
+                    </span>
+                    <span className="text-[8px] font-black uppercase tracking-[0.2em] opacity-80 whitespace-nowrap">
+                        vs ult. actualización
+                    </span>
+                </div>
             </motion.div>
         </motion.div>
     );
