@@ -47,10 +47,15 @@ export default function NoUtilPage() {
         return `${((val / total) * 100).toFixed(2)}%`;
     };
 
+    const getIncidence = (val, total) => {
+        if (!total) return '0%';
+        return ((val / total) * 100).toFixed(1) + '%';
+    };
+
     const cards = [
         { id: 1, label: 'Total No Útiles', value: tLeads, trend: '+0%', color: 'from-rose-600 to-rose-800', icon: AlertOctagon, fill: 'h-[40%]' },
-        { id: 2, label: 'Últimos 7 días', value: tLeads7, trend: '+0%', color: 'from-orange-500 to-rose-600', icon: Calendar, fill: 'h-[35%]' },
-        { id: 3, label: 'Últimos 14 días', value: tLeads14, trend: '+0%', color: 'from-amber-500 to-orange-600', icon: Clock, fill: 'h-[30%]' },
+        { id: 2, label: 'Incidencia (7d)', value: getIncidence(tLeads7, tLeads), trend: `vs Total`, color: 'from-orange-500 to-rose-600', icon: Calendar, fill: 'h-[35%]', unit: null },
+        { id: 3, label: 'Incidencia (14d)', value: getIncidence(tLeads14, tLeads), trend: `vs Total`, color: 'from-amber-500 to-orange-600', icon: Clock, fill: 'h-[30%]', unit: null },
     ];
 
     return (

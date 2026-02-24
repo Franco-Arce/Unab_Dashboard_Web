@@ -69,50 +69,93 @@ export default function DashboardLayout() {
     return (
         <div className="flex min-h-screen bg-nods-bg text-nods-text-primary font-sans">
             {/* Sidebar ... (no changes needed) */}
-            <aside className="w-64 flex-shrink-0 border-r border-nods-border bg-nods-sidebar flex flex-col sticky top-0 h-screen transition-all duration-300">
-                <div className="p-6">
-                    <div className="flex items-center gap-4 mb-10 px-2">
-                        <img src={nodsWhite} alt="NODS" className="h-6 w-auto opacity-90" />
+            {/* Sidebar Redesign */}
+            <aside className="w-72 flex-shrink-0 bg-[#0a0f18] flex flex-col sticky top-0 h-screen transition-all duration-300 border-r border-slate-800/30">
+                <div className="p-8 flex flex-col h-full">
+                    {/* Logo Section */}
+                    <div className="flex items-center gap-4 mb-12 px-2">
+                        <div className="p-2.5 bg-gradient-to-br from-blue-600 to-indigo-800 rounded-2xl shadow-lg shadow-blue-500/20">
+                            <img src={nodsWhite} alt="NODS" className="h-4 w-auto" />
+                        </div>
+                        <span className="text-xl font-black text-white tracking-tighter italic uppercase opacity-90">Dashboard</span>
                     </div>
 
-                    <nav className="space-y-1">
+                    {/* Navigation */}
+                    <nav className="space-y-2 flex-1">
                         {navItems.map((item) => (
                             <NavLink
                                 key={item.path}
                                 to={item.path}
                                 end={item.path === '/dashboard'}
                                 className={({ isActive }) => `
-                                    flex items-center justify-between px-4 py-3 rounded-xl transition-all group
+                                    relative flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-500 group overflow-hidden
                                     ${isActive
-                                        ? 'bg-nods-accent text-white font-bold shadow-[0_4px_12px_rgba(37,99,235,0.15)]'
-                                        : 'text-slate-400 hover:bg-slate-900 hover:text-white'}
+                                        ? 'text-white shadow-2xl shadow-blue-500/10'
+                                        : 'text-slate-500 hover:text-slate-200'}
                                 `}
                             >
-                                <div className="flex items-center gap-3">
-                                    <item.icon className={`w-5 h-5 ${location.pathname === item.path ? 'text-white' : 'text-slate-500 group-hover:text-nods-accent'}`} />
-                                    <span>{item.label}</span>
-                                </div>
-                                {location.pathname === item.path && <ChevronRight className="w-4 h-4" />}
+                                {({ isActive }) => (
+                                    <>
+                                        {/* Background active highlight (Glassmorphism + Liquid) */}
+                                        {isActive && (
+                                            <motion.div
+                                                layoutId="activeNav"
+                                                className="absolute inset-0 bg-blue-600 z-0 overflow-hidden"
+                                                initial={false}
+                                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                            >
+                                                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-800 opacity-90" />
+                                                {/* Liquid flow effect */}
+                                                <div className="absolute inset-0 opacity-20 animate-liquid-1 filter blur-sm"
+                                                    style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, white 0%, transparent 50%)', backgroundSize: '100% 100%' }} />
+                                                <div className="absolute inset-0 opacity-10 animate-liquid-2 filter blur-md"
+                                                    style={{ backgroundImage: 'radial-gradient(circle at 80% 50%, white 0%, transparent 40%)', backgroundSize: '120% 120%' }} />
+                                            </motion.div>
+                                        )}
+
+                                        <div className="relative z-10 flex items-center justify-between w-full">
+                                            <div className="flex items-center gap-4">
+                                                <div className={`p-2 rounded-xl transition-colors duration-500 ${isActive ? 'bg-white/10' : 'bg-transparent group-hover:bg-slate-800/50'}`}>
+                                                    <item.icon className={`w-5 h-5 transition-transform duration-500 group-hover:scale-110 ${isActive ? 'text-white' : 'text-slate-500'}`} />
+                                                </div>
+                                                <span className={`text-sm tracking-tight transition-all duration-300 ${isActive ? 'font-black uppercase text-[11px] tracking-[0.1em]' : 'font-bold'}`}>
+                                                    {item.label}
+                                                </span>
+                                            </div>
+                                            {isActive && <ChevronRight className="w-4 h-4 text-white/50" />}
+                                        </div>
+                                    </>
+                                )}
                             </NavLink>
                         ))}
                     </nav>
-                </div>
 
-                <div className="mt-auto p-4 border-t border-slate-800/50">
-                    <div className="bg-slate-900/50 p-4 rounded-2xl mb-4 border border-slate-800">
-                        <div className="flex items-center gap-3 mb-2 text-white">
-                            <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold">
-                                {user?.username?.[0] || 'A'}
+                    {/* User Section Redesign */}
+                    <div className="pt-8 mt-auto">
+                        <div className="bg-slate-900/40 border border-slate-800/50 p-5 rounded-[2rem] backdrop-blur-xl relative overflow-hidden group">
+                            {/* Decorative liquid accent */}
+                            <div className="absolute -bottom-10 -right-10 w-24 h-24 bg-blue-600/20 blur-[50px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+
+                            <div className="flex items-center gap-4 mb-4 relative z-10">
+                                <div className="w-12 h-12 rounded-full border-2 border-slate-700 p-0.5 transition-transform duration-500 group-hover:rotate-12">
+                                    <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-600 to-indigo-800 flex items-center justify-center text-sm font-black text-white shadow-inner">
+                                        {user?.username?.[0] || 'A'}
+                                    </div>
+                                </div>
+                                <div>
+                                    <span className="block text-xs font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Usuario</span>
+                                    <span className="block text-sm font-black text-white italic tracking-tight">{user?.username || 'Administrador'}</span>
+                                </div>
                             </div>
-                            <span className="text-sm font-medium">{user?.username || 'Admin'}</span>
+
+                            <button
+                                onClick={handleLogout}
+                                className="flex items-center justify-center gap-2 text-[10px] font-black text-slate-500 hover:text-rose-400 transition-all uppercase tracking-[0.2em] w-full py-2 border-t border-slate-800/50 mt-2 hover:bg-rose-400/5 rounded-lg"
+                            >
+                                <LogOut className="w-3 h-3" />
+                                Cerrar Sesión
+                            </button>
                         </div>
-                        <button
-                            onClick={handleLogout}
-                            className="flex items-center gap-2 text-xs text-slate-500 hover:text-red-400 transition-colors w-full"
-                        >
-                            <LogOut className="w-3 h-3" />
-                            Cerrar Sesión
-                        </button>
                     </div>
                 </div>
             </aside>

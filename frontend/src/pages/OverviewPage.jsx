@@ -15,6 +15,7 @@ import { motion } from 'framer-motion';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell, AreaChart, Area, CartesianGrid } from 'recharts';
 import api from '../api';
 import { MetricCard } from '../components/MetricCard';
+import { CircularLiquidGauge } from '../components/CircularLiquidGauge';
 
 // Floating bubbles component for liquid effect
 const FloatingBubbles = ({ count = 6 }) => {
@@ -241,21 +242,17 @@ export default function OverviewPage() {
                         initial={{ opacity: 0, x: 30 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.6, delay: 0.6, type: "spring" }}
-                        whileHover={{ scale: 1.02, y: -4 }}
-                        className="bg-white border border-nods-border rounded-3xl p-6 shadow-lg w-full cursor-pointer"
+                        className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/50 w-full relative overflow-hidden group"
                     >
-                        <h4 className="text-sm font-bold uppercase tracking-widest text-nods-text-muted mb-6">Eficiencia</h4>
-                        <div className="flex items-center gap-6">
-                            <div className="relative w-24 h-24 flex items-center justify-center shrink-0">
-                                <svg className="w-full h-full -rotate-90">
-                                    <circle cx="48" cy="48" r="40" fill="transparent" stroke="currentColor" strokeWidth="8" className="text-slate-100" />
-                                    <circle cx="48" cy="48" r="40" fill="transparent" stroke="currentColor" strokeWidth="8" strokeDasharray={251} strokeDashoffset={251 - (251 * (kpis.matriculados / kpis.total_leads))} className="text-nods-accent" />
-                                </svg>
-                                <span className="absolute text-lg font-black text-nods-text-primary">{Math.round((kpis.matriculados / kpis.total_leads) * 100)}%</span>
-                            </div>
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-8 italic">Eficiencia</h4>
+                        <div className="flex items-center gap-8 relative z-10">
+                            <CircularLiquidGauge
+                                percent={(kpis.matriculados / kpis.total_leads) * 100}
+                                color="from-blue-600 to-indigo-700"
+                            />
                             <div>
-                                <div className="text-sm font-black text-nods-text-primary">Tasa de Conversión</div>
-                                <div className="text-xs text-nods-text-primary/70 font-bold mt-1">Leads a Matriculados</div>
+                                <div className="text-lg font-black text-slate-900 tracking-tight leading-none mb-1">Tasa de Conversión</div>
+                                <div className="text-xs text-slate-500 font-bold uppercase tracking-tighter opacity-70 italic">Leads a Matriculados</div>
                             </div>
                         </div>
                     </motion.div>
@@ -264,21 +261,17 @@ export default function OverviewPage() {
                         initial={{ opacity: 0, x: 30 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.6, delay: 0.7, type: "spring" }}
-                        whileHover={{ scale: 1.02, y: -4 }}
-                        className="bg-white border border-nods-border rounded-3xl p-6 shadow-lg w-full cursor-pointer"
+                        className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/50 w-full relative overflow-hidden group"
                     >
-                        <h4 className="text-sm font-bold uppercase tracking-widest text-nods-text-muted mb-6">Salud de Base</h4>
-                        <div className="flex items-center gap-6">
-                            <div className="relative w-24 h-24 flex items-center justify-center shrink-0">
-                                <svg className="w-full h-full -rotate-90">
-                                    <circle cx="48" cy="48" r="40" fill="transparent" stroke="currentColor" strokeWidth="8" className="text-slate-100" />
-                                    <circle cx="48" cy="48" r="40" fill="transparent" stroke="currentColor" strokeWidth="8" strokeDasharray={251} strokeDashoffset={251 - (251 * (kpis.en_gestion / kpis.total_leads))} className="text-nods-warning" />
-                                </svg>
-                                <span className="absolute text-lg font-black text-nods-text-primary">{Math.round((kpis.en_gestion / kpis.total_leads) * 100)}%</span>
-                            </div>
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-8 italic">Salud de Base</h4>
+                        <div className="flex items-center gap-8 relative z-10">
+                            <CircularLiquidGauge
+                                percent={(kpis.en_gestion / kpis.total_leads) * 100}
+                                color="from-orange-500 to-amber-600"
+                            />
                             <div>
-                                <div className="text-sm font-black text-nods-text-primary">Cobertura</div>
-                                <div className="text-xs text-nods-text-primary/70 font-bold mt-1">Leads en gestión</div>
+                                <div className="text-lg font-black text-slate-900 tracking-tight leading-none mb-1">Cobertura</div>
+                                <div className="text-xs text-slate-500 font-bold uppercase tracking-tighter opacity-70 italic">Leads en gestión</div>
                             </div>
                         </div>
                     </motion.div>

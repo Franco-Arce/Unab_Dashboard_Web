@@ -89,9 +89,13 @@ export const MetricCard = ({ data }) => {
                 </p>
                 <div className="flex items-baseline gap-2">
                     <h3 className="text-3xl font-black text-slate-900 tracking-tighter leading-none">
-                        {value.toLocaleString()}
+                        {typeof value === 'number' ? value.toLocaleString() : value}
                     </h3>
-                    <span className="text-[10px] font-bold text-blue-600 uppercase tracking-tighter">unid.</span>
+                    {data.unit !== null && (
+                        <span className="text-[10px] font-bold text-blue-600 uppercase tracking-tighter">
+                            {data.unit || 'unid.'}
+                        </span>
+                    )}
                 </div>
             </div>
 
