@@ -108,7 +108,7 @@ export default function AIPanel({ onClose }) {
             {/* Body */}
             <div className="flex-1 overflow-y-auto p-6 bg-slate-50/50 space-y-4">
                 {/* Chat */}
-                {tab === 'chat' && (
+                {tab === 'chat' ? (
                     <div className="flex flex-col gap-4 min-h-full">
                         {messages.map((msg, i) => (
                             <motion.div
@@ -128,7 +128,7 @@ export default function AIPanel({ onClose }) {
                                 </div>
                             </motion.div>
                         ))}
-                        {sending && (
+                        {sending ? (
                             <div className="flex gap-3">
                                 <div className="w-8 h-8 rounded-full bg-nods-sidebar flex items-center justify-center flex-shrink-0">
                                     <Bot size={14} className="text-white" />
@@ -138,13 +138,13 @@ export default function AIPanel({ onClose }) {
                                     <span className="text-[11px] font-bold text-nods-text-muted uppercase tracking-wider">Analizando...</span>
                                 </div>
                             </div>
-                        )}
+                        ) : null}
                         <div ref={messagesEnd} />
                     </div>
-                )}
+                ) : null}
 
                 {/* Insights */}
-                {tab === 'insights' && (
+                {tab === 'insights' ? (
                     <div className="space-y-4">
                         {loadingInsights ? (
                             <div className="space-y-4">
@@ -174,7 +174,7 @@ export default function AIPanel({ onClose }) {
                             🔄 Regenerar Insights
                         </button>
                     </div>
-                )}
+                ) : null}
             </div>
 
             {/* Input */}

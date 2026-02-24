@@ -73,12 +73,12 @@ export const MetricCard = ({ data }) => {
                 <div className={`p-3 rounded-2xl bg-gradient-to-br ${color} text-white shadow-lg shadow-blue-200/50 group-hover:scale-110 transition-transform duration-500`}>
                     {Icon && <Icon size={22} />}
                 </div>
-                {trend && trend !== '0%' && (
+                {trend && trend !== '0%' ? (
                     <div className={`flex items-center gap-1 text-[10px] font-black px-2 py-1 rounded-lg ${isPositiveTrend ? 'bg-emerald-50 text-emerald-600' : isNegativeTrend ? 'bg-rose-50 text-rose-600' : 'bg-slate-50 text-slate-600'}`}>
                         {isPositiveTrend ? <TrendingUp size={10} /> : <ArrowUpRight size={10} className={isNegativeTrend ? "rotate-90" : ""} />}
                         {trend}
                     </div>
-                )}
+                ) : null}
             </div>
 
             {/* CONTENIDO INFERIOR: Texto y Valor */}
