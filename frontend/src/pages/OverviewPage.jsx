@@ -155,12 +155,12 @@ export default function OverviewPage() {
                                 return (
                                     <div key={index} className="relative">
                                         <div className="flex items-center gap-4 group">
-                                            {/* Step Badge */}
-                                            <div className="hidden md:flex flex-col items-center">
-                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Paso</span>
-                                                <div className="w-10 h-10 rounded-2xl bg-[#0f172a] flex items-center justify-center text-white text-xs font-black shadow-lg">
-                                                    0{index + 1}
-                                                </div>
+                                            {/* Left: Step Circle */}
+                                            <div
+                                                className="w-12 h-12 md:w-14 md:h-14 rounded-full flex-shrink-0 flex items-center justify-center text-white font-black text-lg shadow-sm transition-transform group-hover:scale-105"
+                                                style={{ backgroundColor: barColor }}
+                                            >
+                                                {index + 1}
                                             </div>
 
                                             {/* Main Bar with Parallax Liquid */}
