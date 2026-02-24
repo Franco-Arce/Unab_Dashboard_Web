@@ -73,16 +73,19 @@ export default function DashboardLayout() {
             <aside className="w-72 flex-shrink-0 bg-[#0a0f18] flex flex-col sticky top-0 h-screen transition-all duration-300 border-r border-slate-800/30">
                 <div className="p-8 flex flex-col h-full">
                     {/* Logo Section */}
-                    <div className="flex items-center gap-4 mb-12 px-2">
-                        <div className="flex items-center justify-center">
+                    <div className="flex items-center gap-3 mb-12 px-2">
+                        <div className="flex items-center justify-center py-1">
                             <img
                                 src={logoNods}
                                 alt="NODS"
-                                className="h-8 w-auto filter brightness-110 contrast-125"
+                                className="h-7 w-auto filter brightness-110 contrast-125"
                                 style={{ mixBlendMode: 'lighten' }}
                             />
                         </div>
-                        <span className="text-xl font-black text-white tracking-tighter italic uppercase opacity-90">Dashboard</span>
+                        <div className="flex flex-col">
+                            <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.4em] leading-none mb-1">UNAB</span>
+                            <span className="text-sm font-black text-white tracking-[0.2em] italic uppercase opacity-90 leading-none">DASHBOARD</span>
+                        </div>
                     </div>
 
                     {/* Navigation */}
@@ -101,7 +104,7 @@ export default function DashboardLayout() {
                             >
                                 {({ isActive }) => (
                                     <>
-                                        {/* Background active highlight (Glassmorphism + Liquid) */}
+                                        {/* Background active highlight (Glassmorphism + Liquid) ... (keep existing) */}
                                         {isActive && (
                                             <motion.div
                                                 layoutId="activeNav"
@@ -110,7 +113,6 @@ export default function DashboardLayout() {
                                                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                             >
                                                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-800 opacity-90" />
-                                                {/* Liquid flow effect */}
                                                 <div className="absolute inset-0 opacity-20 animate-liquid-1 filter blur-sm"
                                                     style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, white 0%, transparent 50%)', backgroundSize: '100% 100%' }} />
                                                 <div className="absolute inset-0 opacity-10 animate-liquid-2 filter blur-md"
@@ -136,29 +138,24 @@ export default function DashboardLayout() {
                     </nav>
 
                     {/* User Section Redesign */}
-                    <div className="pt-8 mt-auto">
-                        <div className="bg-slate-900/40 border border-slate-800/50 p-5 rounded-[2rem] backdrop-blur-xl relative overflow-hidden group">
-                            {/* Decorative liquid accent */}
-                            <div className="absolute -bottom-10 -right-10 w-24 h-24 bg-blue-600/20 blur-[50px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-
-                            <div className="flex items-center gap-4 mb-4 relative z-10">
-                                <div className="w-12 h-12 rounded-full border-2 border-slate-700 p-0.5 transition-transform duration-500 group-hover:rotate-12">
-                                    <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-600 to-indigo-800 flex items-center justify-center text-sm font-black text-white shadow-inner">
-                                        {user?.username?.[0] || 'A'}
-                                    </div>
+                    <div className="pt-8 mt-auto border-t border-slate-800/50">
+                        <div className="flex items-center justify-between px-2">
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-800 flex items-center justify-center text-xs font-black text-white shadow-lg shadow-blue-500/10">
+                                    {user?.username?.[0] || 'A'}
                                 </div>
                                 <div>
-                                    <span className="block text-xs font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Usuario</span>
-                                    <span className="block text-sm font-black text-white italic tracking-tight">{user?.username || 'Administrador'}</span>
+                                    <span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Personal</span>
+                                    <span className="block text-sm font-black text-white tracking-tight">{user?.username || 'Administrador'}</span>
                                 </div>
                             </div>
 
                             <button
                                 onClick={handleLogout}
-                                className="flex items-center justify-center gap-2 text-[10px] font-black text-slate-500 hover:text-rose-400 transition-all uppercase tracking-[0.2em] w-full py-2 border-t border-slate-800/50 mt-2 hover:bg-rose-400/5 rounded-lg"
+                                className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-400/5 rounded-xl transition-all group"
+                                title="Cerrar Sesión"
                             >
-                                <LogOut className="w-3 h-3" />
-                                Cerrar Sesión
+                                <LogOut className="w-4 h-4 group-hover:scale-110 transition-transform" />
                             </button>
                         </div>
                     </div>
