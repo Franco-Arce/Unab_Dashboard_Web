@@ -18,7 +18,8 @@ async def _openai_chat(messages: list, temperature: float = 0.3, max_tokens: int
     """Fallback: Call OpenAI API directly."""
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
-        raise Exception("OPENAI_API_KEY no configurada en el servidor")
+        print("[AI] Warning: OPENAI_API_KEY is missing")
+        raise Exception("OPENAI_API_KEY no configurada")
 
     async with httpx.AsyncClient() as client:
         resp = await client.post(
@@ -35,7 +36,11 @@ async def _openai_chat(messages: list, temperature: float = 0.3, max_tokens: int
             },
             timeout=30.0,
         )
-        resp.raise_for_status()
+        if resp.status_code != 200:
+            err_body = resp.text
+            print(f"[AI] OpenAI Error {resp.status_code}: {err_body}")
+            raise Exception(f"OpenAI API Error {resp.status_code}: {err_body}")
+
         data = resp.json()
         return data["choices"][0]["message"]["content"]
 
@@ -44,7 +49,8 @@ async def _groq_chat(messages: list, temperature: float = 0.3, max_tokens: int =
     """Call Groq API directly."""
     api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
-        raise Exception("GROQ_API_KEY no configurada en el servidor")
+        print("[AI] Warning: GROQ_API_KEY is missing")
+        raise Exception("GROQ_API_KEY no configurada")
 
     async with httpx.AsyncClient() as client:
         resp = await client.post(
@@ -61,7 +67,11 @@ async def _groq_chat(messages: list, temperature: float = 0.3, max_tokens: int =
             },
             timeout=30.0,
         )
-        resp.raise_for_status()
+        if resp.status_code != 200:
+            err_body = resp.text
+            print(f"[AI] Groq Error {resp.status_code}: {err_body}")
+            raise Exception(f"Groq API Error {resp.status_code}: {err_body}")
+            
         data = resp.json()
         return data["choices"][0]["message"]["content"]
 
@@ -135,15 +145,23 @@ async def ai_chat(body: ChatRequest, _user: str = Depends(require_auth)):
         messages.append({"role": "user", "content": body.message})
 
         try:
+            print("[AI] Attempting Groq chat...")
             content = await _groq_chat(messages)
+            print("[AI] Groq chat successful")
         except Exception as e:
-            print(f"[AI Chat Groq Fallback] {e}")
-            content = await _openai_chat(messages)
+            print(f"[AI] Groq failed, switching to OpenAI fallback: {e}")
+            try:
+                content = await _openai_chat(messages)
+                print("[AI] OpenAI fallback successful")
+            except Exception as oe:
+                print(f"[AI] OpenAI fallback also failed: {oe}")
+                raise oe
             
         return {"response": content}
     except Exception as e:
-        print(f"[AI Chat Error] {e}")
-        return {"response": f"Error (OpenAI Fallback también falló): {str(e)[:200]}"}
+        error_msg = str(e)
+        print(f"[AI Chat Final Error] {error_msg}")
+        return {"response": f"Error de IA (Groq y OpenAI fallaron): {error_msg[:200]}"}
 
 
 @router.post("/insights")
@@ -175,10 +193,17 @@ async def ai_insights(body: Optional[ContextRequest] = None, _user: str = Depend
         ]
 
         try:
+            print("[AI] Attempting Groq insights...")
             raw = (await _groq_chat(messages, temperature=0.5)).strip()
+            print("[AI] Groq insights successful")
         except Exception as e:
-            print(f"[AI Insights Groq Fallback] {e}")
-            raw = (await _openai_chat(messages, temperature=0.5)).strip()
+            print(f"[AI] Groq insights failed, switching to OpenAI: {e}")
+            try:
+                raw = (await _openai_chat(messages, temperature=0.5)).strip()
+                print("[AI] OpenAI insights successful")
+            except Exception as oe:
+                print(f"[AI] OpenAI insights also failed: {oe}")
+                raise oe
         try:
             if "```" in raw:
                 raw = raw.split("```")[1]
@@ -221,10 +246,17 @@ async def ai_predictions(body: Optional[ContextRequest] = None, _user: str = Dep
         ]
 
         try:
+            print("[AI] Attempting Groq predictions...")
             raw = (await _groq_chat(messages)).strip()
+            print("[AI] Groq predictions successful")
         except Exception as e:
-            print(f"[AI Predictions Groq Fallback] {e}")
-            raw = (await _openai_chat(messages)).strip()
+            print(f"[AI] Groq predictions failed, switching to OpenAI: {e}")
+            try:
+                raw = (await _openai_chat(messages)).strip()
+                print("[AI] OpenAI predictions successful")
+            except Exception as oe:
+                print(f"[AI] OpenAI predictions also failed: {oe}")
+                raise oe
         try:
             if "```" in raw:
                 raw = raw.split("```")[1]
