@@ -41,8 +41,12 @@ export default function LoginPage() {
                 className="w-full max-w-md bg-nods-card backdrop-blur-xl border border-nods-border p-8 rounded-3xl"
             >
                 <div className="flex flex-col items-center mb-10">
-                    <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mb-6 shadow-xl border border-nods-border/50">
-                        <img src={logoUnab} alt="UNAB" className="w-16 h-auto" />
+                    <div className="w-20 h-20 bg-transparent rounded-3xl flex items-center justify-center mb-6">
+                        <img
+                            src={logoUnab}
+                            alt="UNAB"
+                            className="w-16 h-auto mix-blend-multiply"
+                        />
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-nods-text-primary">Universidad UNAB</h1>
                     <p className="text-nods-text-muted text-xs font-bold uppercase tracking-widest mt-2 opacity-60">Dashboard de Control de Campaña</p>
@@ -94,7 +98,12 @@ export default function LoginPage() {
                 </form>
 
                 <div className="mt-8 pt-8 border-t border-nods-border/50 flex flex-col items-center">
-                    <img src={logoNods} alt="NODS" className="h-4 w-auto opacity-30 grayscale" />
+                    <img
+                        src={logoNods}
+                        alt="NODS"
+                        className="h-4 w-auto opacity-30 grayscale contrast-125 filter"
+                        style={{ mixBlendMode: 'lighten' }}
+                    />
                 </div>
             </motion.div>
         </div>

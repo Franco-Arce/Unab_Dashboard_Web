@@ -74,8 +74,13 @@ export default function DashboardLayout() {
                 <div className="p-8 flex flex-col h-full">
                     {/* Logo Section */}
                     <div className="flex items-center gap-4 mb-12 px-2">
-                        <div className="p-2.5 bg-white/10 rounded-2xl shadow-lg">
-                            <img src={logoNods} alt="NODS" className="h-6 w-auto" />
+                        <div className="flex items-center justify-center">
+                            <img
+                                src={logoNods}
+                                alt="NODS"
+                                className="h-8 w-auto filter brightness-110 contrast-125"
+                                style={{ mixBlendMode: 'lighten' }}
+                            />
                         </div>
                         <span className="text-xl font-black text-white tracking-tighter italic uppercase opacity-90">Dashboard</span>
                     </div>
@@ -188,8 +193,12 @@ export default function DashboardLayout() {
                             <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Aliado Educativo</span>
                             <span className="font-bold text-sm text-nods-text-primary">Universidad UNAB</span>
                         </div>
-                        <div className="w-11 h-11 bg-white p-2 rounded-xl shadow-sm flex items-center justify-center border border-nods-border/50 mr-2">
-                            <img src={logoUnab} alt="UNAB" className="w-full h-auto object-contain" />
+                        <div className="w-11 h-11 bg-transparent p-1 rounded-xl flex items-center justify-center mr-2">
+                            <img
+                                src={logoUnab}
+                                alt="UNAB"
+                                className="w-full h-auto object-contain mix-blend-multiply"
+                            />
                         </div>
                         <button
                             onClick={() => setShowAI(!showAI)}
