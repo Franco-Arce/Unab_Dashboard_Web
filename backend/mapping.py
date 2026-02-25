@@ -1,64 +1,54 @@
 import pandas as pd
 import os
-import json
-
-# Absolute path to the mapping file
-EXCEL_PATH = r"C:\Users\franc\OneDrive\Escritorio\Mis Cosas\Proyectos\Nods\UnabDashboardWeb\ArchivosUtiles\mapeo_mapas.xlsx"
+import re
+import unicodedata
 
 class ProgramMapping:
     def __init__(self):
         self.mapping = {}
         self.load_mapping()
 
+    def _normalize(self, text: str) -> str:
+        if not text:
+            return ""
+        # Remove accents
+        nfkd_form = unicodedata.normalize('NFKD', str(text))
+        text = "".join([c for c in nfkd_form if not unicodedata.combining(c)])
+        # Upper case, strip, replace multiple spaces
+        text = text.upper().strip()
+        text = re.sub(r'\s+', ' ', text)
+        return text
+
     def load_mapping(self):
+        backend_dir = os.path.dirname(os.path.abspath(__file__))
+        # Look for the Excel file in the project root or backend dir
+        paths_to_try = [
+            os.path.join(os.path.dirname(backend_dir), "ArchivosUtiles", "mapeo_mapas.xlsx"),
+            os.path.join(backend_dir, "ArchivosUtiles", "mapeo_mapas.xlsx"),
+            "ArchivosUtiles/mapeo_mapas.xlsx"
+        ]
+        
+        excel_path = None
+        for p in paths_to_try:
+            if os.path.exists(p):
+                excel_path = p
+                break
+        
+        if not excel_path:
+            print(f"[Mapping] Excel file not found in any of: {paths_to_try}")
+            return
+
         try:
-            if not os.path.exists(EXCEL_PATH):
-                print(f"[Mapping] Warning: Excel file not found at {EXCEL_PATH}")
-                return
-
-            df = pd.read_excel(EXCEL_PATH)
-            # The structure detected in previous step:
-            # Column 1: "ADMINISTRACIÓN DE EMPRESAS" (Original Program) -> No, this was data.
-            # Let's look at the mapping logic based on the output of the script:
-            # {
-            #   "ADMINISTRACIÓN DE EMPRESAS": "CONTADURÍA PUBLICA", (This seems to be a label?)
-            #   "ECONOMÍA Y NEGOCIOS": "ECONOMÍA Y NEGOCIOS",
-            #   "GRADO": "GRADO" (This is clearly the level)
-            # }
-            # Wait, looking at the JSON output again:
-            # The column NAMED "ADMINISTRACIÓN DE EMPRESAS" (which is likely the header of col A)
-            # contains actual program names (CONTADURÍA PUBLICA, etc.).
-            # The column NAMED "GRADO" (header of col C) contains "GRADO" or "POSGRADO".
-            
-            # Since the header names are actually values from row 0 in many excels, let's read without headers and map.
-            df = pd.read_excel(EXCEL_PATH, header=None)
-            
-            # Let's assume:
-            # Col 1 (index 1): Program Name
-            # Col 2 (index 2): Faculty/Area
-            # Col 3 (index 3? or it was index 2 in the JSON): Level
-            
-            # From the JSON output:
-            # "ADMINISTRACIÓN DE EMPRESAS":"CONTADURÍA PUBLICA" -> Key is Header A, Value is Program
-            # "ECONOMÍA Y NEGOCIOS":"ECONOMÍA Y NEGOCIOS" -> Key is Header B, Value is Area
-            # "GRADO":"GRADO" -> Key is Header C, Value is Level
-            
-            # Re-reading with proper headers if possible, or just mapping the columns.
-            # Usually, the first row IS the header if not specified. 
-            # In the previous run, it treated the first row as headers.
-            
-            headers = df.columns.tolist() # ["ADMINISTRACIÓN DE EMPRESAS", "ECONOMÍA Y NEGOCIOS", "GRADO"]
-            
-            # Map everything to uppercase for safety
-            self.mapping = {}
+            df = pd.read_excel(excel_path, header=None)
+            # We assume Col 0 is Program Name, Col 2 is Level
             for _, row in df.iterrows():
-                prog = str(row[0]).strip().upper()
-                level = str(row[headers[2]]).strip().upper()
-                self.mapping[prog] = level
-                
-            # Also add the headers themselves as they were treated as keys in the JSON
-            self.mapping[str(headers[0]).strip().upper()] = str(headers[2]).strip().upper()
-
+                if pd.isna(row[0]) or pd.isna(row[2]):
+                    continue
+                prog = self._normalize(str(row[0]))
+                level = str(row[2]).strip().upper()
+                if level in ["GRADO", "POSGRADO"]:
+                    self.mapping[prog] = level
+            
             print(f"[Mapping] Loaded {len(self.mapping)} program mappings.")
         except Exception as e:
             print(f"[Mapping] Error loading Excel: {e}")
@@ -67,8 +57,31 @@ class ProgramMapping:
         if not program_name:
             return "OTROS"
         
-        clean_name = str(program_name).strip().upper()
-        return self.mapping.get(clean_name, "OTROS")
+        clean_name = self._normalize(program_name)
+        
+        # 1. Exact match
+        if clean_name in self.mapping:
+            return self.mapping[clean_name]
+        
+        # 2. Try removing "VIRTUAL" if present
+        name_no_virtual = re.sub(r'\s+VIRTUAL$', '', clean_name)
+        if name_no_virtual in self.mapping:
+            return self.mapping[name_no_virtual]
+            
+        # 3. Substring match (if any mapped program name is inside the lead's program name)
+        # We check the longest matching substrings first to be more specific
+        sorted_keys = sorted(self.mapping.keys(), key=len, reverse=True)
+        for mapped_prog in sorted_keys:
+            if mapped_prog in clean_name:
+                return self.mapping[mapped_prog]
+        
+        # 4. Special rules for patterns
+        if "MAESTRIA" in clean_name or "ESPECIALIZACION" in clean_name or "DOCTORADO" in clean_name:
+            return "POSGRADO"
+        if "TECNOLOGIA" in clean_name or "PROFESIONAL" in clean_name:
+            return "GRADO"
+            
+        return "OTROS"
 
 # Singleton instance
 mapping = ProgramMapping()

@@ -137,10 +137,35 @@ async def get_estados(nivel: Optional[str] = Query(None), _user: str = Depends(r
 
 
 @router.get("/no-util")
-async def get_no_util(_user: str = Depends(require_auth)):
+async def get_no_util(nivel: Optional[str] = Query(None), _user: str = Depends(require_auth)):
     data = await cache.get_all()
-    no_util = data.get("no_util", [])
-    total = data.get("no_util_total", 0)
+    
+    if nivel and nivel.upper() != "TODOS":
+        target_nivel = nivel.upper()
+        programs_of_level = [p["programa"] for p in data.get("merged_programs", []) if p.get("nivel") == target_nivel]
+        
+        if not programs_of_level:
+            return {"no_util": [], "no_util_total": 0, "trends": {}}
+            
+        placeholders = ",".join(f"${i+1}" for i in range(len(programs_of_level)))
+        query = f"""
+            SELECT 
+                descrip_subcat AS descripcion_sub,
+                COUNT(*) AS leads,
+                SUM(CASE WHEN fecha_a_utilizar::timestamp >= NOW() - INTERVAL '7 days' THEN 1 ELSE 0 END) AS leads_7d,
+                SUM(CASE WHEN fecha_a_utilizar::timestamp >= NOW() - INTERVAL '14 days' THEN 1 ELSE 0 END) AS leads_14d
+            FROM dim_contactos
+            WHERE (descrip_cat ILIKE '%no util%' OR descrip_cat ILIKE '%descarte%')
+              AND UPPER(TRIM(txtprogramainteres)) IN ({placeholders})
+            GROUP BY descrip_subcat
+            ORDER BY leads DESC
+        """
+        no_util_rows = await fetch_all(query, *programs_of_level)
+        no_util = [dict(r) for r in no_util_rows]
+        total = sum(item.get("leads", 0) for item in no_util)
+    else:
+        no_util = data.get("no_util", [])
+        total = data.get("no_util_total", 0)
 
     result = []
     for item in no_util:
@@ -196,12 +221,17 @@ async def get_leads(
         
     if nivel and nivel.upper() != "TODOS":
         target_nivel = nivel.upper()
-        # Find all programs that belong to this level
-        programs_of_level = [p for p, l in mapping.mapping.items() if l == target_nivel]
+        # Use the programs already classified in the cache to ensure consistency
+        data = await cache.get_all()
+        programs_of_level = [p["programa"] for p in data.get("merged_programs", []) if p.get("nivel") == target_nivel]
+        
         if programs_of_level:
             placeholders = ",".join(f"${len(args)+i+1}" for i in range(len(programs_of_level)))
-            where_clauses.append(f"txtprogramainteres IN ({placeholders})")
+            where_clauses.append(f"UPPER(TRIM(txtprogramainteres)) IN ({placeholders})")
             args.extend(programs_of_level)
+        else:
+            # If no programs match this level, force no results
+            where_clauses.append("1=0")
         
     where_sql = " AND ".join(where_clauses)
     

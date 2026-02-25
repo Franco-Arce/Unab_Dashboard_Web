@@ -98,6 +98,8 @@ class DashboardCache:
             total_adm = 0
             total_pag = 0
             total_meta = 0
+            total_sol_25 = 0
+            total_adm_25 = 0
             total_pag_25 = 0
             total_sol_var = 0
             total_adm_var = 0
