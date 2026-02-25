@@ -47,6 +47,19 @@ export const api = {
         if (nivel) q.set('nivel', nivel);
         q.set('t', Date.now());
         const res = await request(`/api/dashboard/kpis?${q.toString()}`);
+
+        // Hotfix: If backend hasn't been re-deployed to include global op_venta sum
+        if (res && (!res.op_venta || res.op_venta === 0)) {
+            try {
+                const estRes = await request(`/api/dashboard/estados?${q.toString()}`);
+                if (estRes && estRes.estados_by_programa) {
+                    res.op_venta = estRes.estados_by_programa.reduce((acc, p) => acc + (p.op_venta || 0), 0);
+                }
+            } catch (e) {
+                console.error("Error patching op_venta", e);
+            }
+        }
+
         dashboardContext.kpis = res;
         return res;
     },
@@ -55,6 +68,23 @@ export const api = {
         if (nivel) q.set('nivel', nivel);
         q.set('t', Date.now());
         const res = await request(`/api/dashboard/funnel?${q.toString()}`);
+
+        // Hotfix for funnel op_venta
+        const opVentaItem = res.find(f => f.stage === "Oportunidad de Venta");
+        if (opVentaItem && (!opVentaItem.value || opVentaItem.value === 0)) {
+            try {
+                const estRes = await request(`/api/dashboard/estados?${q.toString()}`);
+                if (estRes && estRes.estados_by_programa) {
+                    const totalLeads = res.find(f => f.stage === "Total Leads")?.value || 1;
+                    const realOpVenta = estRes.estados_by_programa.reduce((acc, p) => acc + (p.op_venta || 0), 0);
+                    opVentaItem.value = realOpVenta;
+                    opVentaItem.percent = Math.round((realOpVenta / totalLeads) * 100 * 100) / 100;
+                }
+            } catch (e) {
+                console.error("Error patching funnel op_venta", e);
+            }
+        }
+
         dashboardContext.funnel = res;
         return res;
     },
