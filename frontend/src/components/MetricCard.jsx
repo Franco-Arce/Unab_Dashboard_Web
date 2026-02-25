@@ -159,13 +159,22 @@ export const MetricCard = ({ data }) => {
                     <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1 group-hover:text-slate-600 transition-colors">
                         {label}
                     </h3>
-                    <div className="flex items-baseline gap-1">
-                        <h3 className="text-3xl font-black text-slate-900 tracking-tighter leading-none">
+                    <div className="flex flex-col gap-1">
+                        <h3 className={`font-black text-slate-900 tracking-tighter leading-tight ${typeof value === 'string' && value.length > 20 ? 'text-sm' :
+                                typeof value === 'string' && value.length > 10 ? 'text-xl' : 'text-3xl'
+                            }`}>
                             {typeof value === 'number' ? value.toLocaleString() : value}
                         </h3>
-                        <span className="text-[10px] font-bold text-blue-600 uppercase tracking-tighter">
-                            {data.unit || 'unid.'}
-                        </span>
+                        {data.description && (
+                            <p className="text-[11px] font-medium text-slate-500 leading-relaxed line-clamp-3">
+                                {data.description}
+                            </p>
+                        )}
+                        {typeof value === 'number' && data.unit !== null && (
+                            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-tighter">
+                                {data.unit || 'unid.'}
+                            </span>
+                        )}
                     </div>
                 </div>
             </div>

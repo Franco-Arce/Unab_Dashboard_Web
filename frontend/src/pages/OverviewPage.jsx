@@ -9,7 +9,11 @@ import {
     Search,
     Filter,
     GraduationCap,
-    UserCheck
+    UserCheck,
+    Star,
+    AlertCircle,
+    TrendingUp,
+    TrendingDown
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell, AreaChart, Area, CartesianGrid } from 'recharts';
@@ -48,14 +52,20 @@ const FloatingBubbles = ({ count = 6 }) => {
 export default function OverviewPage() {
     const [kpis, setKpis] = useState(null);
     const [funnel, setFunnel] = useState([]);
+    const [insights, setInsights] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const load = async () => {
             try {
-                const [k, f] = await Promise.all([api.kpis(), api.funnel()]);
+                const [k, f, i] = await Promise.all([
+                    api.kpis(),
+                    api.funnel(),
+                    api.aiInsights()
+                ]);
                 setKpis(k);
                 setFunnel(f);
+                setInsights(i.insights || []);
             } catch (err) {
                 console.error(err);
             } finally {
@@ -85,6 +95,16 @@ export default function OverviewPage() {
     };
 
     const trends = kpis.trends || { total_leads: 0, matriculados: 0, en_gestion: 0, pagados: 0 };
+
+    const getIcon = (iconStr) => {
+        switch (iconStr) {
+            case 'trending_up': return TrendingUp;
+            case 'trending_down': return TrendingDown;
+            case 'alert': return AlertCircle;
+            case 'star': return Star;
+            default: return Star;
+        }
+    };
 
     const cards = [
         {
@@ -125,6 +145,16 @@ export default function OverviewPage() {
         },
     ];
 
+    const aiCards = insights.map((insight, idx) => ({
+        id: `ai-${idx}`,
+        label: insight.title,
+        value: "Insight IA",
+        description: insight.description,
+        icon: getIcon(insight.icon),
+        color: idx % 2 === 0 ? 'from-indigo-500 to-blue-700' : 'from-emerald-500 to-teal-600',
+        percentage: 30 + (idx * 15) // Slightly different levels for variety
+    }));
+
     return (
         <div className="space-y-8">
             {/* KPI Cards */}
@@ -140,6 +170,32 @@ export default function OverviewPage() {
                     </motion.div>
                 ))}
             </motion.div>
+
+            {/* AI Insights Section */}
+            {aiCards.length > 0 && (
+                <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-indigo-500/10 rounded-lg">
+                            <Star className="w-5 h-5 text-indigo-500" />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-bold text-nods-text-primary">Insights del Analista</h3>
+                            <p className="text-nods-text-muted text-sm font-medium">Análisis predictivo y recomendaciones inteligentes</p>
+                        </div>
+                    </div>
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+                    >
+                        {aiCards.map((card, i) => (
+                            <motion.div key={card.id} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 + i * 0.1 }}>
+                                <MetricCard data={card} />
+                            </motion.div>
+                        ))}
+                    </motion.div>
+                </div>
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Funnel Section */}
