@@ -163,9 +163,9 @@ export default function NoUtilPage() {
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="lg:col-span-3 bg-[#0f1115] border border-zinc-800 rounded-3xl p-6 relative overflow-hidden group"
+                    className="lg:col-span-3 bg-white border border-nods-border rounded-3xl p-6 relative overflow-hidden group shadow-xl"
                 >
-                    <h3 className="text-xs font-black text-zinc-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                    <h3 className="text-xs font-black text-nods-text-muted uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-rose-500 rounded-full" />
                         Distribución de Categorías
                     </h3>
@@ -191,8 +191,8 @@ export default function NoUtilPage() {
                             </PieChart>
                         </ResponsiveContainer>
                         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                            <span className="text-3xl font-black text-white">{tLeads.toLocaleString()}</span>
-                            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest text-center leading-tight px-4">
+                            <span className="text-3xl font-black text-nods-text-primary">{tLeads.toLocaleString()}</span>
+                            <span className="text-[10px] text-nods-text-muted font-bold uppercase tracking-widest text-center leading-tight px-4">
                                 Leads<br />Totales
                             </span>
                         </div>
@@ -204,33 +204,33 @@ export default function NoUtilPage() {
             <div className="space-y-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="relative flex-1 max-w-md group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-rose-500 transition-colors" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-nods-text-muted group-focus-within:text-rose-500 transition-colors" />
                         <input
                             type="text"
                             placeholder="Filtrar por subcategoría..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
-                            className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-3 pl-12 pr-4 focus:border-rose-500/50 outline-none transition-all text-sm text-zinc-200 shadow-xl"
+                            className="w-full bg-white border border-nods-border rounded-2xl py-3 pl-12 pr-4 focus:border-rose-500/50 outline-none transition-all text-sm text-nods-text-primary shadow-sm"
                         />
                     </div>
-                    <div className="flex items-center gap-4 text-xs font-bold text-zinc-500 px-2">
+                    <div className="flex items-center gap-4 text-xs font-bold text-nods-text-muted px-2">
                         <Filter className="w-3 h-3" />
                         Mostrando {filtered.length} categorías
                     </div>
                 </div>
 
-                <div className="bg-[#0f1115] border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl">
+                <div className="bg-white border border-nods-border rounded-3xl overflow-hidden shadow-xl">
                     <div className="overflow-x-auto custom-scrollbar">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-zinc-900/50 text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">
+                                <tr className="bg-slate-50/50 text-[10px] font-black text-nods-text-muted uppercase tracking-[0.2em] border-b border-nods-border">
                                     <th className="px-8 py-5">Subcategoría</th>
                                     <th className="px-6 py-5 text-center">Leads Totales</th>
                                     <th className="px-6 py-5 text-center">% Participación</th>
                                     <th className="px-6 py-5 text-right pr-10">Estado</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-zinc-800/50">
+                            <tbody className="divide-y divide-slate-100">
                                 <AnimatePresence mode="popLayout">
                                     {filtered.map((item, idx) => (
                                         <motion.tr
@@ -239,7 +239,7 @@ export default function NoUtilPage() {
                                             animate={{ opacity: 1 }}
                                             exit={{ opacity: 0 }}
                                             key={item.subcategoria}
-                                            className="group hover:bg-zinc-800/30 transition-all cursor-default"
+                                            className="group hover:bg-slate-50 transition-all cursor-default"
                                         >
                                             <td className="px-8 py-4">
                                                 <div className="flex items-center gap-3">
@@ -247,22 +247,22 @@ export default function NoUtilPage() {
                                                         className="w-1.5 h-6 rounded-full"
                                                         style={{ backgroundColor: COLORS[idx % COLORS.length] }}
                                                     />
-                                                    <span className="text-sm font-bold text-zinc-200 group-hover:text-white transition-colors">
+                                                    <span className="text-sm font-bold text-nods-text-primary transition-colors">
                                                         {item.subcategoria}
                                                     </span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-center">
-                                                <span className="text-sm font-black text-zinc-300 group-hover:text-rose-400 transition-colors">
+                                                <span className="text-sm font-black text-nods-text-primary group-hover:text-rose-500 transition-colors">
                                                     {item.leads?.toLocaleString()}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-col items-center gap-1.5">
-                                                    <span className="text-xs font-bold text-zinc-400">
+                                                    <span className="text-xs font-bold text-nods-text-muted">
                                                         {item.porcentaje}%
                                                     </span>
-                                                    <div className="w-24 h-1 bg-zinc-800 rounded-full overflow-hidden">
+                                                    <div className="w-24 h-1 bg-slate-100 rounded-full overflow-hidden">
                                                         <motion.div
                                                             initial={{ width: 0 }}
                                                             animate={{ width: `${item.porcentaje}%` }}
@@ -274,7 +274,7 @@ export default function NoUtilPage() {
                                             <td className="px-6 py-4 text-right pr-10">
                                                 <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border ${item.leads > 100
                                                     ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
-                                                    : 'bg-zinc-800 text-zinc-500 border-zinc-700'
+                                                    : 'bg-slate-100 text-nods-text-muted border-nods-border'
                                                     }`}>
                                                     {item.leads > 100 ? 'Alto Volumen' : 'Regular'}
                                                 </span>
