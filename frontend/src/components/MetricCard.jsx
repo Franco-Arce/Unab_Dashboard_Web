@@ -166,11 +166,19 @@ export const MetricCard = ({ data }) => {
                             {typeof value === 'number' ? value.toLocaleString() : value}
                         </h3>
                         {data.description && (
-                            <p className="text-[11px] font-medium text-slate-500 leading-relaxed line-clamp-3">
-                                {data.description}
-                            </p>
+                            <div className="flex">
+                                <span className={`text-[9px] font-black uppercase tracking-tighter px-2 py-0.5 rounded-md border shadow-sm transition-all duration-300 ${data.color?.includes('orange') || data.color?.includes('amber') ? 'bg-orange-50/80 border-orange-100 text-orange-600' :
+                                        data.color?.includes('blue') ? 'bg-blue-50/80 border-blue-100 text-blue-600' :
+                                            data.color?.includes('emerald') || data.color?.includes('teal') ? 'bg-emerald-50/80 border-emerald-100 text-emerald-600' :
+                                                data.color?.includes('violet') || data.color?.includes('purple') ? 'bg-purple-50/80 border-purple-100 text-purple-600' :
+                                                    data.color?.includes('slate') ? 'bg-slate-50/80 border-slate-100 text-slate-600' :
+                                                        'bg-indigo-50/80 border-indigo-100 text-indigo-600'
+                                    }`}>
+                                    {data.description}
+                                </span>
+                            </div>
                         )}
-                        {typeof value === 'number' && data.unit !== null && (
+                        {typeof value === 'number' && data.unit !== null && !data.description && (
                             <span className="text-[10px] font-bold text-blue-600 uppercase tracking-tighter">
                                 {data.unit || 'unid.'}
                             </span>

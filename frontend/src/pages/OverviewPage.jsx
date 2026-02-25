@@ -112,36 +112,61 @@ export default function OverviewPage() {
             label: 'Total Leads',
             value: kpis.total_leads,
             trend: formatTrend(trends.total_leads),
-            color: 'from-blue-600 to-blue-800',
+            color: 'from-slate-700 to-slate-900',
             icon: Users,
-            percentage: 85 // Represents overall goal progress
+            percentage: 100,
+            description: "Todos los contactos"
         },
         {
             id: 2,
-            label: 'Matriculados',
-            value: kpis.matriculados,
-            trend: formatTrend(trends.matriculados),
-            color: 'from-emerald-500 to-teal-600',
-            icon: GraduationCap,
-            percentage: kpis.total_leads > 0 ? Math.round((kpis.matriculados / kpis.total_leads) * 100) : 0
-        },
-        {
-            id: 3,
             label: 'En Gestión',
             value: kpis.en_gestion,
             trend: formatTrend(trends.en_gestion),
-            color: 'from-indigo-500 to-blue-700',
+            color: 'from-orange-500 to-amber-600',
             icon: UserCheck,
-            percentage: kpis.total_leads > 0 ? Math.round((kpis.en_gestion / kpis.total_leads) * 100) : 0
+            percentage: kpis.total_leads > 0 ? Math.round((kpis.en_gestion / kpis.total_leads) * 100) : 0,
+            description: `${kpis.total_leads > 0 ? ((kpis.en_gestion / kpis.total_leads) * 100).toFixed(1) : 0}% del total`
+        },
+        {
+            id: 3,
+            label: 'Op. de Venta',
+            value: kpis.op_venta || 0,
+            trend: formatTrend(trends.op_venta),
+            color: 'from-blue-500 to-blue-700',
+            icon: Filter,
+            percentage: kpis.en_gestion > 0 ? Math.round(((kpis.op_venta || 0) / kpis.en_gestion) * 100) : 0,
+            description: `${kpis.en_gestion > 0 ? (((kpis.op_venta || 0) / kpis.en_gestion) * 100).toFixed(1) : 0}% de en gestión`
         },
         {
             id: 4,
+            label: 'Proceso Pago',
+            value: kpis.proceso_pago || 0,
+            trend: formatTrend(trends.proceso_pago),
+            color: 'from-violet-500 to-purple-600',
+            icon: CreditCard,
+            percentage: (kpis.op_venta || 0) > 0 ? Math.round(((kpis.proceso_pago || 0) / (kpis.op_venta || 1)) * 100) : 0,
+            description: `${(kpis.op_venta || 0) > 0 ? (((kpis.proceso_pago || 0) / kpis.op_venta) * 100).toFixed(1) : 0}% de op. venta`
+        },
+        {
+            id: 5,
             label: 'Pagados',
             value: kpis.pagados,
             trend: formatTrend(trends.pagados),
-            color: 'from-cyan-500 to-blue-500',
-            icon: CreditCard,
-            percentage: kpis.matriculados > 0 ? Math.round((kpis.pagados / kpis.matriculados) * 100) : 25
+            color: 'from-emerald-500 to-teal-600',
+            icon: GraduationCap,
+            percentage: kpis.metas > 0 ? Math.round((kpis.pagados / kpis.metas) * 100) : 0,
+            description: `de ${kpis.metas?.toLocaleString() || 0} meta`
+        },
+        {
+            id: 6,
+            label: 'Conversión',
+            value: `${kpis.total_leads > 0 ? ((kpis.pagados / kpis.total_leads) * 100).toFixed(2) : 0}%`,
+            trend: null,
+            color: 'from-orange-600 to-rose-700',
+            icon: Target,
+            percentage: kpis.total_leads > 0 ? Math.round((kpis.pagados / kpis.total_leads) * 100 * 5) : 0, // Multiplied for visual fill
+            description: "Leads -> Pagados",
+            unit: null
         },
     ];
 
@@ -163,7 +188,7 @@ export default function OverviewPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ staggerChildren: 0.1, delayChildren: 0.1 }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6"
             >
                 {cards.map((card, i) => (
                     <motion.div key={card.id || i} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>

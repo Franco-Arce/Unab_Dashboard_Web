@@ -14,6 +14,7 @@ async def get_kpis(_user: str = Depends(require_auth)):
     return {
         "total_leads": data.get("total_leads", 0),
         "en_gestion": data.get("en_gestion", 0),
+        "op_venta": data.get("op_venta", 0),
         "solicitados": totals.get("solicitados", 0),
         "admitidos": totals.get("admitidos", 0),
         "pagados": totals.get("pagados", 0),
