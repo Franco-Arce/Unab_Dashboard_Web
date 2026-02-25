@@ -79,28 +79,28 @@ export const MetricCard = ({ data }) => {
     // Mapeo de colores basado en el diseño del usuario
     const colorMap = {
         'from-blue-600 to-blue-800': {
-            bg: 'bg-blue-50/60',
-            wave: '#eff6ff',
+            bg: 'bg-blue-100/70',
+            wave: '#dbeafe',
             icon: 'bg-blue-600'
         },
         'from-emerald-500 to-teal-600': {
-            bg: 'bg-emerald-50/60',
-            wave: '#ecfdf5',
+            bg: 'bg-emerald-100/70',
+            wave: '#d1fae5',
             icon: 'bg-emerald-500'
         },
         'from-indigo-500 to-blue-700': {
-            bg: 'bg-indigo-50/60',
-            wave: '#eef2ff',
+            bg: 'bg-indigo-100/70',
+            wave: '#e0e7ff',
             icon: 'bg-indigo-500'
         },
         'from-cyan-500 to-blue-500': {
-            bg: 'bg-sky-50/60',
-            wave: '#f0f9ff',
+            bg: 'bg-sky-100/70',
+            wave: '#e0f2fe',
             icon: 'bg-sky-500'
         },
         'from-rose-600 to-rose-900': {
-            bg: 'bg-rose-50/60',
-            wave: '#fff1f2',
+            bg: 'bg-rose-100/70',
+            wave: '#ffe4e6',
             icon: 'bg-rose-600'
         }
     };
@@ -122,9 +122,9 @@ export const MetricCard = ({ data }) => {
                 >
                     {/* Múltiples ondas en la parte superior del nivel actual */}
                     <div className="absolute bottom-full left-0 w-full h-10 overflow-hidden">
-                        <WaveEffect color={theme.wave} opacity={0.3} duration={7} delay={0} />
-                        <WaveEffect color={theme.wave} opacity={0.5} duration={5} delay={-2} />
-                        <WaveEffect color={theme.wave} opacity={0.8} duration={3} delay={-1} />
+                        <WaveEffect color={theme.wave} opacity={0.5} duration={7} delay={0} />
+                        <WaveEffect color={theme.wave} opacity={0.7} duration={5} delay={-2} />
+                        <WaveEffect color={theme.wave} opacity={0.9} duration={3} delay={-1} />
                     </div>
                 </motion.div>
             </div>

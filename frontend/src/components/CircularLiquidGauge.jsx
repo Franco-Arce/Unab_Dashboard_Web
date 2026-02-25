@@ -57,7 +57,7 @@ export const CircularLiquidGauge = ({ percent, color = 'from-blue-600 to-blue-80
             <div className="absolute w-[70px] h-[70px] rounded-full overflow-hidden z-0 shadow-inner">
                 {/* Parallax Waves with larger movement */}
                 <div
-                    className={`absolute inset-0 opacity-40 bg-gradient-to-t ${color} animate-liquid-1`}
+                    className={`absolute inset-0 opacity-60 bg-gradient-to-t ${color} animate-liquid-1`}
                     style={{
                         backgroundImage: `linear-gradient(to top, rgba(255,255,255,0.3), transparent)`,
                         width: '400%',
@@ -66,7 +66,7 @@ export const CircularLiquidGauge = ({ percent, color = 'from-blue-600 to-blue-80
                     }}
                 />
                 <div
-                    className={`absolute inset-0 opacity-25 bg-gradient-to-t ${color} animate-liquid-2`}
+                    className={`absolute inset-0 opacity-40 bg-gradient-to-t ${color} animate-liquid-2`}
                     style={{
                         backgroundImage: `linear-gradient(to top, rgba(255,255,255,0.2), transparent)`,
                         width: '400%',
