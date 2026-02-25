@@ -111,30 +111,9 @@ export default function NoUtilPage() {
     return (
         <div className="space-y-8 max-w-7xl mx-auto pb-20 p-4 md:p-8">
             {/* Header */}
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                 <div>
-                    <div className="flex items-center gap-3 mb-1">
-                        <div className="p-2 bg-rose-500/10 rounded-lg">
-                            <AlertOctagon className="w-5 h-5 text-rose-500" />
-                        </div>
-                        <h2 className="text-2xl font-black text-white tracking-tight">Leads No Útiles</h2>
-                    </div>
-                    <p className="text-zinc-500 text-sm">Distribución y análisis de subcategorías de descarte.</p>
-                </div>
-
-                <div className="flex items-center gap-3">
-                    <button
-                        onClick={handleExport}
-                        className="flex items-center gap-2 px-6 py-3 bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 rounded-2xl text-xs font-bold transition-all shadow-xl group"
-                    >
-                        <Download className="w-4 h-4 text-rose-500 group-hover:scale-110 transition-transform" />
-                        Exportar Reporte
-                    </button>
-                    <div className="h-10 w-px bg-zinc-800 mx-2 hidden md:block" />
-                    <div className="flex items-center gap-2 px-4 py-2 bg-rose-500/10 rounded-xl border border-rose-500/20">
-                        <div className="w-2 h-2 bg-rose-500 rounded-full" />
-                        <span className="text-[10px] font-bold text-rose-500 uppercase tracking-wider">Última Actualización</span>
-                    </div>
+                    <h2 className="text-2xl font-black text-white tracking-tight">Leads No Útiles</h2>
                 </div>
             </header>
 
