@@ -87,10 +87,42 @@ export default function OverviewPage() {
     const trends = kpis.trends || { total_leads: 0, matriculados: 0, en_gestion: 0, pagados: 0 };
 
     const cards = [
-        { id: 1, label: 'Total Leads', value: kpis.total_leads, trend: formatTrend(trends.total_leads), color: 'from-blue-600 to-blue-800', icon: Users, fill: 'h-[40%]' },
-        { id: 2, label: 'Matriculados', value: kpis.matriculados, trend: formatTrend(trends.matriculados), color: 'from-emerald-500 to-teal-600', icon: GraduationCap, fill: 'h-[30%]' },
-        { id: 3, label: 'En Gestión', value: kpis.en_gestion, trend: formatTrend(trends.en_gestion), color: 'from-indigo-500 to-blue-700', icon: UserCheck, fill: 'h-[35%]' },
-        { id: 4, label: 'Pagados', value: kpis.pagados, trend: formatTrend(trends.pagados), color: 'from-cyan-500 to-blue-500', icon: CreditCard, fill: 'h-[25%]' },
+        {
+            id: 1,
+            label: 'Total Leads',
+            value: kpis.total_leads,
+            trend: formatTrend(trends.total_leads),
+            color: 'from-blue-600 to-blue-800',
+            icon: Users,
+            percentage: 85 // Represents overall goal progress
+        },
+        {
+            id: 2,
+            label: 'Matriculados',
+            value: kpis.matriculados,
+            trend: formatTrend(trends.matriculados),
+            color: 'from-emerald-500 to-teal-600',
+            icon: GraduationCap,
+            percentage: kpis.total_leads > 0 ? Math.round((kpis.matriculados / kpis.total_leads) * 100) : 0
+        },
+        {
+            id: 3,
+            label: 'En Gestión',
+            value: kpis.en_gestion,
+            trend: formatTrend(trends.en_gestion),
+            color: 'from-indigo-500 to-blue-700',
+            icon: UserCheck,
+            percentage: kpis.total_leads > 0 ? Math.round((kpis.en_gestion / kpis.total_leads) * 100) : 0
+        },
+        {
+            id: 4,
+            label: 'Pagados',
+            value: kpis.pagados,
+            trend: formatTrend(trends.pagados),
+            color: 'from-cyan-500 to-blue-500',
+            icon: CreditCard,
+            percentage: kpis.matriculados > 0 ? Math.round((kpis.pagados / kpis.matriculados) * 100) : 25
+        },
     ];
 
     return (

@@ -55,10 +55,43 @@ export default function AdmisionesPage() {
     };
 
     const cards = [
-        { id: 1, label: 'Solicitados', value: tSol, trend: calcTrend(tSolVar, tSol), color: 'from-blue-600 to-blue-800', icon: Users, fill: 'h-[40%]' },
-        { id: 2, label: 'Admitidos', value: tAdm, trend: calcTrend(tAdmVar, tAdm), color: 'from-indigo-600 to-blue-700', icon: UserPlus, fill: 'h-[35%]' },
-        { id: 3, label: 'Pagados', value: tPag, trend: calcTrend(tPagVar, tPag), color: 'from-emerald-500 to-teal-600', icon: CreditCard, fill: 'h-[30%]' },
-        { id: 4, label: 'Alcanzado Meta', value: tPag25 > 0 ? ((tPag / tPag25) * 100).toFixed(1) + '%' : '0%', trend: 'vs 2025', color: 'from-cyan-500 to-blue-500', icon: CreditCard, fill: 'h-[25%]', unit: null },
+        {
+            id: 1,
+            label: 'Solicitados',
+            value: tSol,
+            trend: calcTrend(tSolVar, tSol),
+            color: 'from-blue-600 to-blue-800',
+            icon: Users,
+            percentage: tSol25 > 0 ? Math.round((tSol / tSol25) * 100) : 50
+        },
+        {
+            id: 2,
+            label: 'Admitidos',
+            value: tAdm,
+            trend: calcTrend(tAdmVar, tAdm),
+            color: 'from-indigo-600 to-blue-700',
+            icon: UserPlus,
+            percentage: tAdm25 > 0 ? Math.round((tAdm / tAdm25) * 100) : 40
+        },
+        {
+            id: 3,
+            label: 'Pagados',
+            value: tPag,
+            trend: calcTrend(tPagVar, tPag),
+            color: 'from-emerald-500 to-teal-600',
+            icon: CreditCard,
+            percentage: tPag25 > 0 ? Math.round((tPag / tPag25) * 100) : 30
+        },
+        {
+            id: 4,
+            label: 'Alcanzado Meta',
+            value: tPag25 > 0 ? ((tPag / tPag25) * 100).toFixed(1) + '%' : '0%',
+            trend: 'vs 2025',
+            color: 'from-cyan-500 to-blue-500',
+            icon: CreditCard,
+            percentage: tPag25 > 0 ? Math.round((tPag / tPag25) * 100) : 0,
+            unit: null
+        },
     ];
 
     return (

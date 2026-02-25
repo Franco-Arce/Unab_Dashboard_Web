@@ -81,7 +81,15 @@ export default function NoUtilPage() {
     const trends = data?.trends || {};
 
     const cards = [
-        { id: 1, label: 'Total No Útiles', value: tLeads, trend: trends.no_util, color: 'from-rose-600 to-rose-900', icon: AlertOctagon, fill: 'h-[40%]' },
+        {
+            id: 1,
+            label: 'Total No Útiles',
+            value: tLeads,
+            trend: trends.no_util,
+            color: 'from-rose-600 to-rose-900',
+            icon: AlertOctagon,
+            percentage: 40
+        },
     ];
 
     const handleExport = () => {
@@ -262,8 +270,8 @@ export default function NoUtilPage() {
                                             </td>
                                             <td className="px-6 py-4 text-right pr-10">
                                                 <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border ${item.leads > 100
-                                                        ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
-                                                        : 'bg-zinc-800 text-zinc-500 border-zinc-700'
+                                                    ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                                                    : 'bg-zinc-800 text-zinc-500 border-zinc-700'
                                                     }`}>
                                                     {item.leads > 100 ? 'Alto Volumen' : 'Regular'}
                                                 </span>

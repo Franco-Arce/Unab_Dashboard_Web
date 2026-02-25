@@ -85,7 +85,15 @@ export default function LeadsPage() {
         setPage(1);
     };
 
-    const card = { id: 1, label: 'Resultados Encontrados', value: total, trend: '+0%', color: 'from-blue-600 to-indigo-700', icon: Users, fill: 'h-[30%]' };
+    const card = {
+        id: 1,
+        label: 'Resultados Encontrados',
+        value: total,
+        trend: '+0%',
+        color: 'from-blue-600 to-indigo-700',
+        icon: Users,
+        percentage: 75
+    };
 
     return (
         <div className="space-y-8">

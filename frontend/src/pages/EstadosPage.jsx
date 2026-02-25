@@ -53,10 +53,42 @@ export default function EstadosPage() {
     const trends = data?.trends || {};
 
     const cards = [
-        { id: 1, label: 'Total Leads', value: tLeads, trend: formatTrend(trends.total_leads), color: 'from-blue-600 to-blue-800', icon: Users, fill: 'h-[40%]' },
-        { id: 2, label: 'En Gestión', value: tGestion, trend: formatTrend(trends.en_gestion), color: 'from-indigo-600 to-blue-700', icon: UserCheck, fill: 'h-[35%]' },
-        { id: 3, label: 'Op. Venta', value: tOpVenta, trend: formatTrend(trends.op_venta), color: 'from-blue-400 to-indigo-500', icon: Target, fill: 'h-[30%]' },
-        { id: 4, label: 'Pagados', value: tPag, trend: formatTrend(trends.pagados), color: 'from-emerald-500 to-teal-600', icon: CreditCard, fill: 'h-[25%]' },
+        {
+            id: 1,
+            label: 'Total Leads',
+            value: tLeads,
+            trend: formatTrend(trends.total_leads),
+            color: 'from-blue-600 to-blue-800',
+            icon: Users,
+            percentage: 85
+        },
+        {
+            id: 2,
+            label: 'En Gestión',
+            value: tGestion,
+            trend: formatTrend(trends.en_gestion),
+            color: 'from-indigo-600 to-blue-700',
+            icon: UserCheck,
+            percentage: tLeads > 0 ? Math.round((tGestion / tLeads) * 100) : 0
+        },
+        {
+            id: 3,
+            label: 'Op. Venta',
+            value: tOpVenta,
+            trend: formatTrend(trends.op_venta),
+            color: 'from-blue-400 to-indigo-500',
+            icon: Target,
+            percentage: tGestion > 0 ? Math.round((tOpVenta / tGestion) * 100) : 0
+        },
+        {
+            id: 4,
+            label: 'Pagados',
+            value: tPag,
+            trend: formatTrend(trends.pagados),
+            color: 'from-emerald-500 to-teal-600',
+            icon: CreditCard,
+            percentage: tLeads > 0 ? Math.round((tPag / tLeads) * 100) : 0
+        },
     ];
 
     return (
