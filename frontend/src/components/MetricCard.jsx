@@ -136,43 +136,27 @@ export const MetricCard = ({ data }) => {
                         {Icon && <Icon size={22} strokeWidth={2.5} />}
                     </div>
 
-                    <div className="flex flex-col items-end gap-2">
-                        {trend && trend !== '0%' && (
-                            <div className={`backdrop-blur-md border px-2 py-1 rounded-lg text-[10px] font-black flex flex-col items-center shadow-sm transition-all duration-300 ${isPositiveTrend ? 'bg-emerald-50/80 border-emerald-100 text-emerald-600' :
-                                isNegativeTrend ? 'bg-rose-50/80 border-rose-100 text-rose-600' :
-                                    'bg-slate-50/80 border-slate-100 text-slate-600'
-                                }`}>
-                                <div className="flex items-center gap-1">
-                                    {isPositiveTrend ? <TrendingUp size={10} /> : <ArrowUpRight size={10} className={isNegativeTrend ? "rotate-90" : ""} />}
-                                    <span>{trend}</span>
-                                </div>
-                                <span className="text-[6px] opacity-60 uppercase tracking-widest">vs update</span>
-                            </div>
-                        )}
-                        <span className="text-[10px] font-black text-slate-400 bg-white/60 backdrop-blur-sm px-2 py-0.5 rounded-full border border-slate-100/50 shadow-sm">
-                            {percentage}%
-                        </span>
-                    </div>
+                    {/* Removed corner trend/percentage to clean up the design as requested */}
                 </div>
 
                 <div>
-                    <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1 group-hover:text-slate-600 transition-colors">
+                    <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 group-hover:text-slate-700 transition-colors">
                         {label}
                     </h3>
                     <div className="flex flex-col gap-1">
-                        <h3 className={`font-black text-slate-900 tracking-tighter leading-tight ${typeof value === 'string' && value.length > 20 ? 'text-sm' :
-                                typeof value === 'string' && value.length > 10 ? 'text-xl' : 'text-3xl'
-                            }`}>
-                            {typeof value === 'number' ? value.toLocaleString() : value}
+                        <h3 className={`font-black text-slate-900 tracking-tighter leading-none mb-1 ${typeof value === 'string' && value.length > 20 ? 'text-sm' :
+                            typeof value === 'string' && value.length > 10 ? 'text-3xl' : 'text-4xl'
+                            }`} style={{ fontFamily: "'Arial Black', Impact, sans-serif" }}>
+                            {typeof value === 'number' ? value.toLocaleString('es-AR') : value}
                         </h3>
                         {data.description && (
                             <div className="flex">
                                 <span className={`text-[9px] font-black uppercase tracking-tighter px-2 py-0.5 rounded-md border shadow-sm transition-all duration-300 ${data.color?.includes('orange') || data.color?.includes('amber') ? 'bg-orange-50/80 border-orange-100 text-orange-600' :
-                                        data.color?.includes('blue') ? 'bg-blue-50/80 border-blue-100 text-blue-600' :
-                                            data.color?.includes('emerald') || data.color?.includes('teal') ? 'bg-emerald-50/80 border-emerald-100 text-emerald-600' :
-                                                data.color?.includes('violet') || data.color?.includes('purple') ? 'bg-purple-50/80 border-purple-100 text-purple-600' :
-                                                    data.color?.includes('slate') ? 'bg-slate-50/80 border-slate-100 text-slate-600' :
-                                                        'bg-indigo-50/80 border-indigo-100 text-indigo-600'
+                                    data.color?.includes('blue') ? 'bg-blue-50/80 border-blue-100 text-blue-600' :
+                                        data.color?.includes('emerald') || data.color?.includes('teal') ? 'bg-emerald-50/80 border-emerald-100 text-emerald-600' :
+                                            data.color?.includes('violet') || data.color?.includes('purple') ? 'bg-purple-50/80 border-purple-100 text-purple-600' :
+                                                data.color?.includes('slate') ? 'bg-slate-50/80 border-slate-100 text-slate-600' :
+                                                    'bg-indigo-50/80 border-indigo-100 text-indigo-600'
                                     }`}>
                                     {data.description}
                                 </span>

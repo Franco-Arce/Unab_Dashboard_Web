@@ -4,7 +4,7 @@ import { Download, Filter, Users, Target, CreditCard, UserCheck } from 'lucide-r
 import api from '../api';
 import { useFilters } from '../context/FilterContext';
 import { exportToCSV } from '../utils/export';
-import { MetricCard } from '../components/MetricCard';
+import { SummaryCards } from '../components/SummaryCards';
 
 export default function EstadosPage() {
     const [data, setData] = useState(null);
@@ -47,52 +47,7 @@ export default function EstadosPage() {
         });
     }
 
-    const formatTrend = (val) => {
-        if (!val) return '0%';
-        if (val > 0) return `+${val}%`;
-        return `${val}%`;
-    };
 
-    const trends = data?.trends || {};
-
-    const cards = [
-        {
-            id: 1,
-            label: 'Total Leads',
-            value: tLeads,
-            trend: formatTrend(trends.total_leads),
-            color: 'from-blue-600 to-blue-800',
-            icon: Users,
-            percentage: 85
-        },
-        {
-            id: 2,
-            label: 'En Gestión',
-            value: tGestion,
-            trend: formatTrend(trends.en_gestion),
-            color: 'from-indigo-600 to-blue-700',
-            icon: UserCheck,
-            percentage: tLeads > 0 ? Math.round((tGestion / tLeads) * 100) : 0
-        },
-        {
-            id: 3,
-            label: 'Op. Venta',
-            value: tOpVenta,
-            trend: formatTrend(trends.op_venta),
-            color: 'from-blue-400 to-indigo-500',
-            icon: Target,
-            percentage: tGestion > 0 ? Math.round((tOpVenta / tGestion) * 100) : 0
-        },
-        {
-            id: 4,
-            label: 'Pagados',
-            value: tPag,
-            trend: formatTrend(trends.pagados),
-            color: 'from-emerald-500 to-teal-600',
-            icon: CreditCard,
-            percentage: tLeads > 0 ? Math.round((tPag / tLeads) * 100) : 0
-        },
-    ];
 
     return (
         <div className="space-y-8">
@@ -104,18 +59,14 @@ export default function EstadosPage() {
             </header>
 
             {/* KPI Cards */}
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ staggerChildren: 0.1 }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-            >
-                {cards.map((card, i) => (
-                    <motion.div key={card.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-                        <MetricCard data={card} />
-                    </motion.div>
-                ))}
-            </motion.div>
+            <SummaryCards kpis={{
+                total_leads: tLeads,
+                en_gestion: tGestion,
+                op_venta: tOpVenta,
+                proceso_pago: tProcPago,
+                pagados: tPag,
+                metas: tMeta
+            }} />
 
             <div className="flex justify-end gap-3 relative pt-4">
                 <button

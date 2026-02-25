@@ -4,7 +4,7 @@ import { Search, Download, CheckCircle, AlertTriangle, XCircle, Minus, Users, Us
 import api from '../api';
 import { useFilters } from '../context/FilterContext';
 import { exportToCSV } from '../utils/export';
-import { MetricCard } from '../components/MetricCard';
+import { SummaryCards } from '../components/SummaryCards';
 
 export default function AdmisionesPage() {
     const [data, setData] = useState(null);
@@ -37,6 +37,7 @@ export default function AdmisionesPage() {
     let tSol = 0, tAdm = 0, tPag = 0;
     let tSol25 = 0, tAdm25 = 0, tPag25 = 0;
     let tSolVar = 0, tAdmVar = 0, tPagVar = 0;
+    let tLeads = 0, tGestion = 0, tOpVenta = 0, tProcPago = 0, tMeta = 0;
 
     filtered.forEach(p => {
         tSol += p.solicitados || 0;
@@ -48,54 +49,14 @@ export default function AdmisionesPage() {
         tSolVar += p.solicitados_var || 0;
         tAdmVar += p.admitidos_var || 0;
         tPagVar += p.pagados_var || 0;
+        tLeads += p.leads || 0;
+        tGestion += p.en_gestion || 0;
+        tOpVenta += p.op_venta || 0;
+        tProcPago += p.proceso_pago || 0;
+        tMeta += p.meta || 0;
     });
 
-    const calcTrend = (val, total) => {
-        const prev = total - val;
-        if (prev <= 0) return '+0%';
-        const p = ((val / prev) * 100).toFixed(1);
-        return p > 0 ? `+${p}%` : `${p}%`;
-    };
 
-    const cards = [
-        {
-            id: 1,
-            label: 'Solicitados',
-            value: tSol,
-            trend: calcTrend(tSolVar, tSol),
-            color: 'from-blue-600 to-blue-800',
-            icon: Users,
-            percentage: tSol25 > 0 ? Math.round((tSol / tSol25) * 100) : 50
-        },
-        {
-            id: 2,
-            label: 'Admitidos',
-            value: tAdm,
-            trend: calcTrend(tAdmVar, tAdm),
-            color: 'from-indigo-600 to-blue-700',
-            icon: UserPlus,
-            percentage: tAdm25 > 0 ? Math.round((tAdm / tAdm25) * 100) : 40
-        },
-        {
-            id: 3,
-            label: 'Pagados',
-            value: tPag,
-            trend: calcTrend(tPagVar, tPag),
-            color: 'from-emerald-500 to-teal-600',
-            icon: CreditCard,
-            percentage: tPag25 > 0 ? Math.round((tPag / tPag25) * 100) : 30
-        },
-        {
-            id: 4,
-            label: 'Alcanzado Meta',
-            value: tPag25 > 0 ? ((tPag / tPag25) * 100).toFixed(1) + '%' : '0%',
-            trend: 'vs 2025',
-            color: 'from-cyan-500 to-blue-500',
-            icon: CreditCard,
-            percentage: tPag25 > 0 ? Math.round((tPag / tPag25) * 100) : 0,
-            unit: null
-        },
-    ];
 
     return (
         <div className="space-y-8">
@@ -107,18 +68,14 @@ export default function AdmisionesPage() {
             </header>
 
             {/* KPI Cards */}
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ staggerChildren: 0.1 }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-            >
-                {cards.map((card, i) => (
-                    <motion.div key={card.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-                        <MetricCard data={card} />
-                    </motion.div>
-                ))}
-            </motion.div>
+            <SummaryCards kpis={{
+                total_leads: tLeads,
+                en_gestion: tGestion,
+                op_venta: tOpVenta,
+                proceso_pago: tProcPago,
+                pagados: tPag,
+                metas: tMeta
+            }} />
 
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4">
                 <div className="relative flex-1 max-w-md">

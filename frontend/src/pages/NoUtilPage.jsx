@@ -4,7 +4,7 @@ import api from '../api';
 import { useFilters } from '../context/FilterContext';
 import { exportToCSV } from '../utils/export';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MetricCard } from '../components/MetricCard';
+import { SummaryCards } from '../components/SummaryCards';
 import {
     PieChart,
     Pie,
@@ -24,10 +24,18 @@ export default function NoUtilPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const { nivel } = useFilters();
 
+    const [kpisData, setKpisData] = useState(null);
+
     useEffect(() => {
         setLoading(true);
-        api.noUtil(nivel)
-            .then(setData)
+        Promise.all([
+            api.noUtil(nivel),
+            api.kpis(nivel)
+        ])
+            .then(([noUtilRes, kpisRes]) => {
+                setData(noUtilRes);
+                setKpisData(kpisRes);
+            })
             .catch(console.error)
             .finally(() => setLoading(false));
     }, [nivel]);
@@ -81,20 +89,6 @@ export default function NoUtilPage() {
 
     const tLeads = filtered.reduce((acc, curr) => acc + (curr.leads || 0), 0);
 
-    const trends = data?.trends || {};
-
-    const cards = [
-        {
-            id: 1,
-            label: 'Total No Útiles',
-            value: tLeads,
-            trend: trends.no_util,
-            color: 'from-rose-600 to-rose-900',
-            icon: AlertOctagon,
-            percentage: 40
-        },
-    ];
-
     const handleExport = () => {
         exportToCSV(data.no_util, 'leads_no_util_unab_2026');
     };
@@ -145,25 +139,14 @@ export default function NoUtilPage() {
             </header>
 
             {/* KPI Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <div className="lg:col-span-1">
-                    {cards.map((card, i) => (
-                        <motion.div
-                            key={card.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.1 }}
-                        >
-                            <MetricCard data={card} />
-                        </motion.div>
-                    ))}
-                </div>
+            <SummaryCards kpis={kpisData || {}} />
 
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 pt-2">
                 {/* Donut Chart Integrated */}
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="lg:col-span-3 bg-white border border-nods-border rounded-3xl p-6 relative overflow-hidden group shadow-xl"
+                    className="lg:col-span-4 bg-white border border-nods-border rounded-3xl p-6 relative overflow-hidden group shadow-xl"
                 >
                     <h3 className="text-xs font-black text-nods-text-muted uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-rose-500 rounded-full" />

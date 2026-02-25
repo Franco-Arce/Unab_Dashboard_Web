@@ -19,7 +19,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api';
 import { useFilters } from '../context/FilterContext';
-import { MetricCard } from '../components/MetricCard';
+import { SummaryCards } from '../components/SummaryCards';
 
 export default function LeadsPage() {
     const [leads, setLeads] = useState([]);
@@ -61,6 +61,11 @@ export default function LeadsPage() {
         api.bases().then(setAvailableBases).catch(console.error);
     }, []);
 
+    const [kpisData, setKpisData] = useState(null);
+    useEffect(() => {
+        api.kpis(nivel).then(setKpisData).catch(console.error);
+    }, [nivel]);
+
     const fetchLeads = async () => {
         setLoading(true);
         try {
@@ -91,16 +96,6 @@ export default function LeadsPage() {
         setPage(1);
     };
 
-    const card = {
-        id: 1,
-        label: 'Resultados Encontrados',
-        value: total,
-        trend: '+0%',
-        color: 'from-blue-600 to-indigo-700',
-        icon: Users,
-        percentage: 75
-    };
-
     return (
         <div className="space-y-8">
             <header className="flex justify-between items-end">
@@ -111,9 +106,7 @@ export default function LeadsPage() {
             </header>
 
             {/* KPI Section */}
-            <div className="max-w-xs transition-all duration-500">
-                <MetricCard data={card} />
-            </div>
+            <SummaryCards kpis={kpisData || {}} />
 
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between pt-4">
                 <div className="relative w-full md:max-w-md">
