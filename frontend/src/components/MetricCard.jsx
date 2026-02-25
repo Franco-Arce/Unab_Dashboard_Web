@@ -3,6 +3,37 @@ import { motion } from 'framer-motion';
 import { TrendingUp, ArrowUpRight } from 'lucide-react';
 
 /**
+ * Componente de burbujas interactivas
+ * Utilizado por CircularLiquidGauge y componentes de métricas.
+ */
+export const InteractiveBubbles = ({ count = 5, isHovered }) => {
+    const bubbles = React.useMemo(() => Array.from({ length: count }), [count]);
+
+    return (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {bubbles.map((_, i) => (
+                <motion.div
+                    key={i}
+                    initial={{ y: "120%", x: Math.random() * 100 + "%", opacity: 0 }}
+                    animate={{
+                        y: "-20%",
+                        opacity: [0, 0.4, 0],
+                        x: (Math.random() * 100) + (isHovered ? (Math.random() * 20 - 10) : 0) + "%"
+                    }}
+                    transition={{
+                        duration: isHovered ? (1.5 + Math.random()) : (3 + Math.random() * 2),
+                        repeat: Infinity,
+                        delay: Math.random() * 5,
+                        ease: "linear"
+                    }}
+                    className="absolute w-1.5 h-1.5 bg-white rounded-full blur-[1px]"
+                />
+            ))}
+        </div>
+    );
+};
+
+/**
  * Componente Wave (Onda)
  * Crea el efecto visual de agua usando un path SVG animado.
  */
