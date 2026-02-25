@@ -122,9 +122,9 @@ export const MetricCard = ({ data }) => {
                 >
                     {/* Múltiples ondas en la parte superior del nivel actual */}
                     <div className="absolute bottom-full left-0 w-full h-10 overflow-hidden">
-                        <WaveEffect color={theme.wave} opacity={0.5} duration={7} delay={0} />
-                        <WaveEffect color={theme.wave} opacity={0.7} duration={5} delay={-2} />
-                        <WaveEffect color={theme.wave} opacity={0.9} duration={3} delay={-1} />
+                        <WaveEffect color={theme.wave} opacity={0.3} duration={7} delay={0} />
+                        <WaveEffect color={theme.wave} opacity={0.4} duration={5} delay={-2} />
+                        <WaveEffect color={theme.wave} opacity={0.6} duration={3} delay={-1} />
                     </div>
                 </motion.div>
             </div>
