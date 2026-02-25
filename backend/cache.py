@@ -109,6 +109,7 @@ class DashboardCache:
             latest_fecha_pos = None
 
             for r in agg_rows:
+                # Use standard normalization: UPPER + TRIM
                 prog = str(r.get("programa", "")).strip().upper()
                 nivel = mapping.get_level(prog)
                 

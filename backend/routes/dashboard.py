@@ -28,7 +28,7 @@ async def get_kpis(nivel: Optional[str] = Query(None), _user: str = Depends(requ
     
     # Filter and re-aggregate
     nivel = nivel.upper()
-    programs = [p for p in data.get("merged_programs", []) if p.get("nivel") == nivel]
+    programs = [p for p in data.get("merged_programs", []) if str(p.get("nivel", "")).upper() == nivel]
     
     total_leads = sum(p.get("leads", 0) for p in programs)
     en_gestion = sum(p.get("en_gestion", 0) for p in programs)
@@ -65,7 +65,7 @@ async def get_funnel(nivel: Optional[str] = Query(None), _user: str = Depends(re
         total_leads = data.get("total_leads", 0)
     else:
         nivel = nivel.upper()
-        programs = [p for p in data.get("merged_programs", []) if p.get("nivel") == nivel]
+        programs = [p for p in data.get("merged_programs", []) if str(p.get("nivel", "")).upper() == nivel]
         total_leads = sum(p.get("leads", 0) for p in programs)
         en_gestion = sum(p.get("en_gestion", 0) for p in programs)
         op_venta = sum(p.get("op_venta", 0) for p in programs)
