@@ -74,7 +74,7 @@ export default function DashboardLayout() {
             <aside className="w-72 flex-shrink-0 bg-[#0a0f18] flex flex-col sticky top-0 h-screen transition-all duration-300 border-r border-slate-800/30">
                 <div className="p-8 flex flex-col h-full">
                     {/* Logo Section - Grupo Nods Logo */}
-                    <div className="flex items-center mb-12 px-2">
+                    <div className="flex items-center justify-center mb-12">
                         <img
                             src={nodsWhite}
                             alt="Grupo Nods"
