@@ -23,9 +23,9 @@ class ProgramMapping:
         backend_dir = os.path.dirname(os.path.abspath(__file__))
         # Look for the Excel file in the project root or backend dir
         paths_to_try = [
-            os.path.join(os.path.dirname(backend_dir), "ArchivosUtiles", "mapeo_mapas.xlsx"),
-            os.path.join(backend_dir, "ArchivosUtiles", "mapeo_mapas.xlsx"),
-            "ArchivosUtiles/mapeo_mapas.xlsx"
+        os.path.join(backend_dir, "ArchivosUtiles", "mapeo_mapas.xlsx"),
+        os.path.join(os.path.dirname(backend_dir), "ArchivosUtiles", "mapeo_mapas.xlsx"),
+        "ArchivosUtiles/mapeo_mapas.xlsx"
         ]
         
         excel_path = None
