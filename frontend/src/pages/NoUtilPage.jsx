@@ -224,10 +224,9 @@ export default function NoUtilPage() {
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-slate-50/50 text-[10px] font-black text-nods-text-muted uppercase tracking-[0.2em] border-b border-nods-border">
-                                    <th className="px-8 py-5">Subcategoría</th>
-                                    <th className="px-6 py-5 text-center">Leads Totales</th>
-                                    <th className="px-6 py-5 text-center">% Participación</th>
-                                    <th className="px-6 py-5 text-right pr-10">Estado</th>
+                                    <th className="px-8 py-5">SUBCATEGORÍA</th>
+                                    <th className="px-6 py-5 text-center">LEADS TOTALES</th>
+                                    <th className="px-6 py-5 text-center">% PARTICIPACIÓN</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -270,14 +269,6 @@ export default function NoUtilPage() {
                                                         />
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-right pr-10">
-                                                <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border ${item.leads > 100
-                                                    ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
-                                                    : 'bg-slate-100 text-nods-text-muted border-nods-border'
-                                                    }`}>
-                                                    {item.leads > 100 ? 'Alto Volumen' : 'Regular'}
-                                                </span>
                                             </td>
                                         </motion.tr>
                                     ))}

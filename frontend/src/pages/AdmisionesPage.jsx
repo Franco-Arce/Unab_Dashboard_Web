@@ -146,16 +146,16 @@ export default function AdmisionesPage() {
                     <table className="w-full text-left text-sm whitespace-nowrap">
                         <thead>
                             <tr className="bg-slate-50/50 border-b border-nods-border text-[11px] font-bold text-nods-text-muted uppercase tracking-wider">
-                                <th className="px-4 py-4 w-1/4">Programas</th>
-                                <th className="px-2 py-4 text-center border-l border-nods-border/50">Solicitados</th>
-                                <th className="px-2 py-4 text-center">Admitidos</th>
-                                <th className="px-2 py-4 text-center">Pagados</th>
-                                <th className="px-2 py-4 text-center border-l border-nods-border/50 text-amber-600">Solicitados 25</th>
-                                <th className="px-2 py-4 text-center text-amber-600">Admitidos 25</th>
-                                <th className="px-2 py-4 text-center text-amber-600">Pagados 25</th>
-                                <th className="px-2 py-4 text-center border-l border-nods-border/50">Solicitados VAR</th>
-                                <th className="px-2 py-4 text-center">Admitidos VAR</th>
-                                <th className="px-2 py-4 text-center">Pagados VAR</th>
+                                <th className="px-4 py-4 w-1/4">PROGRAMAS</th>
+                                <th className="px-2 py-4 text-center border-l border-nods-border/50">SOLICITADOS</th>
+                                <th className="px-2 py-4 text-center">ADMITIDOS</th>
+                                <th className="px-2 py-4 text-center">PAGADOS</th>
+                                <th className="px-2 py-4 text-center border-l border-nods-border/50 text-cyan-700">SOLICITADOS 25</th>
+                                <th className="px-2 py-4 text-center text-cyan-700">ADMITIDOS 25</th>
+                                <th className="px-2 py-4 text-center text-cyan-700">PAGADOS 25</th>
+                                <th className="px-2 py-4 text-center border-l border-nods-border/50">SOLICITADOS VAR</th>
+                                <th className="px-2 py-4 text-center">ADMITIDOS VAR</th>
+                                <th className="px-2 py-4 text-center">PAGADOS VAR</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -166,9 +166,9 @@ export default function AdmisionesPage() {
                                     <td className="px-2 py-3 text-center text-xs text-nods-text-muted">{item.admitidos || ''}</td>
                                     <td className="px-2 py-3 text-center text-xs text-nods-text-muted">{item.pagados || ''}</td>
 
-                                    <td className="px-2 py-3 text-center text-xs text-amber-600 font-medium border-l border-nods-border/30">{item.solicitados_25 || ''}</td>
-                                    <td className="px-2 py-3 text-center text-xs text-amber-600 font-medium">{item.admitidos_25 || ''}</td>
-                                    <td className="px-2 py-3 text-center text-xs text-amber-600 font-medium">{item.pagados_25 || ''}</td>
+                                    <td className="px-2 py-3 text-center text-xs text-cyan-700 font-bold border-l border-nods-border/30">{item.solicitados_25 || ''}</td>
+                                    <td className="px-2 py-3 text-center text-xs text-cyan-700 font-bold">{item.admitidos_25 || ''}</td>
+                                    <td className="px-2 py-3 text-center text-xs text-cyan-700 font-bold">{item.pagados_25 || ''}</td>
 
                                     <td className="px-2 py-3 border-l border-nods-border/30">
                                         <div className="flex items-center justify-center gap-2">
@@ -197,9 +197,9 @@ export default function AdmisionesPage() {
                                     <td className="px-2 py-4 text-center text-sm font-bold text-nods-text-primary">{tAdm.toLocaleString()}</td>
                                     <td className="px-2 py-4 text-center text-sm font-bold text-nods-text-primary">{tPag.toLocaleString()}</td>
 
-                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-600 border-l border-nods-border/30">{tSol25 === 0 ? '' : tSol25.toLocaleString()}</td>
-                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-600">{tAdm25 === 0 ? '' : tAdm25.toLocaleString()}</td>
-                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-600">{tPag25 === 0 ? '' : tPag25.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-cyan-700 border-l border-nods-border/30">{tSol25 === 0 ? '' : tSol25.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-cyan-700">{tAdm25 === 0 ? '' : tAdm25.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-cyan-700">{tPag25 === 0 ? '' : tPag25.toLocaleString()}</td>
 
                                     <td className="px-2 py-4 text-center text-sm font-bold text-nods-text-primary border-l border-nods-border/30">{tSolVar.toLocaleString()}</td>
                                     <td className="px-2 py-4 text-center text-sm font-bold text-nods-text-primary">{tAdmVar.toLocaleString()}</td>

@@ -191,11 +191,11 @@ export default function LeadsPage() {
                     <table className="w-full text-left text-sm">
                         <thead className="bg-slate-50/50 border-b border-nods-border text-[10px] font-bold text-nods-text-muted uppercase tracking-widest sticky top-0 z-10">
                             <tr>
-                                <th className="px-6 py-4">Contacto</th>
-                                <th className="px-6 py-4">Programa</th>
-                                <th className="px-6 py-4">Estado / Gestión</th>
-                                <th className="px-6 py-4">Fecha</th>
-                                <th className="px-6 py-4">Acciones</th>
+                                <th className="px-6 py-4">CONTACTO</th>
+                                <th className="px-6 py-4">PROGRAMA</th>
+                                <th className="px-6 py-4">ESTADO / GESTIÓN</th>
+                                <th className="px-6 py-4">FECHA</th>
+                                <th className="px-6 py-4">ACCIONES</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">

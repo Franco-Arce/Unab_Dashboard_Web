@@ -132,18 +132,18 @@ export default function EstadosPage() {
                     <table className="w-full text-left text-sm whitespace-nowrap">
                         <thead>
                             <tr className="bg-slate-50/50 border-b border-nods-border text-[11px] font-bold text-nods-text-muted uppercase tracking-wider">
-                                <th className="px-4 py-4 w-1/4">Programas</th>
-                                <th className="px-2 py-4 text-center">Leads</th>
-                                <th className="px-2 py-4 text-center">En Gestión</th>
-                                <th className="px-2 py-4 text-center">No Útil</th>
-                                <th className="px-2 py-4 text-center">Op. Venta</th>
-                                <th className="px-2 py-4 text-center">Proc. Pago</th>
-                                <th className="px-2 py-4 text-center text-amber-600">Solicitados</th>
-                                <th className="px-2 py-4 text-center text-amber-600">Admitidos</th>
-                                <th className="px-2 py-4 text-center text-amber-600">Pagados</th>
-                                <th className="px-2 py-4 text-center text-amber-600">Meta</th>
-                                <th className="px-2 py-4 text-center text-amber-600">Avance</th>
-                                <th className="px-2 py-4 text-center text-amber-600">Conversión</th>
+                                <th className="px-4 py-4 w-1/4">PROGRAMAS</th>
+                                <th className="px-2 py-4 text-center">LEADS</th>
+                                <th className="px-2 py-4 text-center">EN GESTIÓN</th>
+                                <th className="px-2 py-4 text-center">NO ÚTIL</th>
+                                <th className="px-2 py-4 text-center">OP. VENTA</th>
+                                <th className="px-2 py-4 text-center">PROC. PAGO</th>
+                                <th className="px-2 py-4 text-center text-cyan-700">SOLICITADOS</th>
+                                <th className="px-2 py-4 text-center text-cyan-700">ADMITIDOS</th>
+                                <th className="px-2 py-4 text-center text-cyan-700">PAGADOS</th>
+                                <th className="px-2 py-4 text-center text-cyan-700">META</th>
+                                <th className="px-2 py-4 text-center text-cyan-700">AVANCE</th>
+                                <th className="px-2 py-4 text-center text-cyan-700">CONVERSIÓN</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -158,12 +158,12 @@ export default function EstadosPage() {
                                         <td className="px-2 py-3 text-center text-xs text-nods-text-muted">{item.no_util || ''}</td>
                                         <td className="px-2 py-3 text-center text-xs text-nods-text-muted">{item.op_venta || ''}</td>
                                         <td className="px-2 py-3 text-center text-xs text-nods-text-muted">{item.proceso_pago || ''}</td>
-                                        <td className="px-2 py-3 text-center text-xs text-amber-600 font-medium">{item.solicitados || ''}</td>
-                                        <td className="px-2 py-3 text-center text-xs text-amber-600 font-medium">{item.admitidos || ''}</td>
-                                        <td className="px-2 py-3 text-center text-xs text-amber-600 font-medium">{item.pagados || ''}</td>
-                                        <td className="px-2 py-3 text-center text-xs text-amber-600 font-medium">{item.meta || ''}</td>
-                                        <td className="px-2 py-3 text-center text-xs text-amber-600 font-medium">{formatPercent(avance)}</td>
-                                        <td className="px-2 py-3 text-center text-xs text-amber-600 font-medium">{formatPercent(conversion)}</td>
+                                        <td className="px-2 py-3 text-center text-xs text-cyan-700 font-bold">{item.solicitados || ''}</td>
+                                        <td className="px-2 py-3 text-center text-xs text-cyan-700 font-bold">{item.admitidos || ''}</td>
+                                        <td className="px-2 py-3 text-center text-xs text-cyan-700 font-bold">{item.pagados || ''}</td>
+                                        <td className="px-2 py-3 text-center text-xs text-cyan-700 font-bold">{item.meta || ''}</td>
+                                        <td className="px-2 py-3 text-center text-xs text-cyan-700 font-bold">{formatPercent(avance)}</td>
+                                        <td className="px-2 py-3 text-center text-xs text-cyan-700 font-bold">{formatPercent(conversion)}</td>
                                     </tr>
                                 );
                             })}
@@ -176,12 +176,12 @@ export default function EstadosPage() {
                                     <td className="px-2 py-4 text-center text-sm font-bold text-nods-text-primary">{tNoUtil.toLocaleString()}</td>
                                     <td className="px-2 py-4 text-center text-sm font-bold text-nods-text-primary">{tOpVenta.toLocaleString()}</td>
                                     <td className="px-2 py-4 text-center text-sm font-bold text-nods-text-primary">{tProcPago === 0 ? '' : tProcPago.toLocaleString()}</td>
-                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-600">{tSol.toLocaleString()}</td>
-                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-600">{tAdm.toLocaleString()}</td>
-                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-600">{tPag.toLocaleString()}</td>
-                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-600">{tMeta.toLocaleString()}</td>
-                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-600">{formatPercent(tPag / tMeta)}</td>
-                                    <td className="px-2 py-4 text-center text-sm font-bold text-amber-600">{formatPercent(tPag / tLeads)}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-cyan-700">{tSol.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-cyan-700">{tAdm.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-cyan-700">{tPag.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-cyan-700">{tMeta.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-cyan-700">{formatPercent(tPag / tMeta)}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-cyan-700">{formatPercent(tPag / tLeads)}</td>
                                 </tr>
                             )}
                         </tbody>
