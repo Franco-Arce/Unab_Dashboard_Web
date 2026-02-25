@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Download, Search, AlertOctagon, Calendar, Clock, Filter } from 'lucide-react';
 import api from '../api';
+import { useFilters } from '../context/FilterContext';
 import { exportToCSV } from '../utils/export';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MetricCard } from '../components/MetricCard';
@@ -21,13 +22,15 @@ export default function NoUtilPage() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const { nivel } = useFilters();
 
     useEffect(() => {
-        api.noUtil()
+        setLoading(true);
+        api.noUtil(nivel)
             .then(setData)
             .catch(console.error)
             .finally(() => setLoading(false));
-    }, []);
+    }, [nivel]);
 
     const filtered = useMemo(() => {
         if (!data || !data.no_util) return [];

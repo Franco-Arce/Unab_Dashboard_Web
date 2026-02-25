@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Download, CheckCircle, AlertTriangle, XCircle, Minus, Users, UserPlus, CreditCard } from 'lucide-react';
 import api from '../api';
+import { useFilters } from '../context/FilterContext';
 import { exportToCSV } from '../utils/export';
 import { MetricCard } from '../components/MetricCard';
 
@@ -9,10 +10,12 @@ export default function AdmisionesPage() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const { nivel } = useFilters();
 
     useEffect(() => {
-        api.admisiones().then(setData).catch(console.error).finally(() => setLoading(false));
-    }, []);
+        setLoading(true);
+        api.admisiones(nivel).then(setData).catch(console.error).finally(() => setLoading(false));
+    }, [nivel]);
 
     if (loading) return <div className="h-96 bg-white animate-pulse rounded-3xl border border-nods-border shadow-2xl" />;
 

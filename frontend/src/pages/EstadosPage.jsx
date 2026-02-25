@@ -2,18 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Download, Filter, Users, Target, CreditCard, UserCheck } from 'lucide-react';
 import api from '../api';
+import { useFilters } from '../context/FilterContext';
 import { exportToCSV } from '../utils/export';
 import { MetricCard } from '../components/MetricCard';
 
 export default function EstadosPage() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const { nivel } = useFilters();
     const [showFilters, setShowFilters] = useState(false);
     const [filters, setFilters] = useState({ base: '' });
 
     useEffect(() => {
-        api.estados().then(setData).catch(console.error).finally(() => setLoading(false));
-    }, []);
+        setLoading(true);
+        api.estados(nivel).then(setData).catch(console.error).finally(() => setLoading(false));
+    }, [nivel]);
 
     if (loading) return <div className="h-96 bg-white animate-pulse rounded-3xl border border-nods-border shadow-2xl" />;
 

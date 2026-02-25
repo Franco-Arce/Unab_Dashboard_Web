@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import AIPanel from '../components/AIPanel';
 import api from '../api';
+import { useFilters } from '../context/FilterContext';
 import logoUnab from '../assets/unab-logo.jpg';
 import nLogo from '../assets/n-logo.png';
 import nodsWhite from '../assets/nods-white.png';
@@ -24,6 +25,7 @@ export default function DashboardLayout() {
     const [meta, setMeta] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
     const [showAI, setShowAI] = useState(false);
+    const { nivel, setNivel } = useFilters();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -74,12 +76,28 @@ export default function DashboardLayout() {
             <aside className="w-72 flex-shrink-0 bg-[#0a0f18] flex flex-col sticky top-0 h-screen transition-all duration-300 border-r border-slate-800/30">
                 <div className="p-8 flex flex-col h-full">
                     {/* Logo Section - Grupo Nods Logo */}
-                    <div className="flex items-center justify-center mb-12">
+                    <div className="flex items-center justify-center mb-8">
                         <img
                             src={nodsWhite}
                             alt="Grupo Nods"
                             className="h-8 w-auto"
                         />
+                    </div>
+
+                    {/* Level Selector */}
+                    <div className="mb-6 bg-slate-900/50 p-1.5 rounded-2xl border border-slate-800/30 flex gap-2">
+                        {['TODOS', 'GRADO', 'POSGRADO'].map((opt) => (
+                            <button
+                                key={opt}
+                                onClick={() => setNivel(opt)}
+                                className={`flex-1 py-2.5 rounded-xl text-[9px] font-black transition-all duration-300 tracking-widest ${nivel === opt
+                                        ? 'bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-xl shadow-blue-500/20'
+                                        : 'text-slate-500 hover:text-slate-300'
+                                    }`}
+                            >
+                                {opt}
+                            </button>
+                        ))}
                     </div>
 
                     {/* Navigation */}

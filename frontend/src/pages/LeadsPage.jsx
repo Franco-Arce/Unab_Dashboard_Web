@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api';
+import { useFilters } from '../context/FilterContext';
 import { MetricCard } from '../components/MetricCard';
 
 export default function LeadsPage() {
@@ -29,6 +30,7 @@ export default function LeadsPage() {
     const [filters, setFilters] = useState({ base: '', programa: '' });
     const [showFilters, setShowFilters] = useState(false);
     const [availableBases, setAvailableBases] = useState([]);
+    const { nivel } = useFilters();
 
     // Modal states
     const [selectedLead, setSelectedLead] = useState(null);
@@ -62,7 +64,7 @@ export default function LeadsPage() {
     const fetchLeads = async () => {
         setLoading(true);
         try {
-            const res = await api.leads({ page, search, ...filters });
+            const res = await api.leads({ page, search, nivel, ...filters });
             setLeads(res.data);
             setTotal(res.total);
         } catch (err) {
@@ -75,7 +77,11 @@ export default function LeadsPage() {
     useEffect(() => {
         const timeout = setTimeout(fetchLeads, 500);
         return () => clearTimeout(timeout);
-    }, [page, search, filters]);
+    }, [page, search, filters, nivel]);
+
+    useEffect(() => {
+        setPage(1);
+    }, [nivel]);
 
     const totalPages = Math.ceil(total / 25);
 

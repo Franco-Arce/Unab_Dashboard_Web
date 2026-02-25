@@ -42,28 +42,33 @@ export const api = {
     me: () => request('/api/auth/me'),
 
     // Dashboard
-    kpis: async () => {
-        const res = await request('/api/dashboard/kpis');
+    kpis: async (nivel) => {
+        const q = nivel ? `?nivel=${nivel}` : '';
+        const res = await request(`/api/dashboard/kpis${q}`);
         dashboardContext.kpis = res;
         return res;
     },
-    funnel: async () => {
-        const res = await request('/api/dashboard/funnel');
+    funnel: async (nivel) => {
+        const q = nivel ? `?nivel=${nivel}` : '';
+        const res = await request(`/api/dashboard/funnel${q}`);
         dashboardContext.funnel = res;
         return res;
     },
-    admisiones: async () => {
-        const res = await request('/api/dashboard/admisiones');
+    admisiones: async (nivel) => {
+        const q = nivel ? `?nivel=${nivel}` : '';
+        const res = await request(`/api/dashboard/admisiones${q}`);
         dashboardContext.admisiones = res;
         return res;
     },
-    estados: async () => {
-        const res = await request('/api/dashboard/estados');
+    estados: async (nivel) => {
+        const q = nivel ? `?nivel=${nivel}` : '';
+        const res = await request(`/api/dashboard/estados${q}`);
         dashboardContext.estados = res;
         return res;
     },
-    noUtil: async () => {
-        const res = await request('/api/dashboard/no-util');
+    noUtil: async (nivel) => {
+        const q = nivel ? `?nivel=${nivel}` : '';
+        const res = await request(`/api/dashboard/no-util${q}`);
         dashboardContext.noUtil = res;
         return res;
     },

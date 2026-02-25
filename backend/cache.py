@@ -8,6 +8,7 @@ import copy
 import os
 from datetime import datetime, timezone
 from database import fetch_all, fetch_one
+from mapping import mapping
 
 
 class DashboardCache:
@@ -107,6 +108,7 @@ class DashboardCache:
 
             for r in agg_rows:
                 prog = str(r.get("programa", "")).strip().upper()
+                nivel = mapping.get_level(prog)
                 
                 # Metric fields
                 leads = _safe_int(r.get("leads"))
@@ -155,6 +157,7 @@ class DashboardCache:
                 
                 merged_programs.append({
                     "programa": prog,
+                    "nivel": nivel,
                     "leads": leads,
                     "en_gestion": en_gestion,
                     "no_util": leads_no_util,

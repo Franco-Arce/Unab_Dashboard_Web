@@ -18,6 +18,7 @@ import {
 import { motion } from 'framer-motion';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell, AreaChart, Area, CartesianGrid } from 'recharts';
 import api from '../api';
+import { useFilters } from '../context/FilterContext';
 import { MetricCard } from '../components/MetricCard';
 import { CircularLiquidGauge } from '../components/CircularLiquidGauge';
 
@@ -54,13 +55,14 @@ export default function OverviewPage() {
     const [funnel, setFunnel] = useState([]);
     const [insights, setInsights] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { nivel } = useFilters();
 
     useEffect(() => {
         const load = async () => {
             try {
                 const [k, f, i] = await Promise.all([
-                    api.kpis(),
-                    api.funnel(),
+                    api.kpis(nivel),
+                    api.funnel(nivel),
                     api.aiInsights()
                 ]);
                 setKpis(k);
@@ -73,7 +75,7 @@ export default function OverviewPage() {
             }
         };
         load();
-    }, []);
+    }, [nivel]);
 
     if (loading) return (
         <motion.div
@@ -211,8 +213,8 @@ export default function OverviewPage() {
                                 <h3 className="text-xl font-bold mb-1 text-nods-text-primary">Embudo de Conversión</h3>
                                 <p className="text-nods-text-muted text-sm font-medium">Rendimiento de las etapas de la campaña</p>
                             </div>
-                            <div className="bg-slate-50 px-4 py-2 rounded-xl text-xs font-bold border border-nods-border text-nods-text-primary">
-                                Global
+                            <div className="bg-slate-50 px-4 py-2 rounded-xl text-xs font-bold border border-nods-border text-nods-text-primary uppercase tracking-widest">
+                                {nivel === 'TODOS' ? 'Global' : nivel}
                             </div>
                         </div>
 
