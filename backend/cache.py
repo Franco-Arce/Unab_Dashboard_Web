@@ -253,6 +253,16 @@ class DashboardCache:
             self.data = data
             self.last_refresh = datetime.now(timezone.utc)
             print(f"[Cache] Refreshed at {self.last_refresh.isoformat()} — {data.get('total_leads', 0)} leads loaded")
+            
+            # Diagnostic logging for refresh
+            if data:
+                merged = data.get("merged_programs", [])
+                levels = {}
+                for p in merged:
+                    lvl = p.get("nivel", "MISSING")
+                    levels[lvl] = levels.get(lvl, 0) + 1
+                print(f"[Cache] refresh: {len(merged)} programs, levels: {levels}")
+
 
     async def get(self, key: str, default=None):
         if self.is_stale:
@@ -262,6 +272,16 @@ class DashboardCache:
     async def get_all(self) -> dict:
         if self.is_stale:
             await self.refresh()
+        
+        # Diagnostic logging
+        if self.data:
+            merged = self.data.get("merged_programs", [])
+            levels = {}
+            for p in merged:
+                lvl = p.get("nivel", "MISSING")
+                levels[lvl] = levels.get(lvl, 0) + 1
+            print(f"[Cache] get_all: {len(merged)} programs, levels: {levels}")
+            
         return self.data
 
     def get_changes_summary(self) -> str:
