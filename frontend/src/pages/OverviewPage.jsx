@@ -60,13 +60,12 @@ export default function OverviewPage() {
     useEffect(() => {
         const load = async () => {
             try {
-                const [k, f, i] = await Promise.all([
-                    api.kpis(nivel),
-                    api.funnel(nivel),
-                    api.aiInsights()
-                ]);
+                const k = await api.kpis(nivel);
+                const f = await api.funnel(nivel);
                 setKpis(k);
                 setFunnel(f);
+
+                const i = await api.aiInsights();
                 setInsights(i.insights || []);
             } catch (err) {
                 console.error(err);

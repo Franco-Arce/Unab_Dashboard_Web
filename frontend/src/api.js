@@ -43,32 +43,42 @@ export const api = {
 
     // Dashboard
     kpis: async (nivel) => {
-        const q = nivel ? `?nivel=${nivel}` : '';
-        const res = await request(`/api/dashboard/kpis${q}`);
+        const q = new URLSearchParams();
+        if (nivel) q.set('nivel', nivel);
+        q.set('t', Date.now());
+        const res = await request(`/api/dashboard/kpis?${q.toString()}`);
         dashboardContext.kpis = res;
         return res;
     },
     funnel: async (nivel) => {
-        const q = nivel ? `?nivel=${nivel}` : '';
-        const res = await request(`/api/dashboard/funnel${q}`);
+        const q = new URLSearchParams();
+        if (nivel) q.set('nivel', nivel);
+        q.set('t', Date.now());
+        const res = await request(`/api/dashboard/funnel?${q.toString()}`);
         dashboardContext.funnel = res;
         return res;
     },
     admisiones: async (nivel) => {
-        const q = nivel ? `?nivel=${nivel}` : '';
-        const res = await request(`/api/dashboard/admisiones${q}`);
+        const q = new URLSearchParams();
+        if (nivel) q.set('nivel', nivel);
+        q.set('t', Date.now());
+        const res = await request(`/api/dashboard/admisiones?${q.toString()}`);
         dashboardContext.admisiones = res;
         return res;
     },
     estados: async (nivel) => {
-        const q = nivel ? `?nivel=${nivel}` : '';
-        const res = await request(`/api/dashboard/estados${q}`);
+        const q = new URLSearchParams();
+        if (nivel) q.set('nivel', nivel);
+        q.set('t', Date.now());
+        const res = await request(`/api/dashboard/estados?${q.toString()}`);
         dashboardContext.estados = res;
         return res;
     },
     noUtil: async (nivel) => {
-        const q = nivel ? `?nivel=${nivel}` : '';
-        const res = await request(`/api/dashboard/no-util${q}`);
+        const q = new URLSearchParams();
+        if (nivel) q.set('nivel', nivel);
+        q.set('t', Date.now());
+        const res = await request(`/api/dashboard/no-util?${q.toString()}`);
         dashboardContext.noUtil = res;
         return res;
     },

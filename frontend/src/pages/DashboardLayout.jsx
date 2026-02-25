@@ -85,14 +85,14 @@ export default function DashboardLayout() {
                     </div>
 
                     {/* Level Selector */}
-                    <div className="mb-6 bg-slate-900/50 p-1.5 rounded-2xl border border-slate-800/30 flex gap-2">
+                    <div className="mb-6 bg-slate-800/20 p-1.5 rounded-2xl border border-slate-700/30 flex gap-2">
                         {['TODOS', 'GRADO', 'POSGRADO'].map((opt) => (
                             <button
                                 key={opt}
                                 onClick={() => setNivel(opt)}
-                                className={`flex-1 py-2.5 rounded-xl text-[9px] font-black transition-all duration-300 tracking-widest ${nivel === opt
-                                        ? 'bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-xl shadow-blue-500/20'
-                                        : 'text-slate-500 hover:text-slate-300'
+                                className={`flex-1 py-3 rounded-xl text-[10px] font-black transition-all duration-300 tracking-widest ${nivel === opt
+                                    ? 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30'
+                                    : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/40'
                                     }`}
                             >
                                 {opt}
