@@ -160,7 +160,7 @@ export default function AdmisionesPage() {
                         </thead>
                         <tbody className="divide-y divide-slate-100 tabular-nums">
                             {filtered.map((item, idx) => (
-                                <tr key={idx} className="hover:bg-slate-100/60 transition-all even:bg-slate-50/40 group relative">
+                                <tr key={idx} className="hover:bg-slate-100/60 transition-all even:bg-slate-100/80 group relative">
                                     <td className="px-4 py-5 text-xs font-semibold text-nods-text-primary whitespace-normal min-w-[200px] leading-tight break-words group-hover:border-l-4 border-indigo-500 transition-all">{item.programa}</td>
                                     <td className="px-2 py-5 text-center text-xs text-nods-text-muted border-l border-nods-border/30">{item.solicitados || ''}</td>
                                     <td className="px-2 py-5 text-center text-xs text-nods-text-muted">{item.admitidos || ''}</td>

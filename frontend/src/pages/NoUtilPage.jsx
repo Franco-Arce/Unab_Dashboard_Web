@@ -238,7 +238,7 @@ export default function NoUtilPage() {
                                             animate={{ opacity: 1 }}
                                             exit={{ opacity: 0 }}
                                             key={item.subcategoria}
-                                            className="group hover:bg-slate-100/60 transition-all cursor-default even:bg-slate-50/40 relative"
+                                            className="group hover:bg-slate-100/60 transition-all cursor-default even:bg-slate-100/80 relative"
                                         >
                                             <td className="px-8 py-6 relative group-hover:border-l-4 border-rose-500 transition-all">
                                                 <div className="flex items-center gap-3">

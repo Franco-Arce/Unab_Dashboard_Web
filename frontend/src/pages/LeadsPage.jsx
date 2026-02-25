@@ -212,7 +212,7 @@ export default function LeadsPage() {
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         transition={{ delay: idx * 0.02 }}
-                                        className="hover:bg-slate-100/60 transition-all group relative even:bg-slate-50/30"
+                                        className="hover:bg-slate-100/60 transition-all group relative even:bg-slate-100/80"
                                     >
                                         <td className="relative px-6 py-6 ring-0 group-hover:ring-l-4 ring-nods-accent transition-all">
                                             <div className="flex items-center gap-3">
