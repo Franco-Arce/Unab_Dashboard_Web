@@ -4,7 +4,7 @@ import { Lock, User, AlertCircle } from 'lucide-react';
 import api from '../api';
 import { motion } from 'framer-motion';
 import logoUnab from '../assets/unab-logo.jpg';
-import logoNods from '../assets/logo-nods.ico';
+import nodsWhite from '../assets/nods-white.png';
 
 export default function LoginPage() {
     const [username, setUsername] = useState('Admin'); // Default for convenience
@@ -99,10 +99,9 @@ export default function LoginPage() {
 
                 <div className="mt-8 pt-8 border-t border-nods-border/50 flex flex-col items-center">
                     <img
-                        src={logoNods}
+                        src={nodsWhite}
                         alt="NODS"
-                        className="h-4 w-auto opacity-30 grayscale contrast-125 filter"
-                        style={{ mixBlendMode: 'lighten' }}
+                        className="h-6 w-auto opacity-50 hover:opacity-100 transition-opacity duration-500"
                     />
                 </div>
             </motion.div>

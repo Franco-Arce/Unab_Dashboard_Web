@@ -15,7 +15,8 @@ import {
 import AIPanel from '../components/AIPanel';
 import api from '../api';
 import logoUnab from '../assets/unab-logo.jpg';
-import logoNods from '../assets/logo-nods.ico';
+import nLogo from '../assets/n-logo.png';
+import nodsWhite from '../assets/nods-white.png';
 import nodsDark from '../assets/nods-dark.png';
 
 export default function DashboardLayout() {
@@ -72,17 +73,13 @@ export default function DashboardLayout() {
             {/* Sidebar Redesign */}
             <aside className="w-72 flex-shrink-0 bg-[#0a0f18] flex flex-col sticky top-0 h-screen transition-all duration-300 border-r border-slate-800/30">
                 <div className="p-8 flex flex-col h-full">
-                    {/* Logo Section - Coordinated N + DASHBOARD */}
-                    <div className="flex items-center gap-3 mb-12 px-2">
-                        <div className="flex items-center justify-center p-2 bg-blue-600 rounded-xl shadow-lg shadow-blue-500/20">
-                            <img
-                                src={logoNods}
-                                alt="N"
-                                className="h-5 w-auto brightness-200"
-                                style={{ transform: 'translateX(-2px)' }} // Visual adjustment for the N in the icon
-                            />
-                        </div>
-                        <span className="text-xl font-black text-white tracking-tighter italic uppercase opacity-90">Dashboard</span>
+                    {/* Logo Section - Grupo Nods Logo */}
+                    <div className="flex items-center mb-12 px-2">
+                        <img
+                            src={nodsWhite}
+                            alt="Grupo Nods"
+                            className="h-8 w-auto"
+                        />
                     </div>
 
                     {/* Navigation */}
