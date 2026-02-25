@@ -238,9 +238,9 @@ export default function NoUtilPage() {
                                             animate={{ opacity: 1 }}
                                             exit={{ opacity: 0 }}
                                             key={item.subcategoria}
-                                            className="group hover:bg-slate-50 transition-all cursor-default"
+                                            className="group hover:bg-slate-100/60 transition-all cursor-default even:bg-slate-50/40 relative"
                                         >
-                                            <td className="px-8 py-4">
+                                            <td className="px-8 py-6 relative group-hover:border-l-4 border-rose-500 transition-all">
                                                 <div className="flex items-center gap-3">
                                                     <div
                                                         className="w-1.5 h-6 rounded-full"
@@ -251,13 +251,13 @@ export default function NoUtilPage() {
                                                     </span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <span className="text-sm font-black text-nods-text-primary group-hover:text-rose-500 transition-colors">
+                                            <td className="px-6 py-6 text-center">
+                                                <span className="text-sm font-black text-nods-text-primary group-hover:text-rose-500 transition-colors tabular-nums">
                                                     {item.leads?.toLocaleString()}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex flex-col items-center gap-1.5">
+                                            <td className="px-6 py-6">
+                                                <div className="flex flex-col items-center gap-1.5 tabular-nums">
                                                     <span className="text-xs font-bold text-nods-text-muted">
                                                         {item.porcentaje}%
                                                     </span>

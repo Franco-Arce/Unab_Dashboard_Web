@@ -158,31 +158,31 @@ export default function AdmisionesPage() {
                                 <th className="px-2 py-4 text-center">PAGADOS VAR</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-slate-100 tabular-nums">
                             {filtered.map((item, idx) => (
-                                <tr key={idx} className="hover:bg-slate-50 transition-colors">
-                                    <td className="px-4 py-3 text-xs font-semibold text-nods-text-primary whitespace-normal min-w-[200px] leading-tight break-words">{item.programa}</td>
-                                    <td className="px-2 py-3 text-center text-xs text-nods-text-muted border-l border-nods-border/30">{item.solicitados || ''}</td>
-                                    <td className="px-2 py-3 text-center text-xs text-nods-text-muted">{item.admitidos || ''}</td>
-                                    <td className="px-2 py-3 text-center text-xs text-nods-text-muted">{item.pagados || ''}</td>
+                                <tr key={idx} className="hover:bg-slate-100/60 transition-all even:bg-slate-50/40 group relative">
+                                    <td className="px-4 py-5 text-xs font-semibold text-nods-text-primary whitespace-normal min-w-[200px] leading-tight break-words group-hover:border-l-4 border-indigo-500 transition-all">{item.programa}</td>
+                                    <td className="px-2 py-5 text-center text-xs text-nods-text-muted border-l border-nods-border/30">{item.solicitados || ''}</td>
+                                    <td className="px-2 py-5 text-center text-xs text-nods-text-muted">{item.admitidos || ''}</td>
+                                    <td className="px-2 py-5 text-center text-xs text-nods-text-muted">{item.pagados || ''}</td>
 
-                                    <td className="px-2 py-3 text-center text-xs text-cyan-700 font-bold border-l border-nods-border/30">{item.solicitados_25 || ''}</td>
-                                    <td className="px-2 py-3 text-center text-xs text-cyan-700 font-bold">{item.admitidos_25 || ''}</td>
-                                    <td className="px-2 py-3 text-center text-xs text-cyan-700 font-bold">{item.pagados_25 || ''}</td>
+                                    <td className="px-2 py-5 text-center text-xs text-cyan-700 font-bold border-l border-nods-border/30">{item.solicitados_25 || ''}</td>
+                                    <td className="px-2 py-5 text-center text-xs text-cyan-700 font-bold">{item.admitidos_25 || ''}</td>
+                                    <td className="px-2 py-5 text-center text-xs text-cyan-700 font-bold">{item.pagados_25 || ''}</td>
 
-                                    <td className="px-2 py-3 border-l border-nods-border/30">
+                                    <td className="px-2 py-5 border-l border-nods-border/30">
                                         <div className="flex items-center justify-center gap-2">
                                             <StatusIcon val={item.solicitados_var} />
                                             <span className="text-xs text-nods-text-muted w-6 text-right">{item.solicitados_var || 0}</span>
                                         </div>
                                     </td>
-                                    <td className="px-2 py-3">
+                                    <td className="px-2 py-5">
                                         <div className="flex items-center justify-center gap-2">
                                             <StatusIcon val={item.admitidos_var} />
                                             <span className="text-xs text-nods-text-muted w-6 text-right">{item.admitidos_var || 0}</span>
                                         </div>
                                     </td>
-                                    <td className="px-2 py-3">
+                                    <td className="px-2 py-5">
                                         <div className="flex items-center justify-center gap-2">
                                             <StatusIcon val={item.pagados_var} />
                                             <span className="text-xs text-nods-text-muted w-6 text-right">{item.pagados_var || 0}</span>
@@ -192,18 +192,18 @@ export default function AdmisionesPage() {
                             ))}
                             {filtered.length > 0 && (
                                 <tr className="bg-blue-50/50 border-t-2 border-nods-border">
-                                    <td className="px-4 py-4 text-sm font-bold text-nods-text-primary">Total</td>
-                                    <td className="px-2 py-4 text-center text-sm font-bold text-nods-text-primary border-l border-nods-border/30">{tSol.toLocaleString()}</td>
-                                    <td className="px-2 py-4 text-center text-sm font-bold text-nods-text-primary">{tAdm.toLocaleString()}</td>
-                                    <td className="px-2 py-4 text-center text-sm font-bold text-nods-text-primary">{tPag.toLocaleString()}</td>
+                                    <td className="px-4 py-6 text-sm font-bold text-nods-text-primary">TOTAL GENERAL</td>
+                                    <td className="px-2 py-6 text-center text-sm font-bold text-nods-text-primary border-l border-nods-border/30">{tSol.toLocaleString()}</td>
+                                    <td className="px-2 py-6 text-center text-sm font-bold text-nods-text-primary">{tAdm.toLocaleString()}</td>
+                                    <td className="px-2 py-6 text-center text-sm font-bold text-nods-text-primary">{tPag.toLocaleString()}</td>
 
-                                    <td className="px-2 py-4 text-center text-sm font-bold text-cyan-700 border-l border-nods-border/30">{tSol25 === 0 ? '' : tSol25.toLocaleString()}</td>
-                                    <td className="px-2 py-4 text-center text-sm font-bold text-cyan-700">{tAdm25 === 0 ? '' : tAdm25.toLocaleString()}</td>
-                                    <td className="px-2 py-4 text-center text-sm font-bold text-cyan-700">{tPag25 === 0 ? '' : tPag25.toLocaleString()}</td>
+                                    <td className="px-2 py-6 text-center text-sm font-bold text-cyan-700 border-l border-nods-border/30">{tSol25 === 0 ? '' : tSol25.toLocaleString()}</td>
+                                    <td className="px-2 py-6 text-center text-sm font-bold text-cyan-700">{tAdm25 === 0 ? '' : tAdm25.toLocaleString()}</td>
+                                    <td className="px-2 py-6 text-center text-sm font-bold text-cyan-700">{tPag25 === 0 ? '' : tPag25.toLocaleString()}</td>
 
-                                    <td className="px-2 py-4 text-center text-sm font-bold text-nods-text-primary border-l border-nods-border/30">{tSolVar.toLocaleString()}</td>
-                                    <td className="px-2 py-4 text-center text-sm font-bold text-nods-text-primary">{tAdmVar.toLocaleString()}</td>
-                                    <td className="px-2 py-4 text-center text-sm font-bold text-nods-text-primary">{tPagVar.toLocaleString()}</td>
+                                    <td className="px-2 py-6 text-center text-sm font-bold text-nods-text-primary border-l border-nods-border/30">{tSolVar.toLocaleString()}</td>
+                                    <td className="px-2 py-6 text-center text-sm font-bold text-nods-text-primary">{tAdmVar.toLocaleString()}</td>
+                                    <td className="px-2 py-6 text-center text-sm font-bold text-nods-text-primary">{tPagVar.toLocaleString()}</td>
                                 </tr>
                             )}
                         </tbody>

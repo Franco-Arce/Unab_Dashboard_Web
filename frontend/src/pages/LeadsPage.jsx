@@ -212,9 +212,9 @@ export default function LeadsPage() {
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         transition={{ delay: idx * 0.02 }}
-                                        className="hover:bg-slate-50/80 transition-colors group"
+                                        className="hover:bg-slate-100/60 transition-all group relative even:bg-slate-50/30"
                                     >
-                                        <td className="px-6 py-4">
+                                        <td className="relative px-6 py-6 ring-0 group-hover:ring-l-4 ring-nods-accent transition-all">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-nods-text-muted group-hover:bg-nods-accent group-hover:text-white transition-all shadow-sm">
                                                     {lead.txtnombreapellido?.[0] || 'U'}
@@ -227,30 +227,30 @@ export default function LeadsPage() {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="px-6 py-6">
                                             <div className="text-xs font-medium text-nods-text-primary max-w-[200px] truncate">{lead.txtprogramainteres}</div>
                                             <div className="text-[10px] text-nods-text-muted uppercase tracking-widest font-bold">{lead.base}</div>
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="px-6 py-6">
                                             {lead.ultima_mejor_subcat_string ? (
                                                 <div className="inline-flex flex-col">
-                                                    <span className="text-xs font-extrabold text-emerald-600">{lead.ultima_mejor_subcat_string}</span>
+                                                    <span className="text-xs font-extrabold text-emerald-600 uppercase tracking-tight">{lead.ultima_mejor_subcat_string}</span>
                                                     <span className="text-[10px] text-nods-text-muted truncate max-w-[150px]">{lead.descrip_subcat}</span>
                                                 </div>
                                             ) : (
                                                 <span className="text-xs text-nods-text-muted italic">Sin gestión</span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-1 text-nods-text-muted">
+                                        <td className="px-6 py-6">
+                                            <div className="flex items-center gap-1 text-nods-text-muted tabular-nums">
                                                 <Calendar className="w-3 h-3" />
                                                 <span className="text-xs font-medium">{lead.fecha_a_utilizar ? new Date(lead.fecha_a_utilizar).toLocaleDateString() : '-'}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="px-6 py-6 text-right">
                                             <button
                                                 onClick={() => setSelectedLead(lead)}
-                                                className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-nods-text-muted hover:text-nods-accent"
+                                                className="p-2 hover:bg-white rounded-xl transition-all text-nods-text-muted hover:text-nods-accent shadow-sm border border-transparent hover:border-slate-100"
                                             >
                                                 <ExternalLink className="w-4 h-4" />
                                             </button>
