@@ -112,6 +112,7 @@ class DashboardCache:
                 # Use standard normalization: UPPER + TRIM
                 prog = str(r.get("programa", "")).strip().upper()
                 nivel = mapping.get_level(prog)
+                area = mapping.get_area(prog)
                 
                 # Metric fields
                 leads = _safe_int(r.get("leads"))
@@ -161,6 +162,7 @@ class DashboardCache:
                 merged_programs.append({
                     "programa": prog,
                     "nivel": nivel,
+                    "area": area,
                     "leads": leads,
                     "en_gestion": en_gestion,
                     "no_util": leads_no_util,
