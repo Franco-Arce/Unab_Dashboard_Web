@@ -1,7 +1,10 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+# Load .env relative to this file
+backend_dir = os.path.dirname(os.path.abspath(__file__))
+dotenv_path = os.path.join(backend_dir, ".env")
+load_dotenv(dotenv_path)
 
 import asyncio
 from contextlib import asynccontextmanager
