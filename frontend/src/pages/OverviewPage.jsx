@@ -490,7 +490,7 @@ export default function OverviewPage() {
                         {(() => {
                             const filtered = allPrograms
                                 .filter(p => selectedArea === 'TODAS' || p.area === selectedArea)
-                                .sort((a, b) => b.meta - a.meta)
+                                .sort((a, b) => b.pagados - a.pagados)
                                 .slice(0, 10)
                                 .map(p => ({
                                     ...p,
