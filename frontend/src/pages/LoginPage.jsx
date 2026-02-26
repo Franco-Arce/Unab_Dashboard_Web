@@ -7,8 +7,8 @@ import logoUnab from '../assets/unab-logo.jpg';
 import nodsWhite from '../assets/nods-white.png';
 
 export default function LoginPage() {
-    const [username, setUsername] = useState('Admin'); // Default for convenience
-    const [password, setPassword] = useState('Admin123'); // Default for convenience
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();

@@ -8,8 +8,8 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 SECRET = os.getenv("JWT_SECRET")
 ALGORITHM = "HS256"
-VALID_USER = "Admin"
-VALID_PASS = "Admin123"
+VALID_USER = os.getenv("AUTH_USER", "Admin")
+VALID_PASS = os.getenv("AUTH_PASSWORD", "Admin123")
 
 
 class LoginRequest(BaseModel):
