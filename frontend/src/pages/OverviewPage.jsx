@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
     Users,
     UserPlus,
@@ -137,48 +137,59 @@ export default function OverviewPage() {
     const [areas, setAreas] = useState([]);
     const [selectedArea, setSelectedArea] = useState('TODAS');
     const [loading, setLoading] = useState(true);
+    const [chartsVisible, setChartsVisible] = useState(false);
+    const chartsRef = useRef(null);
     const { nivel } = useFilters();
+
+    // Lazy render: only show bottom charts when scrolled into view
+    useEffect(() => {
+        const el = chartsRef.current;
+        if (!el) return;
+        const obs = new IntersectionObserver(
+            ([entry]) => { if (entry.isIntersecting) { setChartsVisible(true); obs.disconnect(); } },
+            { rootMargin: '200px' }
+        );
+        obs.observe(el);
+        return () => obs.disconnect();
+    }, [loading]);
 
     useEffect(() => {
         const load = async () => {
             try {
-                const k = await api.kpis(nivel);
-                const f = await api.funnel(nivel);
+                // Parallel API calls — saves 2-3 seconds vs sequential
+                const [k, f, adm, i] = await Promise.all([
+                    api.kpis(nivel),
+                    api.funnel(nivel),
+                    api.admisiones(nivel).catch(() => ({ programas: [] })),
+                    api.aiInsights().catch(() => ({ insights: [] }))
+                ]);
                 setKpis(k);
                 setFunnel(f);
 
-                // Fetch admisiones for top conversion programs
-                try {
-                    const adm = await api.admisiones(nivel);
-                    const progs = (adm.programas || [])
-                        .filter(p => p.leads > 10 && p.pagados > 0)
-                        .map(p => ({
-                            programa: p.programa,
-                            leads: p.leads,
-                            pagados: p.pagados,
-                            conversion: parseFloat(((p.pagados / p.leads) * 100).toFixed(1))
-                        }))
-                        .sort((a, b) => b.conversion - a.conversion)
-                        .slice(0, 15);
-                    setTopPrograms(progs);
+                // Process admisiones data
+                const progs = (adm.programas || [])
+                    .filter(p => p.leads > 10 && p.pagados > 0)
+                    .map(p => ({
+                        programa: p.programa,
+                        leads: p.leads,
+                        pagados: p.pagados,
+                        conversion: parseFloat(((p.pagados / p.leads) * 100).toFixed(1))
+                    }))
+                    .sort((a, b) => b.conversion - a.conversion)
+                    .slice(0, 15);
+                setTopPrograms(progs);
 
-                    // Store all programs with area info for Avance vs Meta chart
-                    const allProgs = (adm.programas || [])
-                        .filter(p => p.meta > 0)
-                        .map(p => ({
-                            programa: p.programa,
-                            pagados: p.pagados || 0,
-                            meta: p.meta || 0,
-                            area: p.area || 'SIN ÁREA'
-                        }));
-                    setAllPrograms(allProgs);
+                const allProgs = (adm.programas || [])
+                    .filter(p => p.meta > 0)
+                    .map(p => ({
+                        programa: p.programa,
+                        pagados: p.pagados || 0,
+                        meta: p.meta || 0,
+                        area: p.area || 'SIN ÁREA'
+                    }));
+                setAllPrograms(allProgs);
+                setAreas([...new Set(allProgs.map(p => p.area))].sort());
 
-                    // Extract unique areas
-                    const uniqueAreas = [...new Set(allProgs.map(p => p.area))].sort();
-                    setAreas(uniqueAreas);
-                } catch (e) { console.error('Error loading admisiones for overview', e); }
-
-                const i = await api.aiInsights();
                 setInsights(i.insights || []);
             } catch (err) {
                 console.error(err);
@@ -190,15 +201,38 @@ export default function OverviewPage() {
     }, [nivel]);
 
     if (loading) return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-8 animate-pulse"
-        >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[1, 2, 3, 4].map(i => <div key={i} className="h-32 bg-white rounded-3xl border border-zinc-100 shadow-sm" />)}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+            {/* Skeleton KPI Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+                {[1, 2, 3, 4, 5, 6].map(i => (
+                    <div key={i} className="bg-white rounded-3xl border border-slate-100 p-5 shadow-sm">
+                        <div className="w-10 h-10 bg-slate-100 rounded-2xl mb-3 animate-pulse" />
+                        <div className="w-16 h-3 bg-slate-100 rounded mb-2 animate-pulse" />
+                        <div className="w-20 h-7 bg-slate-100 rounded animate-pulse" />
+                    </div>
+                ))}
             </div>
-            <div className="h-[400px] bg-white rounded-3xl border border-zinc-100 shadow-sm" />
+            {/* Skeleton Funnel + Right Column */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 p-8 shadow-sm">
+                    <div className="w-48 h-5 bg-slate-100 rounded mb-2 animate-pulse" />
+                    <div className="w-64 h-3 bg-slate-100 rounded mb-8 animate-pulse" />
+                    {[1, 2, 3, 4, 5].map(i => (
+                        <div key={i} className="h-14 bg-slate-50 rounded-2xl mb-2 animate-pulse" style={{ width: `${100 - i * 15}%` }} />
+                    ))}
+                </div>
+                <div className="flex flex-col gap-4">
+                    {[1, 2, 3].map(i => (
+                        <div key={i} className="bg-white rounded-[2.5rem] border border-slate-100 p-6 shadow-sm flex-1 animate-pulse">
+                            <div className="w-20 h-3 bg-slate-100 rounded mb-4" />
+                            <div className="flex items-center gap-4">
+                                <div className="w-16 h-16 bg-slate-100 rounded-full" />
+                                <div><div className="w-28 h-4 bg-slate-100 rounded mb-2" /><div className="w-20 h-3 bg-slate-100 rounded" /></div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </motion.div>
     );
 
@@ -396,164 +430,60 @@ export default function OverviewPage() {
             </div>
 
             {/* Top Conversión + Avance vs Meta por Programa */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.6 }}
-                    className="bg-white border border-nods-border rounded-3xl p-8 shadow-xl"
-                >
-                    <div className="mb-6">
-                        <h3 className="text-xl font-bold text-nods-text-primary">Top Conversión por Programa</h3>
-                        <p className="text-nods-text-muted text-sm font-medium">Programas con mayor tasa de conversión (leads → pagados)</p>
-                    </div>
-                    <div className="space-y-3">
-                        {topPrograms.length > 0 ? topPrograms.map((prog, i) => {
-                            const maxConversion = topPrograms[0]?.conversion || 1;
-                            const barWidth = (prog.conversion / maxConversion) * 100;
-                            const barColors = ['#1e3a8a', '#2563eb', '#3b82f6', '#60a5fa', '#06b6d4', '#14b8a6', '#10b981', '#34d399'];
-                            return (
-                                <motion.div
-                                    key={prog.programa}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.7 + i * 0.05 }}
-                                    className="group"
-                                >
-                                    <div className="flex items-center justify-between mb-1">
-                                        <span className="text-xs font-bold text-slate-700 truncate max-w-[55%]" title={prog.programa}>
-                                            {prog.programa
-                                                .replace(/ESPECIALIZACI[ÓO]N/gi, 'Esp.')
-                                                .replace(/TECNOLOG[ÍI]A/gi, 'Tec.')
-                                                .replace(/ADMINISTRACI[ÓO]N/gi, 'Adm.')
-                                                .replace(/INGENIER[ÍI]A/gi, 'Ing.')
-                                                .replace(/MAESTR[ÍI]A/gi, 'Mtr.')
-                                                .replace(/CONTADUR[ÍI]A/gi, 'Cont.')
-                                                .replace(/LICENCIATURA/gi, 'Lic.')
-                                            }
-                                        </span>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-[10px] text-slate-400 font-bold">{prog.pagados}/{prog.leads}</span>
-                                            <span className="text-xs font-black text-slate-900">{prog.conversion}%</span>
-                                        </div>
-                                    </div>
-                                    <div className="w-full h-8 bg-slate-100/60 rounded-xl relative overflow-hidden border border-slate-200/40">
-                                        <motion.div
-                                            initial={{ width: 0 }}
-                                            animate={{ width: `${Math.max(barWidth, 8)}%` }}
-                                            transition={{ duration: 1.4, delay: 0.8 + i * 0.06, ease: [0.34, 1.56, 0.64, 1] }}
-                                            className="h-full rounded-xl relative overflow-hidden shadow-[3px_0_10px_rgba(0,0,0,0.1)]"
-                                            style={{ backgroundColor: barColors[i] || '#3b82f6' }}
-                                        >
-                                            <div
-                                                className="absolute inset-0 opacity-10 pointer-events-none animate-liquid-1"
-                                                style={{
-                                                    backgroundImage: `repeating-linear-gradient(-45deg, transparent, transparent 12px, white 12px, white 24px)`,
-                                                    width: '300%'
-                                                }}
-                                            />
-                                            <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
-                                        </motion.div>
-                                    </div>
-                                </motion.div>
-                            );
-                        }) : (
-                            <div className="text-center py-8 text-slate-400 text-sm font-medium">Sin datos suficientes</div>
-                        )}
-                    </div>
-                </motion.div>
-
-                {/* Avance vs Meta por Programa */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.7 }}
-                    className="bg-white border border-nods-border rounded-3xl p-8 shadow-xl"
-                >
-                    <div className="flex justify-between items-start mb-6">
-                        <div>
-                            <h3 className="text-xl font-bold text-nods-text-primary">Avance vs Meta por Programa</h3>
-                            <p className="text-nods-text-muted text-sm font-medium">Progreso hacia la Meta (Gráfico de Barras)</p>
+            <div ref={chartsRef} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {chartsVisible && (<>
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.15 }}
+                        className="bg-white border border-nods-border rounded-3xl p-8 shadow-xl"
+                    >
+                        <div className="mb-6">
+                            <h3 className="text-xl font-bold text-nods-text-primary">Top Conversión por Programa</h3>
+                            <p className="text-nods-text-muted text-sm font-medium">Programas con mayor tasa de conversión (leads → pagados)</p>
                         </div>
-                        <select
-                            value={selectedArea}
-                            onChange={(e) => setSelectedArea(e.target.value)}
-                            className="bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
-                        >
-                            <option value="TODAS">Todas las Áreas</option>
-                            {areas.map(a => (
-                                <option key={a} value={a}>{a.charAt(0) + a.slice(1).toLowerCase()}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="space-y-2">
-                        {(() => {
-                            const filtered = allPrograms
-                                .filter(p => selectedArea === 'TODAS' || p.area === selectedArea)
-                                .sort((a, b) => b.pagados - a.pagados)
-                                .slice(0, 15)
-                                .map(p => {
-                                    let name = p.programa
-                                        .replace(/ESPECIALIZACI[\u00d3O]N/gi, 'Esp.')
-                                        .replace(/TECNOLOG[\u00cdI]A/gi, 'Tec.')
-                                        .replace(/ADMINISTRACI[\u00d3O]N/gi, 'Adm.')
-                                        .replace(/INGENIER[\u00cdI]A/gi, 'Ing.')
-                                        .replace(/MAESTR[\u00cdI]A/gi, 'Mtr.')
-                                        .replace(/CONTADUR[\u00cdI]A/gi, 'Cont.')
-                                        .replace(/LICENCIATURA/gi, 'Lic.')
-                                        .replace(/INTERNACIONAL(ES)?/gi, 'Intl.')
-                                        .replace(/SEGURIDAD/gi, 'Seg.')
-                                        .replace(/NEGOCIOS/gi, 'Neg.');
-                                    return { ...p, displayName: name };
-                                });
-
-                            const maxMeta = Math.max(...filtered.map(p => p.meta), 1);
-
-                            if (filtered.length === 0) {
-                                return <div className="flex items-center justify-center py-12 text-slate-400 text-sm font-medium">Sin datos para esta \u00e1rea</div>;
-                            }
-
-                            return filtered.map((prog, i) => {
-                                const metaWidth = (prog.meta / maxMeta) * 100;
-                                const pagadosWidth = (prog.pagados / maxMeta) * 100;
-                                const barColors = ['#10b981', '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6', '#6366f1', '#8b5cf6', '#a78bfa', '#10b981', '#14b8a6'];
-
+                        <div className="space-y-3">
+                            {topPrograms.length > 0 ? topPrograms.map((prog, i) => {
+                                const maxConversion = topPrograms[0]?.conversion || 1;
+                                const barWidth = (prog.conversion / maxConversion) * 100;
+                                const barColors = ['#1e3a8a', '#2563eb', '#3b82f6', '#60a5fa', '#06b6d4', '#14b8a6', '#10b981', '#34d399'];
                                 return (
                                     <motion.div
                                         key={prog.programa}
-                                        initial={{ opacity: 0, x: -15 }}
+                                        initial={{ opacity: 0, x: -20 }}
                                         animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.3 + i * 0.04 }}
+                                        transition={{ delay: 0.7 + i * 0.05 }}
+                                        className="group"
                                     >
                                         <div className="flex items-center justify-between mb-1">
-                                            <span className="text-[11px] font-bold text-slate-700 truncate" style={{ maxWidth: '70%' }} title={prog.programa}>
-                                                {prog.displayName}
+                                            <span className="text-xs font-bold text-slate-700 truncate max-w-[55%]" title={prog.programa}>
+                                                {prog.programa
+                                                    .replace(/ESPECIALIZACI[ÓO]N/gi, 'Esp.')
+                                                    .replace(/TECNOLOG[ÍI]A/gi, 'Tec.')
+                                                    .replace(/ADMINISTRACI[ÓO]N/gi, 'Adm.')
+                                                    .replace(/INGENIER[ÍI]A/gi, 'Ing.')
+                                                    .replace(/MAESTR[ÍI]A/gi, 'Mtr.')
+                                                    .replace(/CONTADUR[ÍI]A/gi, 'Cont.')
+                                                    .replace(/LICENCIATURA/gi, 'Lic.')
+                                                }
                                             </span>
                                             <div className="flex items-center gap-2">
-                                                <span className="text-emerald-600 font-black text-xs">{prog.pagados}</span>
-                                                <span className="text-slate-400 text-[10px] font-bold">/ {prog.meta}</span>
+                                                <span className="text-[10px] text-slate-400 font-bold">{prog.pagados}/{prog.leads}</span>
+                                                <span className="text-xs font-black text-slate-900">{prog.conversion}%</span>
                                             </div>
                                         </div>
-                                        <div className="w-full h-7 bg-slate-100/60 rounded-xl relative overflow-hidden border border-slate-200/40">
-                                            {/* Meta bar (gray background) */}
+                                        <div className="w-full h-8 bg-slate-100/60 rounded-xl relative overflow-hidden border border-slate-200/40">
                                             <motion.div
                                                 initial={{ width: 0 }}
-                                                animate={{ width: `${Math.max(metaWidth, 4)}%` }}
-                                                transition={{ duration: 1.2, delay: 0.4 + i * 0.04, ease: 'easeOut' }}
-                                                className="absolute inset-y-0 left-0 bg-slate-200/80 rounded-xl"
-                                            />
-                                            {/* Pagados bar (colored, overlaid) */}
-                                            <motion.div
-                                                initial={{ width: 0 }}
-                                                animate={{ width: `${Math.max(pagadosWidth, 3)}%` }}
-                                                transition={{ duration: 1.4, delay: 0.5 + i * 0.05, ease: [0.34, 1.56, 0.64, 1] }}
-                                                className="absolute inset-y-0 left-0 rounded-xl overflow-hidden shadow-[3px_0_10px_rgba(0,0,0,0.1)]"
-                                                style={{ backgroundColor: barColors[i] || '#10b981' }}
+                                                animate={{ width: `${Math.max(barWidth, 8)}%` }}
+                                                transition={{ duration: 1.4, delay: 0.8 + i * 0.06, ease: [0.34, 1.56, 0.64, 1] }}
+                                                className="h-full rounded-xl relative overflow-hidden shadow-[3px_0_10px_rgba(0,0,0,0.1)]"
+                                                style={{ backgroundColor: barColors[i] || '#3b82f6' }}
                                             >
                                                 <div
                                                     className="absolute inset-0 opacity-10 pointer-events-none animate-liquid-1"
                                                     style={{
-                                                        backgroundImage: `repeating-linear-gradient(-45deg, transparent, transparent 10px, white 10px, white 20px)`,
+                                                        backgroundImage: `repeating-linear-gradient(-45deg, transparent, transparent 12px, white 12px, white 24px)`,
                                                         width: '300%'
                                                     }}
                                                 />
@@ -562,20 +492,126 @@ export default function OverviewPage() {
                                         </div>
                                     </motion.div>
                                 );
-                            });
-                        })()}
-                    </div>
-                    <div className="flex items-center justify-center gap-6 mt-4">
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded-sm bg-slate-200" />
-                            <span className="text-[10px] font-bold text-slate-500 uppercase">Meta</span>
+                            }) : (
+                                <div className="text-center py-8 text-slate-400 text-sm font-medium">Sin datos suficientes</div>
+                            )}
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded-sm bg-emerald-500" />
-                            <span className="text-[10px] font-bold text-slate-500 uppercase">Pagados</span>
+                    </motion.div>
+
+                    {/* Avance vs Meta por Programa */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.7 }}
+                        className="bg-white border border-nods-border rounded-3xl p-8 shadow-xl"
+                    >
+                        <div className="flex justify-between items-start mb-6">
+                            <div>
+                                <h3 className="text-xl font-bold text-nods-text-primary">Avance vs Meta por Programa</h3>
+                                <p className="text-nods-text-muted text-sm font-medium">Progreso hacia la Meta (Gráfico de Barras)</p>
+                            </div>
+                            <select
+                                value={selectedArea}
+                                onChange={(e) => setSelectedArea(e.target.value)}
+                                className="bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                            >
+                                <option value="TODAS">Todas las Áreas</option>
+                                {areas.map(a => (
+                                    <option key={a} value={a}>{a.charAt(0) + a.slice(1).toLowerCase()}</option>
+                                ))}
+                            </select>
                         </div>
-                    </div>
-                </motion.div>
+                        <div className="space-y-2">
+                            {(() => {
+                                const filtered = allPrograms
+                                    .filter(p => selectedArea === 'TODAS' || p.area === selectedArea)
+                                    .sort((a, b) => b.pagados - a.pagados)
+                                    .slice(0, 15)
+                                    .map(p => {
+                                        let name = p.programa
+                                            .replace(/ESPECIALIZACI[\u00d3O]N/gi, 'Esp.')
+                                            .replace(/TECNOLOG[\u00cdI]A/gi, 'Tec.')
+                                            .replace(/ADMINISTRACI[\u00d3O]N/gi, 'Adm.')
+                                            .replace(/INGENIER[\u00cdI]A/gi, 'Ing.')
+                                            .replace(/MAESTR[\u00cdI]A/gi, 'Mtr.')
+                                            .replace(/CONTADUR[\u00cdI]A/gi, 'Cont.')
+                                            .replace(/LICENCIATURA/gi, 'Lic.')
+                                            .replace(/INTERNACIONAL(ES)?/gi, 'Intl.')
+                                            .replace(/SEGURIDAD/gi, 'Seg.')
+                                            .replace(/NEGOCIOS/gi, 'Neg.');
+                                        return { ...p, displayName: name };
+                                    });
+
+                                const maxMeta = Math.max(...filtered.map(p => p.meta), 1);
+
+                                if (filtered.length === 0) {
+                                    return <div className="flex items-center justify-center py-12 text-slate-400 text-sm font-medium">Sin datos para esta \u00e1rea</div>;
+                                }
+
+                                return filtered.map((prog, i) => {
+                                    const metaWidth = (prog.meta / maxMeta) * 100;
+                                    const pagadosWidth = (prog.pagados / maxMeta) * 100;
+                                    const barColors = ['#10b981', '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6', '#6366f1', '#8b5cf6', '#a78bfa', '#10b981', '#14b8a6'];
+
+                                    return (
+                                        <motion.div
+                                            key={prog.programa}
+                                            initial={{ opacity: 0, x: -15 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.3 + i * 0.04 }}
+                                        >
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="text-[11px] font-bold text-slate-700 truncate" style={{ maxWidth: '70%' }} title={prog.programa}>
+                                                    {prog.displayName}
+                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-emerald-600 font-black text-xs">{prog.pagados}</span>
+                                                    <span className="text-slate-400 text-[10px] font-bold">/ {prog.meta}</span>
+                                                </div>
+                                            </div>
+                                            <div className="w-full h-7 bg-slate-100/60 rounded-xl relative overflow-hidden border border-slate-200/40">
+                                                {/* Meta bar (gray background) */}
+                                                <motion.div
+                                                    initial={{ width: 0 }}
+                                                    animate={{ width: `${Math.max(metaWidth, 4)}%` }}
+                                                    transition={{ duration: 1.2, delay: 0.4 + i * 0.04, ease: 'easeOut' }}
+                                                    className="absolute inset-y-0 left-0 bg-slate-200/80 rounded-xl"
+                                                />
+                                                {/* Pagados bar (colored, overlaid) */}
+                                                <motion.div
+                                                    initial={{ width: 0 }}
+                                                    animate={{ width: `${Math.max(pagadosWidth, 3)}%` }}
+                                                    transition={{ duration: 1.4, delay: 0.5 + i * 0.05, ease: [0.34, 1.56, 0.64, 1] }}
+                                                    className="absolute inset-y-0 left-0 rounded-xl overflow-hidden shadow-[3px_0_10px_rgba(0,0,0,0.1)]"
+                                                    style={{ backgroundColor: barColors[i] || '#10b981' }}
+                                                >
+                                                    <div
+                                                        className="absolute inset-0 opacity-10 pointer-events-none animate-liquid-1"
+                                                        style={{
+                                                            backgroundImage: `repeating-linear-gradient(-45deg, transparent, transparent 10px, white 10px, white 20px)`,
+                                                            width: '300%'
+                                                        }}
+                                                    />
+                                                    <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
+                                                </motion.div>
+                                            </div>
+                                        </motion.div>
+                                    );
+                                });
+                            })()}
+                        </div>
+                        <div className="flex items-center justify-center gap-6 mt-4">
+                            <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 rounded-sm bg-slate-200" />
+                                <span className="text-[10px] font-bold text-slate-500 uppercase">Meta</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 rounded-sm bg-emerald-500" />
+                                <span className="text-[10px] font-bold text-slate-500 uppercase">Pagados</span>
+                            </div>
+                        </div>
+                    </motion.div>
+                </>)}
             </div>
 
             {/* AI Insights Section moved below funnel */}
