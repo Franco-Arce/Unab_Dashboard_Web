@@ -111,8 +111,12 @@ class DashboardCache:
             for r in agg_rows:
                 # Use standard normalization: UPPER + TRIM
                 prog = str(r.get("programa", "")).strip().upper()
-                nivel = mapping.get_level(prog)
-                area = mapping.get_area(prog)
+                
+                db_nivel = r.get("nivel")
+                nivel = str(db_nivel).strip().upper() if db_nivel else mapping.get_level(prog)
+                
+                db_area = r.get("area_de_conocimiento")
+                area = str(db_area).strip().upper() if db_area else mapping.get_area(prog)
                 
                 # Metric fields
                 leads = _safe_int(r.get("leads"))
