@@ -221,12 +221,12 @@ export default function OverviewPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Funnel Section */}
                 <motion.div
-                    initial={{ opacity: 0, x: -30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4, type: "spring" }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.4 }}
                     className="lg:col-span-2 space-y-6"
                 >
-                    <div className="bg-white border border-nods-border rounded-3xl p-8 relative overflow-hidden group shadow-xl">
+                    <div className="bg-white border border-nods-border rounded-3xl p-8 relative group shadow-xl">
                         <div className="flex justify-between items-end mb-10 relative z-10">
                             <div>
                                 <h3 className="text-xl font-bold mb-1 text-nods-text-primary">Embudo de Conversión</h3>
