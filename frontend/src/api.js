@@ -141,6 +141,26 @@ export const api = {
         method: 'POST',
         body: JSON.stringify({ context_data: dashboardContext }),
     }),
+    exportLeads: async (params = {}) => {
+        const q = new URLSearchParams();
+        Object.entries(params).forEach(([k, v]) => { if (v) q.set(k, v); });
+
+        const res = await fetch(`${API_URL}/api/dashboard/export?${q.toString()}`, {
+            headers: authHeaders(),
+        });
+
+        if (!res.ok) throw new Error('Error al exportar Excel');
+
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Reporte_Leads_${new Date().toISOString().split('T')[0]}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    },
 };
 
 export default api;

@@ -1,9 +1,145 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Response
+from fastapi.responses import StreamingResponse
 from typing import Optional
 from routes.auth import require_auth
 from cache import cache
+import pandas as pd
+import io
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
 router = APIRouter(prefix="/api/dashboard", tags=["dashboard"])
+
+
+@router.get("/export")
+async def export_leads(
+    search: Optional[str] = Query(None),
+    base: Optional[str] = Query(None),
+    programa: Optional[str] = Query(None),
+    nivel: Optional[str] = Query(None),
+    estado: Optional[str] = Query(None),
+    fecha_inicio: Optional[str] = Query(None),
+    fecha_fin: Optional[str] = Query(None),
+    _user: str = Depends(require_auth),
+):
+    from database import fetch_all
+    
+    where_clauses = ["1=1"]
+    args = []
+    
+    if search:
+        where_clauses.append(f"(txtnombreapellido ILIKE ${len(args)+1} OR emlmail ILIKE ${len(args)+1} OR teltelefono ILIKE ${len(args)+1})")
+        args.append(f"%{search}%")
+        
+    if base:
+        where_clauses.append(f"base = ${len(args)+1}")
+        args.append(base)
+        
+    if programa:
+        where_clauses.append(f"txtprogramainteres ILIKE ${len(args)+1}")
+        args.append(f"%{programa}%")
+        
+    if estado:
+        where_clauses.append(f"ultima_mejor_subcat_string = ${len(args)+1}")
+        args.append(estado)
+        
+    if fecha_inicio:
+        where_clauses.append(f"fecha_a_utilizar >= ${len(args)+1}")
+        args.append(fecha_inicio)
+        
+    if fecha_fin:
+        where_clauses.append(f"fecha_a_utilizar <= ${len(args)+1}")
+        args.append(fecha_fin)
+        
+    if nivel and nivel.upper() != "TODOS":
+        target_nivel = nivel.upper()
+        data_cache = await cache.get_all()
+        programs_of_level = [p["programa"] for p in data_cache.get("merged_programs", []) if p.get("nivel") == target_nivel]
+        
+        if programs_of_level:
+            placeholders = ",".join(f"${len(args)+i+1}" for i in range(len(programs_of_level)))
+            where_clauses.append(f"UPPER(TRIM(txtprogramainteres)) IN ({placeholders})")
+            args.extend(programs_of_level)
+        else:
+            where_clauses.append("1=0")
+        
+    where_sql = " AND ".join(where_clauses)
+    
+    data_query = f"""
+        SELECT 
+            idinterno AS "ID INTERNO", 
+            txtnombreapellido AS "NOMBRE Y APELLIDO", 
+            emlmail AS "EMAIL", 
+            teltelefono AS "TELEFONO", 
+            txtprogramainteres AS "PROGRAMA INTERES", 
+            base AS "BASE DE DATOS",
+            ultima_mejor_subcat_string AS "ESTADO GESTION",
+            descrip_subcat AS "DETALLE ESTADO",
+            fecha_a_utilizar AS "FECHA ACTIVIDAD"
+        FROM dim_contactos
+        WHERE {where_sql}
+        ORDER BY fecha_a_utilizar DESC NULLS LAST
+    """
+    
+    rows = await fetch_all(data_query, *args)
+    df = pd.DataFrame(rows)
+    
+    # Generate Excel in memory
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Leads')
+        
+        # Access openpyxl workbook and sheet
+        workbook = writer.book
+        worksheet = writer.sheets['Leads']
+        
+        # Styling constants
+        header_fill = PatternFill(start_color='1E3A8A', end_color='1E3A8A', fill_type='solid') # Blue-900
+        header_font = Font(color='FFFFFF', bold=True, size=11)
+        center_alignment = Alignment(horizontal='center', vertical='center')
+        border = Border(
+            left=Side(style='thin', color='E2E8F0'),
+            right=Side(style='thin', color='E2E8F0'),
+            top=Side(style='thin', color='E2E8F0'),
+            bottom=Side(style='thin', color='E2E8F0')
+        )
+        
+        # Format Headers
+        for cell in worksheet[1]:
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = center_alignment
+            cell.border = border
+            
+        # Auto-adjust column width and alternate row shading
+        for col in worksheet.columns:
+            max_length = 0
+            column = col[0].column_letter # Get the column name
+            for cell in col:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                    
+                    # Apply borders and padding-like styling
+                    if cell.row > 1:
+                        cell.border = border
+                        if cell.row % 2 == 0:
+                            cell.fill = PatternFill(start_color='F8FAFC', end_color='F8FAFC', fill_type='solid')
+                except:
+                    pass
+            adjusted_width = (max_length + 4)
+            worksheet.column_dimensions[column].width = min(adjusted_width, 50) # Cap width
+
+    output.seek(0)
+    
+    headers = {
+        'Content-Disposition': 'attachment; filename="Expert_Leads_Report.xlsx"'
+    }
+    
+    return StreamingResponse(
+        output,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers=headers
+    )
 
 
 @router.get("/kpis")

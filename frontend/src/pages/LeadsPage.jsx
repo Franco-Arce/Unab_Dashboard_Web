@@ -14,7 +14,8 @@ import {
     Copy,
     X,
     Check,
-    Users
+    Users,
+    Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api';
@@ -140,6 +141,13 @@ export default function LeadsPage() {
                         className={`flex items-center gap-2 px-4 py-3 border rounded-2xl text-sm font-bold transition-all flex-1 md:flex-none ${showFilters ? 'bg-nods-accent text-white border-nods-accent shadow-md shadow-nods-accent/20' : 'bg-white border-nods-border text-nods-text-primary hover:bg-slate-50'}`}
                     >
                         <Filter className="w-4 h-4" /> Filtros Avanzados
+                    </button>
+
+                    <button
+                        onClick={() => api.exportLeads({ search, nivel, ...filters })}
+                        className="flex items-center gap-2 px-4 py-3 border border-emerald-100 bg-emerald-50/50 text-emerald-700 rounded-2xl text-sm font-bold hover:bg-emerald-100 transition-all hover:shadow-lg hover:shadow-emerald-100/50"
+                    >
+                        <Download className="w-4 h-4" /> Exportar Excel
                     </button>
 
                     <AnimatePresence>

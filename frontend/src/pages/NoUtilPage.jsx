@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Download, Search, AlertOctagon, Calendar, Clock, Filter, ArrowRight, TrendingDown, Star } from 'lucide-react';
 import api from '../api';
 import { useFilters } from '../context/FilterContext';
-import { exportToCSV } from '../utils/export';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SummaryCards } from '../components/SummaryCards';
 import { MetricCard } from '../components/MetricCard';
@@ -100,7 +99,7 @@ export default function NoUtilPage() {
     }
 
     const handleExport = () => {
-        exportToCSV(data.no_util, 'leads_no_util_unab_2026');
+        api.exportLeads({ estado: 'NO UTIL', nivel });
     };
 
     const CustomTooltip = ({ active, payload }) => {
