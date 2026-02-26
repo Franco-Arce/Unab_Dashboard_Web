@@ -102,65 +102,69 @@ export default function AdmisionesPage() {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm whitespace-nowrap">
                         <thead>
-                            <tr className="bg-slate-50/50 border-b border-nods-border text-[11px] font-bold text-nods-text-muted uppercase tracking-wider">
-                                <th className="px-4 py-4 w-1/4">PROGRAMAS</th>
-                                <th className="px-2 py-4 text-center border-l border-nods-border/50">SOLICITADOS</th>
-                                <th className="px-2 py-4 text-center">ADMITIDOS</th>
-                                <th className="px-2 py-4 text-center">PAGADOS</th>
-                                <th className="px-2 py-4 text-center border-l border-nods-border/50 text-cyan-700">SOLICITADOS 25</th>
-                                <th className="px-2 py-4 text-center text-cyan-700">ADMITIDOS 25</th>
-                                <th className="px-2 py-4 text-center text-cyan-700">PAGADOS 25</th>
-                                <th className="px-2 py-4 text-center border-l border-nods-border/50">SOLICITADOS VAR</th>
-                                <th className="px-2 py-4 text-center">ADMITIDOS VAR</th>
-                                <th className="px-2 py-4 text-center">PAGADOS VAR</th>
+                            {/* Top group headers */}
+                            <tr className="border-b border-nods-border/30">
+                                <th rowSpan={2} className="px-4 py-3 text-[11px] font-black text-nods-text-muted uppercase tracking-wider bg-slate-50/50 w-[260px] align-bottom border-r border-nods-border/20">Programa</th>
+                                <th colSpan={3} className="px-2 py-2 text-center text-[11px] font-black uppercase tracking-widest bg-blue-50/60 text-blue-800 border-r border-nods-border/20 border-l border-nods-border/20">Solicitados</th>
+                                <th colSpan={3} className="px-2 py-2 text-center text-[11px] font-black uppercase tracking-widest bg-cyan-50/60 text-cyan-800 border-r border-nods-border/20">Admitidos</th>
+                                <th colSpan={3} className="px-2 py-2 text-center text-[11px] font-black uppercase tracking-widest bg-emerald-50/60 text-emerald-800">Pagados</th>
+                            </tr>
+                            {/* Sub headers */}
+                            <tr className="bg-slate-50/50 border-b border-nods-border text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                <th className="px-2 py-2 text-center border-l border-nods-border/20">Año Ant.</th>
+                                <th className="px-2 py-2 text-center font-black text-slate-600">Actual</th>
+                                <th className="px-2 py-2 text-center border-r border-nods-border/20">Var %</th>
+                                <th className="px-2 py-2 text-center">Año Ant.</th>
+                                <th className="px-2 py-2 text-center font-black text-slate-600">Actual</th>
+                                <th className="px-2 py-2 text-center border-r border-nods-border/20">Var %</th>
+                                <th className="px-2 py-2 text-center">Año Ant.</th>
+                                <th className="px-2 py-2 text-center font-black text-slate-600">Actual</th>
+                                <th className="px-2 py-2 text-center">Var %</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 tabular-nums">
-                            {filtered.map((item, idx) => (
-                                <tr key={idx} className="hover:bg-slate-100/60 transition-all even:bg-slate-100/80 group relative">
-                                    <td className="px-4 py-5 text-xs font-semibold text-nods-text-primary whitespace-normal min-w-[200px] leading-tight break-words group-hover:border-l-4 border-indigo-500 transition-all">{item.programa}</td>
-                                    <td className="px-2 py-5 text-center text-xs text-nods-text-muted border-l border-nods-border/30">{item.solicitados || ''}</td>
-                                    <td className="px-2 py-5 text-center text-xs text-nods-text-muted">{item.admitidos || ''}</td>
-                                    <td className="px-2 py-5 text-center text-xs text-nods-text-muted">{item.pagados || ''}</td>
-
-                                    <td className="px-2 py-5 text-center text-xs text-cyan-700 font-bold border-l border-nods-border/30">{item.solicitados_25 || ''}</td>
-                                    <td className="px-2 py-5 text-center text-xs text-cyan-700 font-bold">{item.admitidos_25 || ''}</td>
-                                    <td className="px-2 py-5 text-center text-xs text-cyan-700 font-bold">{item.pagados_25 || ''}</td>
-
-                                    <td className="px-2 py-5 border-l border-nods-border/30">
-                                        <div className="flex items-center justify-center gap-2">
-                                            <StatusIcon val={item.solicitados_var} />
-                                            <span className="text-xs text-nods-text-muted w-6 text-right">{item.solicitados_var || 0}</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-2 py-5">
-                                        <div className="flex items-center justify-center gap-2">
-                                            <StatusIcon val={item.admitidos_var} />
-                                            <span className="text-xs text-nods-text-muted w-6 text-right">{item.admitidos_var || 0}</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-2 py-5">
-                                        <div className="flex items-center justify-center gap-2">
-                                            <StatusIcon val={item.pagados_var} />
-                                            <span className="text-xs text-nods-text-muted w-6 text-right">{item.pagados_var || 0}</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
+                            {filtered.map((item, idx) => {
+                                const VarCell = ({ current, previous }) => {
+                                    if (!previous || previous === 0) return <span className="text-slate-300">—</span>;
+                                    const pct = (((current - previous) / previous) * 100).toFixed(1);
+                                    const isPositive = pct > 0;
+                                    const isZero = pct == 0;
+                                    return (
+                                        <span className={`text-[11px] font-bold ${isZero ? 'text-slate-400' : isPositive ? 'text-emerald-600' : 'text-red-500'}`}>
+                                            {isZero ? '—' : `${isPositive ? '▲' : '▼'} ${Math.abs(pct)}%`}
+                                        </span>
+                                    );
+                                };
+                                return (
+                                    <tr key={idx} className="hover:bg-slate-50/80 transition-all group">
+                                        <td className="px-4 py-3.5 text-xs font-semibold text-slate-800 whitespace-normal min-w-[200px] leading-tight break-words border-r border-nods-border/10">{item.programa}</td>
+                                        {/* Solicitados */}
+                                        <td className="px-2 py-3.5 text-center text-xs text-slate-400 border-l border-nods-border/10">{item.solicitados_25 || 0}</td>
+                                        <td className="px-2 py-3.5 text-center text-xs font-bold text-slate-800">{item.solicitados || 0}</td>
+                                        <td className="px-2 py-3.5 text-center border-r border-nods-border/10"><VarCell current={item.solicitados} previous={item.solicitados_25} /></td>
+                                        {/* Admitidos */}
+                                        <td className="px-2 py-3.5 text-center text-xs text-slate-400">{item.admitidos_25 || 0}</td>
+                                        <td className="px-2 py-3.5 text-center text-xs font-bold text-slate-800">{item.admitidos || 0}</td>
+                                        <td className="px-2 py-3.5 text-center border-r border-nods-border/10"><VarCell current={item.admitidos} previous={item.admitidos_25} /></td>
+                                        {/* Pagados */}
+                                        <td className="px-2 py-3.5 text-center text-xs text-slate-400">{item.pagados_25 || 0}</td>
+                                        <td className="px-2 py-3.5 text-center text-xs font-bold text-slate-800">{item.pagados || 0}</td>
+                                        <td className="px-2 py-3.5 text-center"><VarCell current={item.pagados} previous={item.pagados_25} /></td>
+                                    </tr>
+                                );
+                            })}
                             {filtered.length > 0 && (
-                                <tr className="bg-blue-50/50 border-t-2 border-nods-border">
-                                    <td className="px-4 py-6 text-sm font-bold text-nods-text-primary">TOTAL GENERAL</td>
-                                    <td className="px-2 py-6 text-center text-sm font-bold text-nods-text-primary border-l border-nods-border/30">{tSol.toLocaleString()}</td>
-                                    <td className="px-2 py-6 text-center text-sm font-bold text-nods-text-primary">{tAdm.toLocaleString()}</td>
-                                    <td className="px-2 py-6 text-center text-sm font-bold text-nods-text-primary">{tPag.toLocaleString()}</td>
-
-                                    <td className="px-2 py-6 text-center text-sm font-bold text-cyan-700 border-l border-nods-border/30">{tSol25 === 0 ? '' : tSol25.toLocaleString()}</td>
-                                    <td className="px-2 py-6 text-center text-sm font-bold text-cyan-700">{tAdm25 === 0 ? '' : tAdm25.toLocaleString()}</td>
-                                    <td className="px-2 py-6 text-center text-sm font-bold text-cyan-700">{tPag25 === 0 ? '' : tPag25.toLocaleString()}</td>
-
-                                    <td className="px-2 py-6 text-center text-sm font-bold text-nods-text-primary border-l border-nods-border/30">{tSolVar.toLocaleString()}</td>
-                                    <td className="px-2 py-6 text-center text-sm font-bold text-nods-text-primary">{tAdmVar.toLocaleString()}</td>
-                                    <td className="px-2 py-6 text-center text-sm font-bold text-nods-text-primary">{tPagVar.toLocaleString()}</td>
+                                <tr className="bg-slate-50 border-t-2 border-slate-200">
+                                    <td className="px-4 py-4 text-sm font-black text-slate-900 border-r border-nods-border/10">TOTAL GENERAL</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-slate-400 border-l border-nods-border/10">{tSol25 || '—'}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-black text-slate-900">{tSol.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center border-r border-nods-border/10">{tSol25 > 0 ? <span className={`text-xs font-bold ${((tSol - tSol25) / tSol25 * 100) >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>{((tSol - tSol25) / tSol25 * 100) >= 0 ? '▲' : '▼'} {Math.abs(((tSol - tSol25) / tSol25 * 100)).toFixed(1)}%</span> : <span className="text-slate-300">—</span>}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-slate-400">{tAdm25 || '—'}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-black text-slate-900">{tAdm.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center border-r border-nods-border/10">{tAdm25 > 0 ? <span className={`text-xs font-bold ${((tAdm - tAdm25) / tAdm25 * 100) >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>{((tAdm - tAdm25) / tAdm25 * 100) >= 0 ? '▲' : '▼'} {Math.abs(((tAdm - tAdm25) / tAdm25 * 100)).toFixed(1)}%</span> : <span className="text-slate-300">—</span>}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-bold text-slate-400">{tPag25 || '—'}</td>
+                                    <td className="px-2 py-4 text-center text-sm font-black text-slate-900">{tPag.toLocaleString()}</td>
+                                    <td className="px-2 py-4 text-center">{tPag25 > 0 ? <span className={`text-xs font-bold ${((tPag - tPag25) / tPag25 * 100) >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>{((tPag - tPag25) / tPag25 * 100) >= 0 ? '▲' : '▼'} {Math.abs(((tPag - tPag25) / tPag25 * 100)).toFixed(1)}%</span> : <span className="text-slate-300">—</span>}</td>
                                 </tr>
                             )}
                         </tbody>
