@@ -51,22 +51,50 @@ const FloatingBubbles = ({ count = 6 }) => {
     );
 };
 
-// Semicircular Gauge component for "Avance vs Meta"
+// Semicircular Gauge component for "Avance vs Meta" with liquid animation
 const SemiGauge = ({ percent, current, total, label }) => {
     const clampedPercent = Math.min(Math.max(percent, 0), 100);
-    const radius = 80;
-    const strokeWidth = 14;
+    const radius = 70;
+    const strokeWidth = 12;
     const circumference = Math.PI * radius;
     const offset = circumference - (clampedPercent / 100) * circumference;
     const cx = 100;
-    const cy = 95;
+    const cy = 85;
 
-    // Color based on progress
-    const color = clampedPercent >= 75 ? '#10b981' : clampedPercent >= 50 ? '#f59e0b' : clampedPercent >= 25 ? '#f97316' : '#ef4444';
+    // Gradient ID based on progress
+    const gradientId = 'semi-gauge-gradient';
+    const colors = clampedPercent >= 75
+        ? ['#10b981', '#059669']
+        : clampedPercent >= 50
+            ? ['#f59e0b', '#d97706']
+            : clampedPercent >= 25
+                ? ['#f97316', '#ea580c']
+                : ['#ef4444', '#dc2626'];
 
     return (
-        <div className="flex flex-col items-center">
-            <svg width="200" height="120" viewBox="0 0 200 120">
+        <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: [1, 1.02, 1], opacity: 1 }}
+            transition={{
+                scale: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
+                opacity: { duration: 0.8 }
+            }}
+            className="flex flex-col items-center relative"
+        >
+            <svg width="200" height="110" viewBox="0 0 200 110">
+                <defs>
+                    <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor={colors[0]} />
+                        <stop offset="100%" stopColor={colors[1]} />
+                    </linearGradient>
+                    <filter id="semi-glow">
+                        <feGaussianBlur stdDeviation="3" result="blur" />
+                        <feMerge>
+                            <feMergeNode in="blur" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
                 {/* Background track */}
                 <path
                     d={`M ${cx - radius} ${cy} A ${radius} ${radius} 0 0 1 ${cx + radius} ${cy}`}
@@ -75,26 +103,28 @@ const SemiGauge = ({ percent, current, total, label }) => {
                     strokeWidth={strokeWidth}
                     strokeLinecap="round"
                 />
-                {/* Progress arc */}
-                <path
+                {/* Progress arc with gradient and glow */}
+                <motion.path
                     d={`M ${cx - radius} ${cy} A ${radius} ${radius} 0 0 1 ${cx + radius} ${cy}`}
                     fill="none"
-                    stroke={color}
+                    stroke={`url(#${gradientId})`}
                     strokeWidth={strokeWidth}
                     strokeLinecap="round"
                     strokeDasharray={circumference}
-                    strokeDashoffset={offset}
-                    style={{ transition: 'stroke-dashoffset 1.5s ease-out, stroke 0.5s ease' }}
+                    initial={{ strokeDashoffset: circumference }}
+                    animate={{ strokeDashoffset: offset }}
+                    transition={{ duration: 2, delay: 0.3, ease: 'circOut' }}
+                    filter="url(#semi-glow)"
                 />
-                {/* Center text */}
-                <text x={cx} y={cy - 20} textAnchor="middle" className="text-3xl font-black" fill="#0f172a" style={{ fontSize: '32px', fontWeight: 900 }}>
+                {/* Center percentage */}
+                <text x={cx} y={cy - 18} textAnchor="middle" fill="#0f172a" style={{ fontSize: '28px', fontWeight: 900 }}>
                     {clampedPercent.toFixed(1)}%
                 </text>
-                <text x={cx} y={cy} textAnchor="middle" fill="#64748b" style={{ fontSize: '11px', fontWeight: 700 }}>
+                <text x={cx} y={cy + 2} textAnchor="middle" fill="#64748b" style={{ fontSize: '10px', fontWeight: 700 }}>
                     {current.toLocaleString()} / {total.toLocaleString()} {label}
                 </text>
             </svg>
-        </div>
+        </motion.div>
     );
 };
 
@@ -320,15 +350,15 @@ export default function OverviewPage() {
                     </div>
                 </motion.div>
 
-                {/* Right Column: Quick Stats vertically stacked */}
-                <div className="flex flex-col space-y-6 justify-center">
+                {/* Right Column: Quick Stats vertically stacked — stretch to match funnel */}
+                <div className="flex flex-col gap-4 justify-stretch">
                     <motion.div
                         initial={{ opacity: 0, x: 30 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.6, delay: 0.6, type: "spring" }}
-                        className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/50 w-full relative overflow-hidden group"
+                        className="bg-white border border-slate-100 rounded-[2.5rem] p-6 shadow-xl shadow-slate-200/50 w-full relative overflow-hidden group flex-1"
                     >
-                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-8 italic">Eficiencia</h4>
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 italic">Eficiencia</h4>
                         <div className="flex items-center gap-8 relative z-10">
                             <CircularLiquidGauge
                                 percent={(kpis.matriculados / kpis.total_leads) * 100}
@@ -345,9 +375,9 @@ export default function OverviewPage() {
                         initial={{ opacity: 0, x: 30 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.6, delay: 0.7, type: "spring" }}
-                        className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/50 w-full relative overflow-hidden group"
+                        className="bg-white border border-slate-100 rounded-[2.5rem] p-6 shadow-xl shadow-slate-200/50 w-full relative overflow-hidden group flex-1"
                     >
-                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-8 italic">Salud de Base</h4>
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 italic">Salud de Base</h4>
                         <div className="flex items-center gap-8 relative z-10">
                             <CircularLiquidGauge
                                 percent={(kpis.en_gestion / kpis.total_leads) * 100}
@@ -365,7 +395,7 @@ export default function OverviewPage() {
                         initial={{ opacity: 0, x: 30 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.6, delay: 0.8, type: "spring" }}
-                        className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/50 w-full relative overflow-hidden group"
+                        className="bg-white border border-slate-100 rounded-[2.5rem] p-6 shadow-xl shadow-slate-200/50 w-full relative overflow-hidden group flex-1"
                     >
                         <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 italic">Avance vs Meta</h4>
                         <SemiGauge
