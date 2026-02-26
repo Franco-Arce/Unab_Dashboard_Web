@@ -25,6 +25,10 @@ export default function AIPanel({ onClose }) {
         messagesEnd.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, [messages]);
 
+    useEffect(() => {
+        if (initialTab) setTab(initialTab);
+    }, [initialTab]);
+
     const sendMessage = async () => {
         if (!input.trim() || sending) return;
         const userMsg = { role: 'user', content: input };

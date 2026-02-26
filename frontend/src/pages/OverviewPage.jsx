@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import {
     Users,
     UserPlus,
@@ -130,7 +131,7 @@ const SemiGauge = ({ percent, current, total, label }) => {
 };
 
 // Specialized card for AI Insights with improved typography and readability
-const AICard = ({ insight, idx }) => {
+const AICard = ({ insight, idx, onVerMas }) => {
     const Icon = insight.icon;
     const isEven = idx % 2 === 0;
 
@@ -167,15 +168,19 @@ const AICard = ({ insight, idx }) => {
                 <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-lg ${isEven ? 'bg-indigo-50 text-indigo-600' : 'bg-emerald-50 text-emerald-600'}`}>
                     Recomendación
                 </span>
-                <div className="flex items-center gap-1 text-[10px] font-black text-slate-300 group-hover:text-slate-400 transition-colors uppercase tracking-widest">
+                <button
+                    onClick={onVerMas}
+                    className="flex items-center gap-1 text-[10px] font-black text-slate-300 group-hover:text-nods-accent transition-colors uppercase tracking-widest"
+                >
                     Ver más <ArrowUpRight size={14} />
-                </div>
+                </button>
             </div>
         </motion.div>
     );
 };
 
 export default function OverviewPage() {
+    const { openAIPanel } = useOutletContext() || {};
     const [kpis, setKpis] = useState(null);
     const [funnel, setFunnel] = useState(null);
     const [insights, setInsights] = useState(null);
@@ -501,7 +506,12 @@ export default function OverviewPage() {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             {aiInsightsData.map((insight, i) => (
-                                <AICard key={i} insight={insight} idx={i} />
+                                <AICard
+                                    key={i}
+                                    insight={insight}
+                                    idx={i}
+                                    onVerMas={() => openAIPanel?.('insights')}
+                                />
                             ))}
                         </div>
                     </motion.div>

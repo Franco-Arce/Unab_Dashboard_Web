@@ -25,7 +25,13 @@ export default function DashboardLayout() {
     const [meta, setMeta] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
     const [showAI, setShowAI] = useState(false);
+    const [aiInitialTab, setAiInitialTab] = useState('chat');
     const { nivel, setNivel } = useFilters();
+
+    const openAIPanel = (tabName = 'chat') => {
+        setAiInitialTab(tabName);
+        setShowAI(true);
+    };
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -210,7 +216,7 @@ export default function DashboardLayout() {
                             />
                         </div>
                         <button
-                            onClick={() => setShowAI(!showAI)}
+                            onClick={() => openAIPanel('chat')}
                             className={`p-2.5 rounded-xl border transition-all ${showAI
                                 ? 'bg-nods-accent border-nods-accent text-white shadow-lg shadow-nods-accent/20 scale-110'
                                 : 'bg-white border-nods-border text-nods-text-muted hover:border-nods-accent/50 hover:text-nods-accent hover:bg-slate-50'
@@ -224,7 +230,7 @@ export default function DashboardLayout() {
 
                 {/* Page Content */}
                 <div className="p-4 md:p-8 max-w-[1600px] mx-auto w-full">
-                    <Outlet />
+                    <Outlet context={{ openAIPanel }} />
                 </div>
 
                 <AnimatePresence>
@@ -237,7 +243,7 @@ export default function DashboardLayout() {
                                 onClick={() => setShowAI(false)}
                                 className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-40"
                             />
-                            <AIPanel onClose={() => setShowAI(false)} />
+                            <AIPanel initialTab={aiInitialTab} onClose={() => setShowAI(false)} />
                         </>
                     )}
                 </AnimatePresence>
