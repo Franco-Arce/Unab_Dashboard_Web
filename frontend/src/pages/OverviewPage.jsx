@@ -323,23 +323,7 @@ export default function OverviewPage() {
                                             </div>
                                         </div>
 
-                                        {/* Efficiency connector */}
-                                        {efficiency !== null && (
-                                            <div className="flex justify-center my-0.5 relative h-6">
-                                                <motion.div
-                                                    initial={{ opacity: 0, scale: 0.8 }}
-                                                    animate={{ opacity: 1, scale: 1 }}
-                                                    transition={{ delay: 1 + index * 0.1 }}
-                                                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-1.5 bg-slate-800 text-white px-3 py-1 rounded-full shadow-md z-30"
-                                                >
-                                                    <span className="text-[9px] font-black uppercase tracking-wider flex items-center gap-1">
-                                                        <ArrowUpRight className="w-3 h-3 text-emerald-400" />
-                                                        <span className="text-emerald-400">{efficiency}%</span>
-                                                    </span>
-                                                </motion.div>
-                                                <div className="w-px h-full border-l border-dashed border-slate-200 mx-auto" />
-                                            </div>
-                                        )}
+
                                     </div>
                                 );
                             })}
@@ -487,7 +471,7 @@ export default function OverviewPage() {
                                 .slice(0, 10)
                                 .map(p => ({
                                     ...p,
-                                    shortName: p.programa.length > 18 ? p.programa.slice(0, 16) + '…' : p.programa
+                                    shortName: p.programa.length > 22 ? p.programa.slice(0, 20) + '…' : p.programa
                                 }));
 
                             if (filtered.length === 0) {
@@ -496,19 +480,19 @@ export default function OverviewPage() {
 
                             return (
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={filtered} margin={{ top: 10, right: 10, left: -10, bottom: 60 }}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                                    <BarChart data={filtered} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }} barSize={18} barGap={-18}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
                                         <XAxis
-                                            dataKey="shortName"
-                                            tick={{ fontSize: 9, fontWeight: 700, fill: '#64748b' }}
-                                            angle={-45}
-                                            textAnchor="end"
-                                            interval={0}
-                                            axisLine={{ stroke: '#e2e8f0' }}
+                                            type="number"
+                                            tick={{ fontSize: 10, fill: '#94a3b8' }}
+                                            axisLine={false}
                                             tickLine={false}
                                         />
                                         <YAxis
-                                            tick={{ fontSize: 10, fill: '#94a3b8' }}
+                                            type="category"
+                                            dataKey="shortName"
+                                            tick={{ fontSize: 9, fontWeight: 600, fill: '#475569' }}
+                                            width={140}
                                             axisLine={false}
                                             tickLine={false}
                                         />
@@ -528,8 +512,8 @@ export default function OverviewPage() {
                                             ]}
                                             labelFormatter={(label) => label}
                                         />
-                                        <Bar dataKey="meta" fill="#cbd5e1" radius={[6, 6, 0, 0]} name="meta" />
-                                        <Bar dataKey="pagados" fill="#10b981" radius={[6, 6, 0, 0]} name="pagados" />
+                                        <Bar dataKey="meta" fill="#cbd5e1" radius={[0, 6, 6, 0]} name="meta" />
+                                        <Bar dataKey="pagados" fill="#10b981" radius={[0, 6, 6, 0]} name="pagados" />
                                     </BarChart>
                                 </ResponsiveContainer>
                             );
