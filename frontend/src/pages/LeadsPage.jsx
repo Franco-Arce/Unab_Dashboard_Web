@@ -27,9 +27,16 @@ export default function LeadsPage() {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
-    const [filters, setFilters] = useState({ base: '', programa: '' });
+    const [filters, setFilters] = useState({
+        base: '',
+        programa: '',
+        estado: '',
+        fecha_inicio: '',
+        fecha_fin: ''
+    });
     const [showFilters, setShowFilters] = useState(false);
     const [availableBases, setAvailableBases] = useState([]);
+    const [availableEstados, setAvailableEstados] = useState([]);
     const { nivel } = useFilters();
 
     // Modal states
@@ -59,6 +66,7 @@ export default function LeadsPage() {
 
     useEffect(() => {
         api.bases().then(setAvailableBases).catch(console.error);
+        api.estadosGestion().then(setAvailableEstados).catch(console.error);
     }, []);
 
     const [kpisData, setKpisData] = useState(null);
@@ -91,7 +99,13 @@ export default function LeadsPage() {
     const totalPages = Math.ceil(total / 25);
 
     const resetFilters = () => {
-        setFilters({ base: '', programa: '' });
+        setFilters({
+            base: '',
+            programa: '',
+            estado: '',
+            fecha_inicio: '',
+            fecha_fin: ''
+        });
         setShowFilters(false);
         setPage(1);
     };
@@ -148,6 +162,39 @@ export default function LeadsPage() {
                                             <option key={idx} value={b}>{b}</option>
                                         ))}
                                     </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-nods-text-muted uppercase tracking-widest">Estado de Gestión</label>
+                                    <select
+                                        value={filters.estado}
+                                        onChange={(e) => { setFilters({ ...filters, estado: e.target.value }); setPage(1); }}
+                                        className="w-full bg-nods-bg border border-nods-border rounded-xl px-4 py-2.5 text-xs outline-none focus:border-nods-accent text-nods-text-primary"
+                                    >
+                                        <option value="">Todos los estados</option>
+                                        {availableEstados.map((s, idx) => (
+                                            <option key={idx} value={s}>{s}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold text-nods-text-muted uppercase tracking-widest">Desde</label>
+                                        <input
+                                            type="date"
+                                            value={filters.fecha_inicio}
+                                            onChange={(e) => { setFilters({ ...filters, fecha_inicio: e.target.value }); setPage(1); }}
+                                            className="w-full bg-nods-bg border border-nods-border rounded-xl px-4 py-2 text-xs outline-none focus:border-nods-accent text-nods-text-primary"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold text-nods-text-muted uppercase tracking-widest">Hasta</label>
+                                        <input
+                                            type="date"
+                                            value={filters.fecha_fin}
+                                            onChange={(e) => { setFilters({ ...filters, fecha_fin: e.target.value }); setPage(1); }}
+                                            className="w-full bg-nods-bg border border-nods-border rounded-xl px-4 py-2 text-xs outline-none focus:border-nods-accent text-nods-text-primary"
+                                        />
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-bold text-nods-text-muted uppercase tracking-widest">Programa</label>

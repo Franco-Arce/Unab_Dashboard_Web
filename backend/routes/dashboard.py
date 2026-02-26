@@ -199,6 +199,9 @@ async def get_leads(
     base: Optional[str] = Query(None),
     programa: Optional[str] = Query(None),
     nivel: Optional[str] = Query(None),
+    estado: Optional[str] = Query(None),
+    fecha_inicio: Optional[str] = Query(None),
+    fecha_fin: Optional[str] = Query(None),
     _user: str = Depends(require_auth),
 ):
     from database import fetch_all, fetch_one
@@ -218,6 +221,18 @@ async def get_leads(
     if programa:
         where_clauses.append(f"txtprogramainteres ILIKE ${len(args)+1}")
         args.append(f"%{programa}%")
+        
+    if estado:
+        where_clauses.append(f"ultima_mejor_subcat_string = ${len(args)+1}")
+        args.append(estado)
+        
+    if fecha_inicio:
+        where_clauses.append(f"fecha_a_utilizar >= ${len(args)+1}")
+        args.append(fecha_inicio)
+        
+    if fecha_fin:
+        where_clauses.append(f"fecha_a_utilizar <= ${len(args)+1}")
+        args.append(fecha_fin)
         
     if nivel and nivel.upper() != "TODOS":
         target_nivel = nivel.upper()
@@ -267,6 +282,14 @@ async def get_bases(_user: str = Depends(require_auth)):
     query = "SELECT DISTINCT base FROM dim_contactos WHERE base IS NOT NULL ORDER BY base"
     rows = await fetch_all(query)
     return [r["base"] for r in rows]
+
+@router.get("/estados-gestion")
+async def get_estados_gestion(_user: str = Depends(require_auth)):
+    from database import fetch_all
+    query = "SELECT DISTINCT ultima_mejor_subcat_string FROM dim_contactos WHERE ultima_mejor_subcat_string IS NOT NULL ORDER BY ultima_mejor_subcat_string"
+    rows = await fetch_all(query)
+    return [r["ultima_mejor_subcat_string"] for r in rows]
+
 @router.get("/meta")
 async def get_meta(_user: str = Depends(require_auth)):
     data = await cache.get_all()

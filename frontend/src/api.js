@@ -123,6 +123,7 @@ export const api = {
         return request(`/api/dashboard/leads?${q.toString()}`);
     },
     bases: () => request('/api/dashboard/bases'),
+    estadosGestion: () => request('/api/dashboard/estados-gestion'),
     meta: () => request('/api/dashboard/meta'),
     refresh: () => request('/api/dashboard/refresh', { method: 'POST' }),
 
