@@ -143,7 +143,7 @@ export default function OverviewPage() {
                             </div>
                         </div>
 
-                        <div className="py-6 w-full flex flex-col gap-3 relative z-10 min-h-[320px]">
+                        <div className="py-4 w-full flex flex-col gap-2 relative z-10 min-h-[320px]">
                             {funnel.map((entry, index) => {
                                 // Calculate efficiency vs a previous step that makes mathematical sense (>= current value)
                                 let efficiency = null;
@@ -157,91 +157,92 @@ export default function OverviewPage() {
                                     }
                                 }
 
-                                // Updated colors to match the user's latest blue-teal-green theme preference
                                 const themeColors = ["#1e3a8a", "#2563eb", "#3b82f6", "#06b6d4", "#10b981"];
                                 const barColor = themeColors[index] || entry.color;
 
                                 return (
                                     <div key={index} className="relative">
-                                        <div className="flex items-center gap-4 group">
+                                        {/* Full-width bar container */}
+                                        <div className="w-full h-14 bg-slate-100/60 rounded-2xl border border-slate-200/40 relative overflow-hidden group cursor-default">
 
-                                            {/* Main Bar with Parallax Liquid */}
-                                            <div className="flex-1 flex items-center gap-4 bg-slate-100/50 rounded-2xl border border-slate-200/50 pr-6 h-16 relative overflow-hidden group">
+                                            {/* Progress Fill — all data is INSIDE */}
+                                            <motion.div
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${Math.max(entry.percent, 18)}%` }}
+                                                transition={{ duration: 1.6, delay: index * 0.08, ease: [0.34, 1.56, 0.64, 1] }}
+                                                className="h-full flex items-center justify-between px-5 relative z-10 shadow-[4px_0_15px_rgba(0,0,0,0.12)] overflow-hidden rounded-2xl"
+                                                style={{ backgroundColor: barColor }}
+                                            >
+                                                {/* Liquid wave layer 1 */}
+                                                <div
+                                                    className="absolute inset-0 opacity-10 pointer-events-none animate-liquid-1"
+                                                    style={{
+                                                        backgroundImage: `repeating-linear-gradient(-45deg, transparent, transparent 20px, white 20px, white 40px)`,
+                                                        width: '300%'
+                                                    }}
+                                                />
+                                                {/* Liquid wave layer 2 */}
+                                                <div
+                                                    className="absolute inset-0 opacity-[0.06] pointer-events-none animate-liquid-2"
+                                                    style={{
+                                                        backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 30px, white 30px, white 60px)`,
+                                                        width: '300%'
+                                                    }}
+                                                />
+                                                {/* Floating bubbles */}
+                                                <FloatingBubbles count={entry.percent > 50 ? 6 : 3} />
+                                                {/* Top reflection */}
+                                                <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/15 to-transparent pointer-events-none z-20" />
 
-                                                {/* Progress Fill */}
-                                                <motion.div
-                                                    initial={{ width: 0 }}
-                                                    animate={{ width: `${Math.max(entry.percent, 3)}%` }}
-                                                    transition={{ duration: 1.8, delay: index * 0.1, ease: [0.34, 1.56, 0.64, 1] }}
-                                                    className="h-full flex items-center px-6 relative z-10 shadow-[5px_0_20px_rgba(0,0,0,0.15)] overflow-hidden"
-                                                    style={{ backgroundColor: barColor }}
-                                                >
-                                                    {/* CAPA 1: Ondas Rápidas (Efecto base) */}
-                                                    <div
-                                                        className="absolute inset-0 opacity-10 pointer-events-none animate-liquid-1"
-                                                        style={{
-                                                            backgroundImage: `repeating-linear-gradient(-45deg, transparent, transparent 20px, white 20px, white 40px)`,
-                                                            width: '300%'
-                                                        }}
-                                                    />
+                                                {/* Stage name — left side */}
+                                                <span className="font-black whitespace-nowrap text-white text-xs relative z-30 tracking-wide uppercase drop-shadow-md">
+                                                    {entry.stage}
+                                                </span>
 
-                                                    {/* CAPA 2: Ondas de Paralaje (Nueva - Lenta y opuesta) */}
-                                                    <div
-                                                        className="absolute inset-0 opacity-[0.07] pointer-events-none animate-liquid-2"
-                                                        style={{
-                                                            backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 30px, white 30px, white 60px)`,
-                                                            width: '300%'
-                                                        }}
-                                                    />
-
-                                                    {/* CAPA 3: Burbujas Cinéticas (Nueva) */}
-                                                    <FloatingBubbles count={entry.percent > 50 ? 8 : 4} />
-
-                                                    {/* Reflejo superior estático para realismo */}
-                                                    <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent pointer-events-none z-20" />
-
-                                                    <span className="font-black whitespace-nowrap text-white text-sm relative z-30 tracking-tight uppercase italic drop-shadow-md">
-                                                        {entry.stage}
+                                                {/* Volume + Percentage — right side, inside the bar */}
+                                                <div className="flex items-center gap-3 relative z-30">
+                                                    <span className="text-white/90 font-black text-lg leading-none tracking-tight drop-shadow-sm">
+                                                        {entry.value.toLocaleString()}
                                                     </span>
-                                                </motion.div>
-
-                                                {/* Fallback label para barras ultra-cortas */}
-                                                {entry.percent < 28 && (
-                                                    <span className="text-[#1e3a8a] font-black text-xs ml-2 z-20 uppercase italic pointer-events-none">
-                                                        {entry.stage}
-                                                    </span>
-                                                )}
-
-                                                {/* Metadata Section */}
-                                                <div className="ml-auto flex items-center gap-6 z-20">
-                                                    <div className="text-right">
-                                                        <div className="text-2xl font-black text-slate-900 leading-none tracking-tighter">
-                                                            {entry.value.toLocaleString()}
-                                                        </div>
-                                                        <div className="text-[9px] font-black text-blue-600/60 uppercase tracking-widest mt-1">Volumen</div>
-                                                    </div>
-                                                    <div className="bg-white border border-slate-200 text-blue-900 px-3 py-2 rounded-xl text-xs font-black min-w-[60px] text-center shadow-sm group-hover:bg-blue-900 group-hover:text-white transition-colors duration-300">
+                                                    <span className="bg-white/20 backdrop-blur-sm text-white text-[10px] font-black px-2.5 py-1 rounded-lg border border-white/20">
                                                         {entry.percent}%
+                                                    </span>
+                                                </div>
+                                            </motion.div>
+
+                                            {/* Fallback: label + data outside for very small bars */}
+                                            {entry.percent < 18 && (
+                                                <div className="absolute inset-0 flex items-center justify-between px-5 pointer-events-none z-20">
+                                                    <span className="text-slate-700 font-black text-xs uppercase tracking-wide" style={{ marginLeft: `${Math.max(entry.percent, 5) + 2}%` }}>
+                                                        {entry.stage}
+                                                    </span>
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="text-slate-800 font-black text-lg leading-none tracking-tight">
+                                                            {entry.value.toLocaleString()}
+                                                        </span>
+                                                        <span className="bg-slate-900 text-white text-[10px] font-black px-2.5 py-1 rounded-lg">
+                                                            {entry.percent}%
+                                                        </span>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            )}
                                         </div>
 
-                                        {/* Efficiency Divider */}
+                                        {/* Efficiency connector */}
                                         {efficiency !== null && (
-                                            <div className="flex justify-center my-1 relative h-8">
+                                            <div className="flex justify-center my-0.5 relative h-6">
                                                 <motion.div
                                                     initial={{ opacity: 0, scale: 0.8 }}
                                                     animate={{ opacity: 1, scale: 1 }}
                                                     transition={{ delay: 1 + index * 0.1 }}
-                                                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 bg-slate-900 text-white px-4 py-1.5 rounded-full shadow-lg z-30"
+                                                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-1.5 bg-slate-800 text-white px-3 py-1 rounded-full shadow-md z-30"
                                                 >
-                                                    <span className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5">
+                                                    <span className="text-[9px] font-black uppercase tracking-wider flex items-center gap-1">
                                                         <ArrowUpRight className="w-3 h-3 text-emerald-400" />
-                                                        Eficiencia: <span className="text-emerald-400">{efficiency}%</span>
+                                                        <span className="text-emerald-400">{efficiency}%</span>
                                                     </span>
                                                 </motion.div>
-                                                <div className="w-px h-full border-l-2 border-dotted border-slate-200 mx-auto" />
+                                                <div className="w-px h-full border-l border-dashed border-slate-200 mx-auto" />
                                             </div>
                                         )}
                                     </div>
