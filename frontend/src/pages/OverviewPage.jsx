@@ -314,9 +314,15 @@ export default function OverviewPage() {
 
                                             {/* Volume + Percentage — always outside on the right */}
                                             <div className="absolute right-4 inset-y-0 flex items-center gap-3 pointer-events-none z-20">
-                                                <span className={`font-black text-lg leading-none tracking-tight ${index === 0 ? 'text-blue-600' : 'text-slate-800'}`}>
-                                                    {entry.value.toLocaleString()}
-                                                </span>
+                                                {index === 0 ? (
+                                                    <span className="font-black text-lg leading-none tracking-tight text-white bg-gradient-to-r from-emerald-500 to-teal-500 px-3 py-1.5 rounded-xl shadow-lg shadow-emerald-500/25">
+                                                        {entry.value.toLocaleString()}
+                                                    </span>
+                                                ) : (
+                                                    <span className="font-black text-lg leading-none tracking-tight text-slate-800">
+                                                        {entry.value.toLocaleString()}
+                                                    </span>
+                                                )}
                                                 <span className="bg-slate-900 text-white text-[10px] font-black px-2.5 py-1 rounded-lg">
                                                     {entry.percent}%
                                                 </span>
