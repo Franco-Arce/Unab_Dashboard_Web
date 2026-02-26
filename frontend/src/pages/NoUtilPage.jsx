@@ -15,8 +15,8 @@ import {
 } from 'recharts';
 
 const COLORS = [
-    '#F43F5E', '#FB923C', '#FBBF24', '#84CC16', '#10B981',
-    '#06B6D4', '#3B82F6', '#6366F1', '#8B5CF6', '#D946EF',
+    '#FBBF24', '#FB923C', '#F59E0B', '#D97706', '#B45309',
+    '#92400E', '#78350F', '#6366F1', '#8B5CF6', '#D946EF',
     '#f472b6', '#34d399', '#60a5fa', '#a78bfa', '#fb7185'
 ];
 
@@ -56,7 +56,6 @@ export default function NoUtilPage() {
 
     const chartData = useMemo(() => {
         if (!data || !data.no_util) return [];
-        // Show top 15 instead of 7 to fill space and satisfy user request
         const sorted = [...data.no_util].sort((a, b) => b.leads - a.leads);
         const top = sorted.slice(0, 15);
         const others = sorted.slice(15);
@@ -130,12 +129,12 @@ export default function NoUtilPage() {
                 <div className="flex items-center gap-3">
                     <button
                         onClick={handleExport}
-                        className="flex items-center gap-2 bg-white text-nods-text-primary border border-nods-border px-4 py-2 rounded-xl text-xs font-black hover:border-rose-500 hover:text-rose-500 transition-all shadow-sm"
+                        className="flex items-center gap-2 bg-white text-nods-text-primary border border-nods-border px-4 py-2 rounded-xl text-xs font-black hover:border-amber-500 hover:text-amber-500 transition-all shadow-sm"
                     >
                         <Download className="w-4 h-4" />
                         EXPORTAR DATA
                     </button>
-                    <div className="bg-rose-50 border border-rose-100 px-4 py-2 rounded-xl text-[10px] font-black text-rose-600 uppercase tracking-[0.15em]">
+                    <div className="bg-amber-50 border border-amber-100 px-4 py-2 rounded-xl text-[10px] font-black text-amber-600 uppercase tracking-[0.15em]">
                         Filtro: {nivel}
                     </div>
                 </div>
@@ -155,7 +154,7 @@ export default function NoUtilPage() {
                     <div className="flex justify-between items-center mb-8">
                         <div>
                             <h3 className="text-lg font-black text-nods-text-primary flex items-center gap-2">
-                                <div className="w-2 h-6 bg-rose-500 rounded-full" />
+                                <div className="w-2 h-6 bg-amber-500 rounded-full" />
                                 Distribución detallada de descartes
                             </h3>
                             <p className="text-nods-text-muted text-xs font-bold uppercase tracking-widest">Top 15 motivos de no utilidad</p>
@@ -192,7 +191,7 @@ export default function NoUtilPage() {
                                 </PieChart>
                             </ResponsiveContainer>
 
-                            {/* Inner Liquid Circle Content */}
+                            {/* Inner Circle Content */}
                             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                                 <motion.div
                                     animate={{
@@ -211,7 +210,7 @@ export default function NoUtilPage() {
                             <div className="absolute inset-0 rounded-full border-[10px] border-slate-50/50 -z-10 pointer-events-none" />
                         </div>
 
-                        {/* Side Legend (Matching User Image Reference) */}
+                        {/* Side Legend */}
                         <div className="w-full lg:w-1/2 flex flex-col gap-3 py-4 max-h-[340px] overflow-y-auto custom-scrollbar pr-2">
                             {chartData.map((entry, idx) => (
                                 <motion.div
@@ -231,7 +230,9 @@ export default function NoUtilPage() {
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-[10px] font-black text-slate-400">{((entry.value / totalLeadsNoUtil) * 100).toFixed(1)}%</span>
+                                        <div className="bg-slate-900 px-2 py-0.5 rounded-md min-w-[50px] text-center">
+                                            <span className="text-[10px] font-black text-emerald-400">{((entry.value / totalLeadsNoUtil) * 100).toFixed(1)}%</span>
+                                        </div>
                                         <span className="text-sm font-black text-slate-900 min-w-[40px] text-right">{entry.value.toLocaleString()}</span>
                                     </div>
                                 </motion.div>
@@ -240,39 +241,51 @@ export default function NoUtilPage() {
                     </div>
                 </motion.div>
 
-                {/* Vertical Context Section (Highlights) */}
+                {/* Vertical Context Section (Subtle Style) */}
                 <div className="flex flex-col gap-6">
-                    {/* Top Reason Insight Card */}
-                    {topReason && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.2 }}
-                            className="bg-gradient-to-br from-rose-500 to-rose-700 rounded-[2.5rem] p-8 text-white shadow-xl shadow-rose-200 relative overflow-hidden group h-full flex flex-col justify-center"
-                        >
-                            {/* Decorative Icon Background */}
-                            <AlertOctagon className="absolute -right-8 -bottom-8 w-40 h-40 opacity-10 group-hover:rotate-12 transition-transform duration-700" />
+                    {/* Subtle Bar Chart Highlight */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-xl relative overflow-hidden group h-full flex flex-col"
+                    >
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="p-2 bg-amber-50 rounded-xl">
+                                <TrendingDown className="w-5 h-5 text-amber-500" />
+                            </div>
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 italic leading-none">Resumen de Volumen</h4>
+                        </div>
 
-                            <div className="relative z-10">
-                                <span className="bg-white/20 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-4 inline-block">Motivo Principal</span>
-                                <h4 className="text-2xl font-black mb-2 tracking-tight line-clamp-2 leading-tight">
-                                    {topReason.subcategoria}
-                                </h4>
-                                <div className="flex items-end gap-3 mt-4">
-                                    <span className="text-5xl font-black">{topReason.porcentaje}%</span>
-                                    <div className="flex flex-col pb-1">
-                                        <span className="text-xs font-bold opacity-80">de los descartes</span>
-                                        <span className="text-[10px] font-black uppercase tracking-tighter opacity-100">{topReason.leads.toLocaleString()} leads</span>
+                        <div className="space-y-5 flex-1 flex flex-col justify-center">
+                            {chartData.slice(0, 4).map((item, idx) => (
+                                <div key={item.name} className="space-y-2">
+                                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                        <span className="truncate max-w-[150px]">{item.name}</span>
+                                        <div className="bg-slate-900 px-1.5 py-0.5 rounded text-[9px] text-emerald-400 font-black">
+                                            {((item.value / totalLeadsNoUtil) * 100).toFixed(1)}%
+                                        </div>
+                                    </div>
+                                    <div className="h-2.5 w-full bg-slate-50 rounded-full overflow-hidden shadow-inner border border-slate-100/50">
+                                        <motion.div
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${(item.value / totalLeadsNoUtil) * 100}%` }}
+                                            transition={{ duration: 1, delay: 0.5 + (idx * 0.1) }}
+                                            className="h-full bg-gradient-to-r from-amber-400 to-amber-600 rounded-full"
+                                        />
                                     </div>
                                 </div>
-                                <div className="mt-6 pt-6 border-t border-white/20">
-                                    <p className="text-sm font-medium opacity-90 leading-relaxed italic">
-                                        Esta categoría representa el cuello de botella más significativo en tu base de datos actual.
-                                    </p>
-                                </div>
+                            ))}
+                        </div>
+
+                        <div className="mt-6 pt-6 border-t border-slate-50 flex items-center justify-between">
+                            <div className="flex flex-col">
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Participación</span>
+                                <span className="text-sm font-bold text-slate-700 italic">Top 4 motivos</span>
                             </div>
-                        </motion.div>
-                    )}
+                            <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-amber-500 transition-colors" />
+                        </div>
+                    </motion.div>
 
                     {/* Quick Trend Summary */}
                     <motion.div
@@ -283,7 +296,7 @@ export default function NoUtilPage() {
                     >
                         <div className="flex items-center gap-3 mb-6">
                             <div className="p-2 bg-slate-50 rounded-xl">
-                                <TrendingDown className="w-5 h-5 text-slate-400" />
+                                <Clock className="w-5 h-5 text-slate-400" />
                             </div>
                             <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 italic leading-none">Análisis de Tendencia</h4>
                         </div>
@@ -291,7 +304,7 @@ export default function NoUtilPage() {
                         <div className="space-y-6 flex-1 flex flex-col justify-center">
                             <div className="flex items-center justify-between">
                                 <span className="text-xs font-bold text-slate-500">Últimos 7 días</span>
-                                <span className="text-xl font-black text-rose-500">
+                                <span className="text-xl font-black text-amber-500">
                                     {data.no_util.reduce((acc, curr) => acc + (curr.leads_7d || 0), 0).toLocaleString()}
                                 </span>
                             </div>
@@ -310,7 +323,7 @@ export default function NoUtilPage() {
                             </div>
                         </div>
 
-                        <div className="mt-6 flex items-center gap-2 text-rose-500 font-black text-[10px] uppercase tracking-widest">
+                        <div className="mt-6 flex items-center gap-2 text-amber-500 font-black text-[10px] uppercase tracking-widest">
                             <Star className="w-3 h-3 animate-pulse" />
                             Actualización Automática
                         </div>
@@ -322,18 +335,14 @@ export default function NoUtilPage() {
             <div className="space-y-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="relative flex-1 max-w-md group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-amber-500 transition-colors" />
                         <input
                             type="text"
                             placeholder="Buscar subcategoría..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
-                            className="w-full bg-white border border-nods-border rounded-2xl py-3 pl-12 pr-4 focus:border-rose-500/50 outline-none transition-all text-sm text-nods-text-primary shadow-sm"
+                            className="w-full bg-white border border-nods-border rounded-2xl py-3 pl-12 pr-4 focus:border-amber-500/50 outline-none transition-all text-sm text-nods-text-primary shadow-sm"
                         />
-                    </div>
-                    <div className="flex items-center gap-4 text-xs font-bold text-nods-text-muted px-2">
-                        <Filter className="w-3 h-3" />
-                        Mostrando {filtered.length} categorías registradas
                     </div>
                 </div>
 
@@ -345,7 +354,6 @@ export default function NoUtilPage() {
                                     <th className="px-8 py-5">SUBCATEGORÍA DE DESCARTE</th>
                                     <th className="px-6 py-5 text-center">VOLUMEN LEADS</th>
                                     <th className="px-6 py-5 text-center">% PARTICIPACIÓN</th>
-                                    <th className="px-6 py-5 text-right">ACCIONES</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -370,29 +378,26 @@ export default function NoUtilPage() {
                                                     </span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-6 text-center">
-                                                <span className="text-sm font-black text-slate-900 group-hover:text-rose-500 transition-colors tabular-nums">
+                                            <td className="px-6 py-6 text-center tabular-nums">
+                                                <span className="text-sm font-black text-slate-900">
                                                     {item.leads?.toLocaleString()}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-6">
-                                                <div className="flex flex-col items-center gap-1.5 tabular-nums">
-                                                    <span className="text-xs font-black text-slate-900 leading-none">
-                                                        {item.porcentaje}%
-                                                    </span>
-                                                    <div className="w-32 h-1 bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                                            <td className="px-6 py-6 tabular-nums">
+                                                <div className="flex flex-col items-center gap-2">
+                                                    <div className="bg-slate-900 px-3 py-1 rounded-lg">
+                                                        <span className="text-xs font-black text-emerald-400">
+                                                            {item.porcentaje}%
+                                                        </span>
+                                                    </div>
+                                                    <div className="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden shadow-inner border border-slate-200/50">
                                                         <motion.div
                                                             initial={{ width: 0 }}
                                                             animate={{ width: `${item.porcentaje}%` }}
-                                                            className="h-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.4)]"
+                                                            className="h-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.3)]"
                                                         />
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-6 text-right">
-                                                <button className="p-2 text-slate-200 hover:text-rose-500 transition-colors">
-                                                    <ArrowRight className="w-4 h-4" />
-                                                </button>
                                             </td>
                                         </motion.tr>
                                     ))}
