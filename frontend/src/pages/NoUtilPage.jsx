@@ -148,9 +148,9 @@ export default function NoUtilPage() {
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="xl:col-span-2 bg-white border border-nods-border rounded-[2.5rem] p-8 relative overflow-hidden group shadow-xl"
+                    className="xl:col-span-2 bg-white border border-nods-border rounded-[2.5rem] p-6 relative overflow-hidden group shadow-xl"
                 >
-                    <div className="flex justify-between items-center mb-8">
+                    <div className="flex justify-between items-center mb-6">
                         <div>
                             <h3 className="text-lg font-black text-nods-text-primary flex items-center gap-2">
                                 <div className="w-2 h-6 bg-amber-500 rounded-full" />
@@ -162,15 +162,15 @@ export default function NoUtilPage() {
 
                     <div className="flex flex-col lg:flex-row items-center gap-8">
                         {/* Donut Container */}
-                        <div className="w-full lg:w-1/2 h-[340px] relative">
+                        <div className="w-full lg:w-1/2 h-[420px] relative">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
                                         data={chartData}
                                         cx="50%"
                                         cy="50%"
-                                        innerRadius={85}
-                                        outerRadius={120}
+                                        innerRadius={100}
+                                        outerRadius={140}
                                         paddingAngle={3}
                                         dataKey="value"
                                         stroke="none"
@@ -210,7 +210,7 @@ export default function NoUtilPage() {
                         </div>
 
                         {/* Side Legend */}
-                        <div className="w-full lg:w-1/2 flex flex-col gap-3 py-4 max-h-[340px] overflow-y-auto custom-scrollbar pr-2">
+                        <div className="w-full lg:w-1/2 flex flex-col gap-3 py-4 max-h-[420px] overflow-y-auto custom-scrollbar pr-2">
                             {chartData.map((entry, idx) => (
                                 <motion.div
                                     key={entry.name}
