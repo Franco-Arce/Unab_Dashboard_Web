@@ -280,30 +280,51 @@ async def get_estados(nivel: Optional[str] = Query(None), _user: str = Depends(r
 @router.get("/no-util")
 async def get_no_util(nivel: Optional[str] = Query(None), _user: str = Depends(require_auth)):
     from database import fetch_all
+    data_cache = await cache.get_all()
 
-    # Query agg_no_utiles directly so we get all rows, not just what's in dim_contactos cache
-    if nivel and nivel.upper() != "TODOS":
-        target_nivel = nivel.upper()
-        data_cache = await cache.get_all()
-        programs_of_level = [p["programa"] for p in data_cache.get("merged_programs", []) if p.get("nivel") == target_nivel]
+    rows = []
+    try:
+        # Query agg_no_utiles directly so we get all subcategories
+        if nivel and nivel.upper() != "TODOS":
+            target_nivel = nivel.upper()
+            programs_of_level = [p["programa"] for p in data_cache.get("merged_programs", []) if p.get("nivel") == target_nivel]
 
-        if not programs_of_level:
-            return {"no_util": [], "no_util_total": 0, "trends": {}}
+            if not programs_of_level:
+                return {"no_util": [], "no_util_total": 0, "trends": {}}
 
-        placeholders = ",".join(f"${i+1}" for i in range(len(programs_of_level)))
-        query = f"""
-            SELECT descripcion_sub,
-                   SUM(leads_no_utiles) AS leads
-            FROM agg_no_utiles
-            WHERE UPPER(TRIM(programa)) IN ({placeholders})
-            GROUP BY descripcion_sub
-            ORDER BY leads DESC
-        """
-        rows = await fetch_all(query, *programs_of_level)
-    else:
-        rows = await fetch_all(
-            "SELECT descripcion_sub, SUM(leads_no_utiles) AS leads FROM agg_no_utiles GROUP BY descripcion_sub ORDER BY leads DESC"
-        )
+            placeholders = ",".join(f"${i+1}" for i in range(len(programs_of_level)))
+            query = f"""
+                SELECT descripcion_sub,
+                       SUM(leads_no_utiles) AS leads
+                FROM agg_no_utiles
+                WHERE UPPER(TRIM(programa)) IN ({placeholders})
+                GROUP BY descripcion_sub
+                ORDER BY leads DESC
+            """
+            rows = await fetch_all(query, *programs_of_level)
+        else:
+            rows = await fetch_all(
+                "SELECT descripcion_sub, SUM(leads_no_utiles) AS leads FROM agg_no_utiles GROUP BY descripcion_sub ORDER BY leads DESC"
+            )
+    except Exception as e:
+        print(f"[no-util] agg_no_utiles query failed ({e}), falling back to cache")
+        rows = []
+
+    # Fallback: if query returned nothing, use the cached dim_contactos data
+    if not rows:
+        cached_no_util = data_cache.get("no_util", [])
+        total_fb = sum(item.get("leads", 0) for item in cached_no_util)
+        result_fb = [
+            {
+                "subcategoria": item.get("descripcion_sub", ""),
+                "leads": item.get("leads", 0),
+                "leads_7d": item.get("leads_7d", 0),
+                "leads_14d": item.get("leads_14d", 0),
+                "porcentaje": round(item.get("leads", 0) / total_fb * 100, 2) if total_fb else 0,
+            }
+            for item in cached_no_util
+        ]
+        return {"no_util": result_fb, "no_util_total": total_fb, "trends": data_cache.get("trends", {})}
 
     total = sum(int(r.get("leads") or 0) for r in rows)
 
@@ -318,22 +339,25 @@ async def get_no_util(nivel: Optional[str] = Query(None), _user: str = Depends(r
         for r in rows
     ]
 
-    data = await cache.get_all()
-    return {"no_util": result, "no_util_total": total, "trends": data.get("trends", {})}
+    return {"no_util": result, "no_util_total": total, "trends": data_cache.get("trends", {})}
 
 
 @router.get("/no-util-csv")
 async def download_no_util_csv(_user: str = Depends(require_auth)):
-    """Download the full agg_no_utiles table as a CSV file."""
+    """Download the full agg_no_utiles_completo table as a CSV file."""
     from database import fetch_all
-    rows = await fetch_all("SELECT * FROM agg_no_utiles ORDER BY leads_no_utiles DESC")
+    try:
+        rows = await fetch_all("SELECT * FROM agg_no_utiles_completo ORDER BY leads_no_utiles DESC")
+    except Exception as e:
+        print(f"[no-util-csv] Error fetching agg_no_utiles_completo: {e}")
+        return Response(content=f"Error al acceder a la tabla: {e}", media_type="text/plain", status_code=500)
+    
     if not rows:
-        return Response(content="Sin datos", media_type="text/plain")
+        return Response(content="Sin datos en agg_no_utiles_completo", media_type="text/plain")
     
     headers_list = list(rows[0].keys())
     lines = [",".join(headers_list)]
     for row in rows:
-        # Escape commas within values
         values = []
         for h in headers_list:
             val = str(row.get(h, "") if row.get(h) is not None else "")
@@ -346,7 +370,7 @@ async def download_no_util_csv(_user: str = Depends(require_auth)):
     return Response(
         content=csv_content.encode("utf-8-sig"),
         media_type="text/csv",
-        headers={"Content-Disposition": 'attachment; filename="no_utiles.csv"'},
+        headers={"Content-Disposition": 'attachment; filename="agg_no_utiles_completo.csv"'},
     )
 
 
