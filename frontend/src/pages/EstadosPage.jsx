@@ -24,10 +24,7 @@ export default function EstadosPage() {
         exportToCSV(data.estados_by_programa, 'estados_gestion_unab_2026');
     };
 
-    const formatPercent = (val) => {
-        if (!val || isNaN(val) || val === Infinity) return '0.00%';
-        return `${(val * 100).toFixed(2)}%`;
-    };
+
 
     // Calculate totals for the footer row
     let tLeads = 0, tGestion = 0, tNoUtil = 0, tOpVenta = 0, tProcPago = 0;
@@ -79,60 +76,88 @@ export default function EstadosPage() {
 
             {/* Programs Detailed States (Matches PowerBI Layout) */}
             <div className="bg-white border border-nods-border rounded-3xl overflow-hidden shadow-xl pb-4">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm whitespace-nowrap">
-                        <thead>
-                            <tr className="bg-slate-50/50 border-b border-nods-border text-[11px] font-bold text-nods-text-muted uppercase tracking-wider">
-                                <th className="px-4 py-4 w-1/4">PROGRAMAS</th>
-                                <th className="px-2 py-4 text-center">LEADS</th>
-                                <th className="px-2 py-4 text-center">EN GESTIÓN</th>
-                                <th className="px-2 py-4 text-center">NO ÚTIL</th>
-                                <th className="px-2 py-4 text-center">OP. VENTA</th>
-                                <th className="px-2 py-4 text-center">PROC. PAGO</th>
-                                <th className="px-2 py-4 text-center text-cyan-700">SOLICITADOS</th>
-                                <th className="px-2 py-4 text-center text-cyan-700">ADMITIDOS</th>
-                                <th className="px-2 py-4 text-center text-cyan-700">PAGADOS</th>
-                                <th className="px-2 py-4 text-center text-cyan-700">META</th>
-                                <th className="px-2 py-4 text-center text-cyan-700">AVANCE</th>
-                                <th className="px-2 py-4 text-center text-cyan-700">CONVERSIÓN</th>
+                <div className="overflow-x-auto text-[13px]">
+                    <table className="w-full text-left whitespace-nowrap">
+                        <thead className="sticky top-0 z-20">
+                            <tr className="bg-slate-50/80 border-b border-nods-border text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                <th className="px-5 py-4 w-[280px]">Programa</th>
+                                <th className="px-2 py-4 text-center">Leads</th>
+                                <th className="px-2 py-4 text-center">En Gestión</th>
+                                <th className="px-2 py-4 text-center">No Útil</th>
+                                <th className="px-2 py-4 text-center">Op. Venta</th>
+                                <th className="px-2 py-4 text-center">Proc. Pago</th>
+                                <th className="px-2 py-4 text-center">Solicitados</th>
+                                <th className="px-2 py-4 text-center">Admitidos</th>
+                                <th className="px-2 py-4 text-center">Pagados</th>
+                                <th className="px-2 py-4 text-center">Meta</th>
+                                <th className="px-2 py-4 text-center">Avance %</th>
+                                <th className="px-2 py-4 text-center pr-5">Convers. %</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 tabular-nums">
                             {data?.estados_by_programa.map((item, idx) => {
-                                const avance = item.meta ? (item.pagados / item.meta) : 0;
-                                const conversion = item.leads ? (item.pagados / item.leads) : 0;
+                                const avance = item.meta ? (item.pagados / item.meta) * 100 : 0;
+                                const conversion = item.leads ? (item.pagados / item.leads) * 100 : 0;
                                 return (
-                                    <tr key={idx} className="hover:bg-slate-100/60 transition-all even:bg-slate-100/80 group relative">
-                                        <td className="px-4 py-5 text-xs font-semibold text-nods-text-primary whitespace-normal min-w-[200px] leading-tight break-words group-hover:border-l-4 border-indigo-500 transition-all">{item.programa}</td>
-                                        <td className="px-2 py-5 text-center text-xs text-nods-text-muted">{item.leads || ''}</td>
-                                        <td className="px-2 py-5 text-center text-xs text-nods-text-muted">{item.en_gestion || ''}</td>
-                                        <td className="px-2 py-5 text-center text-xs text-nods-text-muted">{item.no_util || ''}</td>
-                                        <td className="px-2 py-5 text-center text-xs text-nods-text-muted">{item.op_venta || ''}</td>
-                                        <td className="px-2 py-5 text-center text-xs text-nods-text-muted">{item.proceso_pago || ''}</td>
-                                        <td className="px-2 py-5 text-center text-xs text-cyan-700 font-bold">{item.solicitados || ''}</td>
-                                        <td className="px-2 py-5 text-center text-xs text-cyan-700 font-bold">{item.admitidos || ''}</td>
-                                        <td className="px-2 py-5 text-center text-xs text-cyan-700 font-bold">{item.pagados || ''}</td>
-                                        <td className="px-2 py-5 text-center text-xs text-cyan-700 font-bold">{item.meta || ''}</td>
-                                        <td className="px-2 py-5 text-center text-xs text-cyan-700 font-bold">{formatPercent(avance)}</td>
-                                        <td className="px-2 py-5 text-center text-xs text-cyan-700 font-bold">{formatPercent(conversion)}</td>
+                                    <tr key={idx} className="hover:bg-blue-50/40 transition-all even:bg-slate-50/50 group relative">
+                                        <td className="px-5 py-3.5 text-[11px] font-bold text-slate-700 whitespace-normal leading-tight break-words border-r border-slate-100 group-hover:text-nods-accent transition-colors">
+                                            {item.programa}
+                                        </td>
+                                        <td className="px-2 py-3.5 text-center font-black text-blue-600">
+                                            {item.leads?.toLocaleString() || '0'}
+                                        </td>
+                                        <td className="px-2 py-3.5 text-center font-black text-amber-500">
+                                            {item.en_gestion?.toLocaleString() || '0'}
+                                        </td>
+                                        <td className="px-2 py-3.5 text-center font-black text-red-500">
+                                            {item.no_util?.toLocaleString() || '0'}
+                                        </td>
+                                        <td className="px-2 py-3.5 text-center font-black text-blue-600">
+                                            {item.op_venta?.toLocaleString() || '0'}
+                                        </td>
+                                        <td className="px-2 py-3.5 text-center font-bold text-violet-400">
+                                            {item.proceso_pago?.toLocaleString() || '0'}
+                                        </td>
+                                        <td className="px-2 py-3.5 text-center font-medium text-slate-400">
+                                            {item.solicitados?.toLocaleString() || '0'}
+                                        </td>
+                                        <td className="px-2 py-3.5 text-center font-medium text-slate-400">
+                                            {item.admitidos?.toLocaleString() || '0'}
+                                        </td>
+                                        <td className="px-2 py-3.5 text-center font-black text-emerald-500">
+                                            {item.pagados?.toLocaleString() || '0'}
+                                        </td>
+                                        <td className="px-2 py-3.5 text-center font-medium text-slate-400">
+                                            {item.meta?.toLocaleString() || '0'}
+                                        </td>
+                                        <td className={`px-2 py-3.5 text-center font-black ${avance >= 100 ? 'text-emerald-500' : avance > 50 ? 'text-amber-500' : 'text-red-400'}`}>
+                                            {avance.toFixed(1)}%
+                                        </td>
+                                        <td className="px-2 py-3.5 text-center font-medium text-slate-400 pr-5">
+                                            {conversion.toFixed(2)}%
+                                        </td>
                                     </tr>
                                 );
                             })}
                             {/* Totals Row */}
                             {data?.estados_by_programa.length > 0 && (
-                                <tr className="bg-blue-50/50 border-t-2 border-nods-border">
-                                    <td className="px-4 py-6 text-sm font-bold text-nods-text-primary">TOTAL GENERAL</td>
-                                    <td className="px-2 py-6 text-center text-sm font-bold text-nods-text-primary">{tLeads.toLocaleString()}</td>
-                                    <td className="px-2 py-6 text-center text-sm font-bold text-nods-text-primary">{tGestion.toLocaleString()}</td>
-                                    <td className="px-2 py-6 text-center text-sm font-bold text-nods-text-primary">{tNoUtil.toLocaleString()}</td>
-                                    <td className="px-2 py-6 text-center text-sm font-bold text-nods-text-primary">{tOpVenta.toLocaleString()}</td>
-                                    <td className="px-2 py-6 text-center text-sm font-bold text-nods-text-primary">{tProcPago === 0 ? '' : tProcPago.toLocaleString()}</td>
-                                    <td className="px-2 py-6 text-center text-sm font-bold text-cyan-700">{tSol.toLocaleString()}</td>
-                                    <td className="px-2 py-6 text-center text-sm font-bold text-cyan-700">{tAdm.toLocaleString()}</td>
-                                    <td className="px-2 py-6 text-center text-sm font-bold text-cyan-700">{tPag.toLocaleString()}</td>
-                                    <td className="px-2 py-6 text-center text-sm font-bold text-cyan-700">{tMeta.toLocaleString()}</td>
-                                    <td className="px-2 py-6 text-center text-sm font-bold text-cyan-700">{formatPercent(tPag / tMeta)}</td>
-                                    <td className="px-2 py-6 text-center text-sm font-bold text-cyan-700">{formatPercent(tPag / tLeads)}</td>
+                                <tr className="bg-slate-50 border-t-2 border-slate-200">
+                                    <td className="px-5 py-5 text-xs font-black text-slate-800">TOTAL GENERAL</td>
+                                    <td className="px-2 py-5 text-center text-sm font-black text-blue-700">{tLeads.toLocaleString()}</td>
+                                    <td className="px-2 py-5 text-center text-sm font-black text-amber-600">{tGestion.toLocaleString()}</td>
+                                    <td className="px-2 py-5 text-center text-sm font-black text-red-600">{tNoUtil.toLocaleString()}</td>
+                                    <td className="px-2 py-5 text-center text-sm font-black text-blue-700">{tOpVenta.toLocaleString()}</td>
+                                    <td className="px-2 py-5 text-center text-sm font-bold text-violet-500">{tProcPago > 0 ? tProcPago.toLocaleString() : '0'}</td>
+                                    <td className="px-2 py-5 text-center text-sm font-bold text-slate-500">{tSol.toLocaleString()}</td>
+                                    <td className="px-2 py-5 text-center text-sm font-bold text-slate-500">{tAdm.toLocaleString()}</td>
+                                    <td className="px-2 py-5 text-center text-sm font-black text-emerald-600">{tPag.toLocaleString()}</td>
+                                    <td className="px-2 py-5 text-center text-sm font-bold text-slate-500">{tMeta.toLocaleString()}</td>
+                                    <td className={`px-2 py-5 text-center text-sm font-black ${(tPag / tMeta) >= 1 ? 'text-emerald-600' : 'text-amber-600'}`}>
+                                        {((tPag / tMeta) * 100).toFixed(1)}%
+                                    </td>
+                                    <td className="px-2 py-5 text-center text-sm font-bold text-slate-500 pr-5">
+                                        {((tPag / tLeads) * 100).toFixed(2)}%
+                                    </td>
                                 </tr>
                             )}
                         </tbody>
