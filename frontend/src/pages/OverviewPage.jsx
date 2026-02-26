@@ -133,6 +133,9 @@ export default function OverviewPage() {
     const [funnel, setFunnel] = useState([]);
     const [insights, setInsights] = useState([]);
     const [topPrograms, setTopPrograms] = useState([]);
+    const [allPrograms, setAllPrograms] = useState([]);
+    const [areas, setAreas] = useState([]);
+    const [selectedArea, setSelectedArea] = useState('TODAS');
     const [loading, setLoading] = useState(true);
     const { nivel } = useFilters();
 
@@ -158,6 +161,21 @@ export default function OverviewPage() {
                         .sort((a, b) => b.conversion - a.conversion)
                         .slice(0, 8);
                     setTopPrograms(progs);
+
+                    // Store all programs with area info for Avance vs Meta chart
+                    const allProgs = (adm.programas || [])
+                        .filter(p => p.meta > 0)
+                        .map(p => ({
+                            programa: p.programa,
+                            pagados: p.pagados || 0,
+                            meta: p.meta || 0,
+                            area: p.area || 'SIN ÁREA'
+                        }));
+                    setAllPrograms(allProgs);
+
+                    // Extract unique areas
+                    const uniqueAreas = [...new Set(allProgs.map(p => p.area))].sort();
+                    setAreas(uniqueAreas);
                 } catch (e) { console.error('Error loading admisiones for overview', e); }
 
                 const i = await api.aiInsights();
@@ -288,42 +306,21 @@ export default function OverviewPage() {
                                                 {/* Top reflection */}
                                                 <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/15 to-transparent pointer-events-none z-20" />
 
-                                                {/* Stage name — left side (only when bar is wide enough) */}
-                                                {entry.percent >= 18 && (
-                                                    <span className="font-black whitespace-nowrap text-white text-xs relative z-30 tracking-wide uppercase drop-shadow-md">
-                                                        {entry.stage}
-                                                    </span>
-                                                )}
-
-                                                {/* Volume + Percentage — right side, inside the bar (only when wide enough) */}
-                                                {entry.percent >= 18 && (
-                                                    <div className="flex items-center gap-3 relative z-30">
-                                                        <span className="text-white/90 font-black text-lg leading-none tracking-tight drop-shadow-sm">
-                                                            {entry.value.toLocaleString()}
-                                                        </span>
-                                                        <span className="bg-white/20 backdrop-blur-sm text-white text-[10px] font-black px-2.5 py-1 rounded-lg border border-white/20">
-                                                            {entry.percent}%
-                                                        </span>
-                                                    </div>
-                                                )}
+                                                {/* Stage name — always inside, clipped by bar edge */}
+                                                <span className="font-black whitespace-nowrap text-white text-xs relative z-30 tracking-wide uppercase drop-shadow-md">
+                                                    {entry.stage}
+                                                </span>
                                             </motion.div>
 
-                                            {/* Fallback: label + data outside for very small bars */}
-                                            {entry.percent < 18 && (
-                                                <div className="absolute inset-0 flex items-center justify-between px-5 pointer-events-none z-20">
-                                                    <span className="text-slate-700 font-black text-xs uppercase tracking-wide" style={{ marginLeft: `${Math.max(entry.percent, 5) + 2}%` }}>
-                                                        {entry.stage}
-                                                    </span>
-                                                    <div className="flex items-center gap-3">
-                                                        <span className="text-slate-800 font-black text-lg leading-none tracking-tight">
-                                                            {entry.value.toLocaleString()}
-                                                        </span>
-                                                        <span className="bg-slate-900 text-white text-[10px] font-black px-2.5 py-1 rounded-lg">
-                                                            {entry.percent}%
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            )}
+                                            {/* Volume + Percentage — always outside on the right */}
+                                            <div className="absolute right-4 inset-y-0 flex items-center gap-3 pointer-events-none z-20">
+                                                <span className="text-slate-800 font-black text-lg leading-none tracking-tight">
+                                                    {entry.value.toLocaleString()}
+                                                </span>
+                                                <span className="bg-slate-900 text-white text-[10px] font-black px-2.5 py-1 rounded-lg">
+                                                    {entry.percent}%
+                                                </span>
+                                            </div>
                                         </div>
 
                                         {/* Efficiency connector */}
@@ -408,8 +405,8 @@ export default function OverviewPage() {
                 </div>
             </div>
 
-            {/* Top Conversión por Programa */}
-            <div className="grid grid-cols-1 gap-8">
+            {/* Top Conversión + Avance vs Meta por Programa */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -456,6 +453,97 @@ export default function OverviewPage() {
                         }) : (
                             <div className="text-center py-8 text-slate-400 text-sm font-medium">Sin datos suficientes</div>
                         )}
+                    </div>
+                </motion.div>
+
+                {/* Avance vs Meta por Programa */}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.7 }}
+                    className="bg-white border border-nods-border rounded-3xl p-8 shadow-xl"
+                >
+                    <div className="flex justify-between items-start mb-6">
+                        <div>
+                            <h3 className="text-xl font-bold text-nods-text-primary">Avance vs Meta por Programa</h3>
+                            <p className="text-nods-text-muted text-sm font-medium">Progreso hacia la Meta (Gráfico de Barras)</p>
+                        </div>
+                        <select
+                            value={selectedArea}
+                            onChange={(e) => setSelectedArea(e.target.value)}
+                            className="bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                        >
+                            <option value="TODAS">Todas las Áreas</option>
+                            {areas.map(a => (
+                                <option key={a} value={a}>{a.charAt(0) + a.slice(1).toLowerCase()}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="w-full" style={{ height: 320 }}>
+                        {(() => {
+                            const filtered = allPrograms
+                                .filter(p => selectedArea === 'TODAS' || p.area === selectedArea)
+                                .sort((a, b) => b.meta - a.meta)
+                                .slice(0, 10)
+                                .map(p => ({
+                                    ...p,
+                                    shortName: p.programa.length > 18 ? p.programa.slice(0, 16) + '…' : p.programa
+                                }));
+
+                            if (filtered.length === 0) {
+                                return <div className="flex items-center justify-center h-full text-slate-400 text-sm font-medium">Sin datos para esta área</div>;
+                            }
+
+                            return (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={filtered} margin={{ top: 10, right: 10, left: -10, bottom: 60 }}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                                        <XAxis
+                                            dataKey="shortName"
+                                            tick={{ fontSize: 9, fontWeight: 700, fill: '#64748b' }}
+                                            angle={-45}
+                                            textAnchor="end"
+                                            interval={0}
+                                            axisLine={{ stroke: '#e2e8f0' }}
+                                            tickLine={false}
+                                        />
+                                        <YAxis
+                                            tick={{ fontSize: 10, fill: '#94a3b8' }}
+                                            axisLine={false}
+                                            tickLine={false}
+                                        />
+                                        <Tooltip
+                                            contentStyle={{
+                                                backgroundColor: '#0f172a',
+                                                border: 'none',
+                                                borderRadius: '12px',
+                                                color: '#fff',
+                                                fontSize: '12px',
+                                                fontWeight: 700,
+                                                padding: '10px 14px'
+                                            }}
+                                            formatter={(value, name) => [
+                                                value.toLocaleString(),
+                                                name === 'meta' ? 'Meta' : 'Pagados'
+                                            ]}
+                                            labelFormatter={(label) => label}
+                                        />
+                                        <Bar dataKey="meta" fill="#cbd5e1" radius={[6, 6, 0, 0]} name="meta" />
+                                        <Bar dataKey="pagados" fill="#10b981" radius={[6, 6, 0, 0]} name="pagados" />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            );
+                        })()}
+                    </div>
+                    <div className="flex items-center justify-center gap-6 mt-2">
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-sm bg-slate-300" />
+                            <span className="text-[10px] font-bold text-slate-500 uppercase">Meta</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-sm bg-emerald-500" />
+                            <span className="text-[10px] font-bold text-slate-500 uppercase">Pagados</span>
+                        </div>
                     </div>
                 </motion.div>
             </div>
