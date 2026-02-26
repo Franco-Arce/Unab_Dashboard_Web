@@ -471,7 +471,17 @@ export default function OverviewPage() {
                                 .slice(0, 10)
                                 .map(p => ({
                                     ...p,
-                                    shortName: p.programa.length > 22 ? p.programa.slice(0, 20) + '…' : p.programa
+                                    shortName: (() => {
+                                        let n = p.programa
+                                            .replace(/ESPECIALIZACI[ÓO]N/gi, 'Esp.')
+                                            .replace(/TECNOLOG[ÍI]A/gi, 'Tec.')
+                                            .replace(/ADMINISTRACI[ÓO]N/gi, 'Adm.')
+                                            .replace(/INGENIER[ÍI]A/gi, 'Ing.')
+                                            .replace(/MAESTR[ÍI]A/gi, 'Mtr.')
+                                            .replace(/CONTADUR[ÍI]A/gi, 'Cont.')
+                                            .replace(/LICENCIATURA/gi, 'Lic.');
+                                        return n.length > 24 ? n.slice(0, 22) + '…' : n;
+                                    })()
                                 }));
 
                             if (filtered.length === 0) {
