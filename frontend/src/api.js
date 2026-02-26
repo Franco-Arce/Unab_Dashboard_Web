@@ -112,6 +112,23 @@ export const api = {
         dashboardContext.noUtil = res;
         return res;
     },
+    noUtilCsv: async () => {
+        // Fetch the CSV as blob and trigger browser download
+        const token = localStorage.getItem('unab_token');
+        const res = await fetch(`${API_URL}/api/dashboard/no-util-csv`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error('Error descargando CSV');
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'agg_no_utiles_completo.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    },
     admitidos: async () => {
         const res = await request('/api/dashboard/admitidos');
         dashboardContext.admitidos = res;

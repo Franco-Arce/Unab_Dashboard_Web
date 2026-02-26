@@ -279,48 +279,69 @@ async def get_estados(nivel: Optional[str] = Query(None), _user: str = Depends(r
 
 @router.get("/no-util")
 async def get_no_util(nivel: Optional[str] = Query(None), _user: str = Depends(require_auth)):
-    data = await cache.get_all()
-    
+    from database import fetch_all
+
+    # Query agg_no_utiles directly so we get all rows, not just what's in dim_contactos cache
     if nivel and nivel.upper() != "TODOS":
         target_nivel = nivel.upper()
-        programs_of_level = [p["programa"] for p in data.get("merged_programs", []) if p.get("nivel") == target_nivel]
-        
+        data_cache = await cache.get_all()
+        programs_of_level = [p["programa"] for p in data_cache.get("merged_programs", []) if p.get("nivel") == target_nivel]
+
         if not programs_of_level:
             return {"no_util": [], "no_util_total": 0, "trends": {}}
-            
+
         placeholders = ",".join(f"${i+1}" for i in range(len(programs_of_level)))
         query = f"""
-            SELECT 
-                descrip_subcat AS descripcion_sub,
-                COUNT(*) AS leads,
-                SUM(CASE WHEN fecha_a_utilizar::timestamp >= NOW() - INTERVAL '7 days' THEN 1 ELSE 0 END) AS leads_7d,
-                SUM(CASE WHEN fecha_a_utilizar::timestamp >= NOW() - INTERVAL '14 days' THEN 1 ELSE 0 END) AS leads_14d
-            FROM dim_contactos
-            WHERE (descrip_cat ILIKE '%no util%' OR descrip_cat ILIKE '%descarte%')
-              AND UPPER(TRIM(txtprogramainteres)) IN ({placeholders})
+            SELECT descrip_subcat AS descripcion_sub,
+                   SUM(leads_no_utiles) AS leads
+            FROM agg_no_utiles
+            WHERE UPPER(TRIM(programa)) IN ({placeholders})
             GROUP BY descrip_subcat
             ORDER BY leads DESC
         """
-        no_util_rows = await fetch_all(query, *programs_of_level)
-        no_util = [dict(r) for r in no_util_rows]
+        rows = await fetch_all(query, *programs_of_level)
     else:
-        no_util = data.get("no_util", [])
+        rows = await fetch_all(
+            "SELECT descrip_subcat AS descripcion_sub, SUM(leads_no_utiles) AS leads FROM agg_no_utiles GROUP BY descrip_subcat ORDER BY leads DESC"
+        )
 
-    # Always calculate the total sum from the returned list to ensure 100% participation sum
-    total = sum(item.get("leads", 0) for item in no_util)
+    total = sum(int(r.get("leads") or 0) for r in rows)
 
-    result = []
-    for item in no_util:
-        leads = item.get("leads", 0)
-        result.append({
-            "subcategoria": item.get("descripcion_sub", ""),
-            "leads": leads,
-            "leads_7d": item.get("leads_7d", 0),
-            "leads_14d": item.get("leads_14d", 0),
-            "porcentaje": round(leads / total * 100, 2) if total else 0,
-        })
+    result = [
+        {
+            "subcategoria": r.get("descripcion_sub", ""),
+            "leads": int(r.get("leads") or 0),
+            "leads_7d": 0,
+            "leads_14d": 0,
+            "porcentaje": round(int(r.get("leads") or 0) / total * 100, 2) if total else 0,
+        }
+        for r in rows
+    ]
 
+    data = await cache.get_all()
     return {"no_util": result, "no_util_total": total, "trends": data.get("trends", {})}
+
+
+@router.get("/no-util-csv")
+async def download_no_util_csv(_user: str = Depends(require_auth)):
+    """Download the full agg_no_utiles_completo table as a CSV file."""
+    from database import fetch_all
+    import io
+    rows = await fetch_all("SELECT * FROM agg_no_utiles_completo ORDER BY leads_no_utiles DESC")
+    if not rows:
+        return Response(content="Sin datos", media_type="text/plain")
+    
+    headers_list = list(rows[0].keys())
+    lines = [",".join(headers_list)]
+    for row in rows:
+        lines.append(",".join(str(row.get(h, "")) for h in headers_list))
+    csv_content = "\n".join(lines)
+    
+    return Response(
+        content=csv_content.encode("utf-8-sig"),  # utf-8-sig adds BOM for Excel compatibility
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="agg_no_utiles_completo.csv"'},
+    )
 
 
 @router.get("/admitidos")

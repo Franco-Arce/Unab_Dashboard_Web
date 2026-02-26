@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Download, Search, AlertOctagon, Calendar, Clock, Filter, ArrowRight, TrendingDown, Star, Loader2 } from 'lucide-react';
+import { Download, Search, AlertOctagon, ArrowRight, TrendingDown, Loader2 } from 'lucide-react';
 import api from '../api';
 import { useFilters } from '../context/FilterContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -23,6 +23,7 @@ export default function NoUtilPage() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isExporting, setIsExporting] = useState(false);
+    const [isDownloadingCsv, setIsDownloadingCsv] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const { nivel } = useFilters();
 
@@ -56,20 +57,13 @@ export default function NoUtilPage() {
 
     const chartData = useMemo(() => {
         if (!data || !data.no_util) return [];
-        const sorted = [...data.no_util].sort((a, b) => b.leads - a.leads);
-        const top = sorted.slice(0, 15);
-        const others = sorted.slice(15);
-
-        if (others.length > 0) {
-            top.push({
-                subcategoria: 'Otras',
-                leads: others.reduce((acc, curr) => acc + curr.leads, 0)
-            });
-        }
-        return top.map(item => ({
-            name: item.subcategoria,
-            value: item.leads
-        }));
+        // Show ALL categories sorted by leads descending (no cap)
+        return [...data.no_util]
+            .sort((a, b) => b.leads - a.leads)
+            .map(item => ({
+                name: item.subcategoria,
+                value: item.leads
+            }));
     }, [data]);
 
     const totalLeadsNoUtil = useMemo(() => {
@@ -108,6 +102,18 @@ export default function NoUtilPage() {
             alert('Error al exportar los datos');
         } finally {
             setIsExporting(false);
+        }
+    };
+
+    const handleDownloadCsv = async () => {
+        try {
+            setIsDownloadingCsv(true);
+            await api.noUtilCsv();
+        } catch (error) {
+            console.error(error);
+            alert('Error al descargar el CSV');
+        } finally {
+            setIsDownloadingCsv(false);
         }
     };
 
@@ -170,7 +176,7 @@ export default function NoUtilPage() {
                                 <div className="w-2 h-6 bg-amber-500 rounded-full" />
                                 Distribución detallada de descartes
                             </h3>
-                            <p className="text-nods-text-muted text-xs font-bold uppercase tracking-widest">Top 15 motivos de no utilidad</p>
+                            <p className="text-nods-text-muted text-xs font-bold uppercase tracking-widest">Todos los motivos de no utilidad</p>
                         </div>
                     </div>
 
@@ -299,48 +305,6 @@ export default function NoUtilPage() {
                             <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-amber-500 transition-colors" />
                         </div>
                     </motion.div>
-
-                    {/* Quick Trend Summary */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-xl flex-1 flex flex-col justify-between"
-                    >
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="p-2 bg-slate-50 rounded-xl">
-                                <Clock className="w-5 h-5 text-slate-400" />
-                            </div>
-                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 italic leading-none">Análisis de Tendencia</h4>
-                        </div>
-
-                        <div className="space-y-6 flex-1 flex flex-col justify-center">
-                            <div className="flex items-center justify-between">
-                                <span className="text-xs font-bold text-slate-500">Últimos 7 días</span>
-                                <span className="text-xl font-black text-amber-500">
-                                    {data.no_util.reduce((acc, curr) => acc + (curr.leads_7d || 0), 0).toLocaleString()}
-                                </span>
-                            </div>
-                            <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden">
-                                <motion.div
-                                    initial={{ width: 0 }}
-                                    animate={{ width: '65%' }}
-                                    className="h-full bg-slate-200"
-                                />
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-xs font-bold text-slate-500">Últimos 14 días</span>
-                                <span className="text-xl font-black text-slate-900">
-                                    {data.no_util.reduce((acc, curr) => acc + (curr.leads_14d || 0), 0).toLocaleString()}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="mt-6 flex items-center gap-2 text-amber-500 font-black text-[10px] uppercase tracking-widest">
-                            <Star className="w-3 h-3 animate-pulse" />
-                            Actualización Automática
-                        </div>
-                    </motion.div>
                 </div>
             </div>
 
@@ -357,6 +321,18 @@ export default function NoUtilPage() {
                             className="w-full bg-white border border-nods-border rounded-2xl py-3 pl-12 pr-4 focus:border-amber-500/50 outline-none transition-all text-sm text-nods-text-primary shadow-sm"
                         />
                     </div>
+                    <button
+                        onClick={handleDownloadCsv}
+                        disabled={isDownloadingCsv}
+                        className={`flex items-center gap-2 bg-white text-nods-text-primary border border-nods-border px-4 py-2.5 rounded-xl text-xs font-black transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${isDownloadingCsv ? 'bg-amber-50 border-amber-500 text-amber-500' : 'hover:border-amber-500 hover:text-amber-500'}`}
+                    >
+                        {isDownloadingCsv ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                            <Download className="w-4 h-4" />
+                        )}
+                        {isDownloadingCsv ? 'DESCARGANDO...' : 'DESCARGAR CSV COMPLETO'}
+                    </button>
                 </div>
 
                 <div className="bg-white border border-nods-border rounded-3xl overflow-hidden shadow-xl">
