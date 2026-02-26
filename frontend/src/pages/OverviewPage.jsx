@@ -61,23 +61,23 @@ const SemiGauge = ({ percent, current, total, label }) => {
     const cx = 100;
     const cy = 85;
 
-    // Gradient ID based on progress
+    // Use blue-teal gradient matching dashboard theme
     const gradientId = 'semi-gauge-gradient';
     const colors = clampedPercent >= 75
-        ? ['#10b981', '#059669']
+        ? ['#10b981', '#06b6d4']
         : clampedPercent >= 50
-            ? ['#f59e0b', '#d97706']
+            ? ['#2563eb', '#06b6d4']
             : clampedPercent >= 25
-                ? ['#f97316', '#ea580c']
+                ? ['#f59e0b', '#f97316']
                 : ['#ef4444', '#dc2626'];
 
     return (
         <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: [1, 1.02, 1], opacity: 1 }}
+            animate={{ scale: [1, 1.03, 1], opacity: 1 }}
             transition={{
-                scale: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
-                opacity: { duration: 0.8 }
+                scale: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+                opacity: { duration: 0.6 }
             }}
             className="flex flex-col items-center relative"
         >
@@ -314,7 +314,7 @@ export default function OverviewPage() {
 
                                             {/* Volume + Percentage — always outside on the right */}
                                             <div className="absolute right-4 inset-y-0 flex items-center gap-3 pointer-events-none z-20">
-                                                <span className="text-slate-800 font-black text-lg leading-none tracking-tight">
+                                                <span className={`font-black text-lg leading-none tracking-tight ${index === 0 ? 'text-blue-600' : 'text-slate-800'}`}>
                                                     {entry.value.toLocaleString()}
                                                 </span>
                                                 <span className="bg-slate-900 text-white text-[10px] font-black px-2.5 py-1 rounded-lg">
@@ -415,7 +415,7 @@ export default function OverviewPage() {
                                     className="group"
                                 >
                                     <div className="flex items-center justify-between mb-1">
-                                        <span className="text-xs font-bold text-slate-700 truncate max-w-[60%]" title={prog.programa}>
+                                        <span className="text-xs font-bold text-slate-700 truncate max-w-[55%]" title={prog.programa}>
                                             {prog.programa.length > 30 ? prog.programa.slice(0, 30) + '…' : prog.programa}
                                         </span>
                                         <div className="flex items-center gap-2">
@@ -423,14 +423,23 @@ export default function OverviewPage() {
                                             <span className="text-xs font-black text-slate-900">{prog.conversion}%</span>
                                         </div>
                                     </div>
-                                    <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                                    <div className="w-full h-8 bg-slate-100/60 rounded-xl relative overflow-hidden border border-slate-200/40">
                                         <motion.div
                                             initial={{ width: 0 }}
-                                            animate={{ width: `${barWidth}%` }}
-                                            transition={{ duration: 1.2, delay: 0.8 + i * 0.05, ease: 'easeOut' }}
-                                            className="h-full rounded-full"
+                                            animate={{ width: `${Math.max(barWidth, 8)}%` }}
+                                            transition={{ duration: 1.4, delay: 0.8 + i * 0.06, ease: [0.34, 1.56, 0.64, 1] }}
+                                            className="h-full rounded-xl relative overflow-hidden shadow-[3px_0_10px_rgba(0,0,0,0.1)]"
                                             style={{ backgroundColor: barColors[i] || '#3b82f6' }}
-                                        />
+                                        >
+                                            <div
+                                                className="absolute inset-0 opacity-10 pointer-events-none animate-liquid-1"
+                                                style={{
+                                                    backgroundImage: `repeating-linear-gradient(-45deg, transparent, transparent 12px, white 12px, white 24px)`,
+                                                    width: '300%'
+                                                }}
+                                            />
+                                            <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
+                                        </motion.div>
                                     </div>
                                 </motion.div>
                             );
