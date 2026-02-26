@@ -292,17 +292,17 @@ async def get_no_util(nivel: Optional[str] = Query(None), _user: str = Depends(r
 
         placeholders = ",".join(f"${i+1}" for i in range(len(programs_of_level)))
         query = f"""
-            SELECT descrip_subcat AS descripcion_sub,
+            SELECT descripcion_sub,
                    SUM(leads_no_utiles) AS leads
             FROM agg_no_utiles
             WHERE UPPER(TRIM(programa)) IN ({placeholders})
-            GROUP BY descrip_subcat
+            GROUP BY descripcion_sub
             ORDER BY leads DESC
         """
         rows = await fetch_all(query, *programs_of_level)
     else:
         rows = await fetch_all(
-            "SELECT descrip_subcat AS descripcion_sub, SUM(leads_no_utiles) AS leads FROM agg_no_utiles GROUP BY descrip_subcat ORDER BY leads DESC"
+            "SELECT descripcion_sub, SUM(leads_no_utiles) AS leads FROM agg_no_utiles GROUP BY descripcion_sub ORDER BY leads DESC"
         )
 
     total = sum(int(r.get("leads") or 0) for r in rows)
@@ -324,23 +324,29 @@ async def get_no_util(nivel: Optional[str] = Query(None), _user: str = Depends(r
 
 @router.get("/no-util-csv")
 async def download_no_util_csv(_user: str = Depends(require_auth)):
-    """Download the full agg_no_utiles_completo table as a CSV file."""
+    """Download the full agg_no_utiles table as a CSV file."""
     from database import fetch_all
-    import io
-    rows = await fetch_all("SELECT * FROM agg_no_utiles_completo ORDER BY leads_no_utiles DESC")
+    rows = await fetch_all("SELECT * FROM agg_no_utiles ORDER BY leads_no_utiles DESC")
     if not rows:
         return Response(content="Sin datos", media_type="text/plain")
     
     headers_list = list(rows[0].keys())
     lines = [",".join(headers_list)]
     for row in rows:
-        lines.append(",".join(str(row.get(h, "")) for h in headers_list))
+        # Escape commas within values
+        values = []
+        for h in headers_list:
+            val = str(row.get(h, "") if row.get(h) is not None else "")
+            if "," in val or '"' in val:
+                val = f'"{val.replace(chr(34), chr(34)+chr(34))}"'
+            values.append(val)
+        lines.append(",".join(values))
     csv_content = "\n".join(lines)
     
     return Response(
-        content=csv_content.encode("utf-8-sig"),  # utf-8-sig adds BOM for Excel compatibility
+        content=csv_content.encode("utf-8-sig"),
         media_type="text/csv",
-        headers={"Content-Disposition": 'attachment; filename="agg_no_utiles_completo.csv"'},
+        headers={"Content-Disposition": 'attachment; filename="no_utiles.csv"'},
     )
 
 
