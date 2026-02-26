@@ -15,7 +15,8 @@ import {
     X,
     Check,
     Users,
-    Download
+    Download,
+    Loader2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api';
@@ -38,6 +39,7 @@ export default function LeadsPage() {
     const [showFilters, setShowFilters] = useState(false);
     const [availableBases, setAvailableBases] = useState([]);
     const [availableEstados, setAvailableEstados] = useState([]);
+    const [isExporting, setIsExporting] = useState(false);
     const { nivel } = useFilters();
 
     // Modal states
@@ -85,6 +87,18 @@ export default function LeadsPage() {
             console.error(err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleExport = async () => {
+        try {
+            setIsExporting(true);
+            await api.exportLeads({ search, nivel, ...filters });
+        } catch (error) {
+            console.error(error);
+            alert('Error al exportar los datos');
+        } finally {
+            setIsExporting(false);
         }
     };
 
@@ -144,10 +158,16 @@ export default function LeadsPage() {
                     </button>
 
                     <button
-                        onClick={() => api.exportLeads({ search, nivel, ...filters })}
-                        className="flex items-center gap-2 px-4 py-3 border border-emerald-100 bg-emerald-50/50 text-emerald-700 rounded-2xl text-sm font-bold hover:bg-emerald-100 transition-all hover:shadow-lg hover:shadow-emerald-100/50"
+                        onClick={handleExport}
+                        disabled={isExporting}
+                        className={`flex items-center gap-2 px-4 py-3 border border-emerald-100 bg-emerald-50/50 text-emerald-700 rounded-2xl text-sm font-bold transition-all hover:shadow-lg hover:shadow-emerald-100/50 disabled:opacity-50 disabled:cursor-not-allowed ${isExporting ? 'bg-emerald-100' : 'hover:bg-emerald-100'}`}
                     >
-                        <Download className="w-4 h-4" /> Exportar Excel
+                        {isExporting ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                            <Download className="w-4 h-4" />
+                        )}
+                        {isExporting ? 'Exportando...' : 'Exportar Excel'}
                     </button>
 
                     <AnimatePresence>

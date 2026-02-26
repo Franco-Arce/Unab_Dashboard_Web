@@ -77,7 +77,7 @@ async def export_leads(
             txtprogramainteres AS "PROGRAMA INTERES", 
             base AS "BASE DE DATOS",
             ultima_mejor_subcat_string AS "ESTADO GESTION",
-            descrip_subcat AS "DETALLE ESTADO",
+            descrip_subcat AS "SUBCATEGORIA",
             fecha_a_utilizar AS "FECHA ACTIVIDAD"
         FROM dim_contactos
         WHERE {where_sql}
@@ -85,6 +85,7 @@ async def export_leads(
     """
     
     rows = await fetch_all(data_query, *args)
+    print(f"[Export] Exporting {len(rows)} leads for user. Filters: no_util={no_util}, nivel={nivel}, search={search}")
     df = pd.DataFrame(rows)
     
     # Generate Excel in memory

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Download, Search, AlertOctagon, Calendar, Clock, Filter, ArrowRight, TrendingDown, Star } from 'lucide-react';
+import { Download, Search, AlertOctagon, Calendar, Clock, Filter, ArrowRight, TrendingDown, Star, Loader2 } from 'lucide-react';
 import api from '../api';
 import { useFilters } from '../context/FilterContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -22,6 +22,7 @@ const COLORS = [
 export default function NoUtilPage() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isExporting, setIsExporting] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const { nivel } = useFilters();
 
@@ -98,8 +99,16 @@ export default function NoUtilPage() {
         );
     }
 
-    const handleExport = () => {
-        api.exportLeads({ no_util: true, nivel });
+    const handleExport = async () => {
+        try {
+            setIsExporting(true);
+            await api.exportLeads({ no_util: true, nivel });
+        } catch (error) {
+            console.error(error);
+            alert('Error al exportar los datos');
+        } finally {
+            setIsExporting(false);
+        }
     };
 
     const CustomTooltip = ({ active, payload }) => {
@@ -128,10 +137,15 @@ export default function NoUtilPage() {
                 <div className="flex items-center gap-3">
                     <button
                         onClick={handleExport}
-                        className="flex items-center gap-2 bg-white text-nods-text-primary border border-nods-border px-4 py-2 rounded-xl text-xs font-black hover:border-amber-500 hover:text-amber-500 transition-all shadow-sm"
+                        disabled={isExporting}
+                        className={`flex items-center gap-2 bg-white text-nods-text-primary border border-nods-border px-4 py-2 rounded-xl text-xs font-black transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${isExporting ? 'bg-amber-50 border-amber-500 text-amber-500' : 'hover:border-amber-500 hover:text-amber-500'}`}
                     >
-                        <Download className="w-4 h-4" />
-                        EXPORTAR DATA
+                        {isExporting ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                            <Download className="w-4 h-4" />
+                        )}
+                        {isExporting ? 'EXPORTANDO...' : 'EXPORTAR DATA'}
                     </button>
                     <div className="bg-amber-50 border border-amber-100 px-4 py-2 rounded-xl text-[10px] font-black text-amber-600 uppercase tracking-[0.15em]">
                         Filtro: {nivel}
