@@ -258,20 +258,24 @@ export default function OverviewPage() {
                                                 {/* Top reflection */}
                                                 <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/15 to-transparent pointer-events-none z-20" />
 
-                                                {/* Stage name — left side */}
-                                                <span className="font-black whitespace-nowrap text-white text-xs relative z-30 tracking-wide uppercase drop-shadow-md">
-                                                    {entry.stage}
-                                                </span>
+                                                {/* Stage name — left side (only when bar is wide enough) */}
+                                                {entry.percent >= 18 && (
+                                                    <span className="font-black whitespace-nowrap text-white text-xs relative z-30 tracking-wide uppercase drop-shadow-md">
+                                                        {entry.stage}
+                                                    </span>
+                                                )}
 
-                                                {/* Volume + Percentage — right side, inside the bar */}
-                                                <div className="flex items-center gap-3 relative z-30">
-                                                    <span className="text-white/90 font-black text-lg leading-none tracking-tight drop-shadow-sm">
-                                                        {entry.value.toLocaleString()}
-                                                    </span>
-                                                    <span className="bg-white/20 backdrop-blur-sm text-white text-[10px] font-black px-2.5 py-1 rounded-lg border border-white/20">
-                                                        {entry.percent}%
-                                                    </span>
-                                                </div>
+                                                {/* Volume + Percentage — right side, inside the bar (only when wide enough) */}
+                                                {entry.percent >= 18 && (
+                                                    <div className="flex items-center gap-3 relative z-30">
+                                                        <span className="text-white/90 font-black text-lg leading-none tracking-tight drop-shadow-sm">
+                                                            {entry.value.toLocaleString()}
+                                                        </span>
+                                                        <span className="bg-white/20 backdrop-blur-sm text-white text-[10px] font-black px-2.5 py-1 rounded-lg border border-white/20">
+                                                            {entry.percent}%
+                                                        </span>
+                                                    </div>
+                                                )}
                                             </motion.div>
 
                                             {/* Fallback: label + data outside for very small bars */}
