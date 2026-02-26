@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
     Users,
     UserPlus,
@@ -51,10 +51,58 @@ const FloatingBubbles = ({ count = 6 }) => {
     );
 };
 
+// Semicircular Gauge component for "Avance vs Meta"
+const SemiGauge = ({ percent, current, total, label }) => {
+    const clampedPercent = Math.min(Math.max(percent, 0), 100);
+    const radius = 80;
+    const strokeWidth = 14;
+    const circumference = Math.PI * radius;
+    const offset = circumference - (clampedPercent / 100) * circumference;
+    const cx = 100;
+    const cy = 95;
+
+    // Color based on progress
+    const color = clampedPercent >= 75 ? '#10b981' : clampedPercent >= 50 ? '#f59e0b' : clampedPercent >= 25 ? '#f97316' : '#ef4444';
+
+    return (
+        <div className="flex flex-col items-center">
+            <svg width="200" height="120" viewBox="0 0 200 120">
+                {/* Background track */}
+                <path
+                    d={`M ${cx - radius} ${cy} A ${radius} ${radius} 0 0 1 ${cx + radius} ${cy}`}
+                    fill="none"
+                    stroke="#e2e8f0"
+                    strokeWidth={strokeWidth}
+                    strokeLinecap="round"
+                />
+                {/* Progress arc */}
+                <path
+                    d={`M ${cx - radius} ${cy} A ${radius} ${radius} 0 0 1 ${cx + radius} ${cy}`}
+                    fill="none"
+                    stroke={color}
+                    strokeWidth={strokeWidth}
+                    strokeLinecap="round"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={offset}
+                    style={{ transition: 'stroke-dashoffset 1.5s ease-out, stroke 0.5s ease' }}
+                />
+                {/* Center text */}
+                <text x={cx} y={cy - 20} textAnchor="middle" className="text-3xl font-black" fill="#0f172a" style={{ fontSize: '32px', fontWeight: 900 }}>
+                    {clampedPercent.toFixed(1)}%
+                </text>
+                <text x={cx} y={cy} textAnchor="middle" fill="#64748b" style={{ fontSize: '11px', fontWeight: 700 }}>
+                    {current.toLocaleString()} / {total.toLocaleString()} {label}
+                </text>
+            </svg>
+        </div>
+    );
+};
+
 export default function OverviewPage() {
     const [kpis, setKpis] = useState(null);
     const [funnel, setFunnel] = useState([]);
     const [insights, setInsights] = useState([]);
+    const [topPrograms, setTopPrograms] = useState([]);
     const [loading, setLoading] = useState(true);
     const { nivel } = useFilters();
 
@@ -65,6 +113,22 @@ export default function OverviewPage() {
                 const f = await api.funnel(nivel);
                 setKpis(k);
                 setFunnel(f);
+
+                // Fetch admisiones for top conversion programs
+                try {
+                    const adm = await api.admisiones(nivel);
+                    const progs = (adm.programas || [])
+                        .filter(p => p.leads > 10 && p.pagados > 0)
+                        .map(p => ({
+                            programa: p.programa,
+                            leads: p.leads,
+                            pagados: p.pagados,
+                            conversion: parseFloat(((p.pagados / p.leads) * 100).toFixed(1))
+                        }))
+                        .sort((a, b) => b.conversion - a.conversion)
+                        .slice(0, 8);
+                    setTopPrograms(progs);
+                } catch (e) { console.error('Error loading admisiones for overview', e); }
 
                 const i = await api.aiInsights();
                 setInsights(i.insights || []);
@@ -292,6 +356,78 @@ export default function OverviewPage() {
                         </div>
                     </motion.div>
                 </div>
+            </div>
+
+            {/* Avance vs Meta + Top Conversión Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Avance vs Meta Global */}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.5 }}
+                    className="bg-white border border-nods-border rounded-3xl p-8 shadow-xl"
+                >
+                    <div className="mb-4">
+                        <h3 className="text-xl font-bold text-nods-text-primary">Avance vs Meta Global</h3>
+                        <p className="text-nods-text-muted text-sm font-medium">Progreso total hacia la meta de inscritos</p>
+                    </div>
+                    <SemiGauge
+                        percent={kpis.metas > 0 ? (kpis.pagados / kpis.metas) * 100 : 0}
+                        current={kpis.pagados || 0}
+                        total={kpis.metas || 0}
+                        label="pagados"
+                    />
+                </motion.div>
+
+                {/* Top Conversión por Programa */}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.6 }}
+                    className="bg-white border border-nods-border rounded-3xl p-8 shadow-xl"
+                >
+                    <div className="mb-6">
+                        <h3 className="text-xl font-bold text-nods-text-primary">Top Conversión por Programa</h3>
+                        <p className="text-nods-text-muted text-sm font-medium">Programas con mayor tasa de conversión (leads → pagados)</p>
+                    </div>
+                    <div className="space-y-3">
+                        {topPrograms.length > 0 ? topPrograms.map((prog, i) => {
+                            const maxConversion = topPrograms[0]?.conversion || 1;
+                            const barWidth = (prog.conversion / maxConversion) * 100;
+                            const barColors = ['#1e3a8a', '#2563eb', '#3b82f6', '#60a5fa', '#06b6d4', '#14b8a6', '#10b981', '#34d399'];
+                            return (
+                                <motion.div
+                                    key={prog.programa}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.7 + i * 0.05 }}
+                                    className="group"
+                                >
+                                    <div className="flex items-center justify-between mb-1">
+                                        <span className="text-xs font-bold text-slate-700 truncate max-w-[60%]" title={prog.programa}>
+                                            {prog.programa.length > 30 ? prog.programa.slice(0, 30) + '…' : prog.programa}
+                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[10px] text-slate-400 font-bold">{prog.pagados}/{prog.leads}</span>
+                                            <span className="text-xs font-black text-slate-900">{prog.conversion}%</span>
+                                        </div>
+                                    </div>
+                                    <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                                        <motion.div
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${barWidth}%` }}
+                                            transition={{ duration: 1.2, delay: 0.8 + i * 0.05, ease: 'easeOut' }}
+                                            className="h-full rounded-full"
+                                            style={{ backgroundColor: barColors[i] || '#3b82f6' }}
+                                        />
+                                    </div>
+                                </motion.div>
+                            );
+                        }) : (
+                            <div className="text-center py-8 text-slate-400 text-sm font-medium">Sin datos suficientes</div>
+                        )}
+                    </div>
+                </motion.div>
             </div>
 
             {/* AI Insights Section moved below funnel */}
