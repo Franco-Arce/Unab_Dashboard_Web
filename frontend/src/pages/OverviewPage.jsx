@@ -359,31 +359,27 @@ export default function OverviewPage() {
                             </div>
                         </div>
                     </motion.div>
+
+                    {/* Avance vs Meta Global */}
+                    <motion.div
+                        initial={{ opacity: 0, x: 30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.6, delay: 0.8, type: "spring" }}
+                        className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/50 w-full relative overflow-hidden group"
+                    >
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 italic">Avance vs Meta</h4>
+                        <SemiGauge
+                            percent={kpis.metas > 0 ? (kpis.pagados / kpis.metas) * 100 : 0}
+                            current={kpis.pagados || 0}
+                            total={kpis.metas || 0}
+                            label="pagados"
+                        />
+                    </motion.div>
                 </div>
             </div>
 
-            {/* Avance vs Meta + Top Conversión Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Avance vs Meta Global */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.5 }}
-                    className="bg-white border border-nods-border rounded-3xl p-8 shadow-xl"
-                >
-                    <div className="mb-4">
-                        <h3 className="text-xl font-bold text-nods-text-primary">Avance vs Meta Global</h3>
-                        <p className="text-nods-text-muted text-sm font-medium">Progreso total hacia la meta de inscritos</p>
-                    </div>
-                    <SemiGauge
-                        percent={kpis.metas > 0 ? (kpis.pagados / kpis.metas) * 100 : 0}
-                        current={kpis.pagados || 0}
-                        total={kpis.metas || 0}
-                        label="pagados"
-                    />
-                </motion.div>
-
-                {/* Top Conversión por Programa */}
+            {/* Top Conversión por Programa */}
+            <div className="grid grid-cols-1 gap-8">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
