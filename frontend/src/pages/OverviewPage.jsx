@@ -486,78 +486,88 @@ export default function OverviewPage() {
                             ))}
                         </select>
                     </div>
-                    <div className="w-full" style={{ height: 380 }}>
+                    <div className="space-y-2">
                         {(() => {
                             const filtered = allPrograms
                                 .filter(p => selectedArea === 'TODAS' || p.area === selectedArea)
                                 .sort((a, b) => b.pagados - a.pagados)
                                 .slice(0, 10)
-                                .map(p => ({
-                                    ...p,
-                                    shortName: (() => {
-                                        let n = p.programa
-                                            .replace(/ESPECIALIZACI[ÓO]N/gi, 'Esp.')
-                                            .replace(/TECNOLOG[ÍI]A/gi, 'Tec.')
-                                            .replace(/ADMINISTRACI[ÓO]N/gi, 'Adm.')
-                                            .replace(/INGENIER[ÍI]A/gi, 'Ing.')
-                                            .replace(/MAESTR[ÍI]A/gi, 'Mtr.')
-                                            .replace(/CONTADUR[ÍI]A/gi, 'Cont.')
-                                            .replace(/LICENCIATURA/gi, 'Lic.')
-                                            .replace(/INTERNACIONAL(ES)?/gi, 'Intl.')
-                                            .replace(/SEGURIDAD/gi, 'Seg.')
-                                            .replace(/NEGOCIOS/gi, 'Neg.');
-                                        return n.length > 20 ? n.slice(0, 18) + '…' : n;
-                                    })()
-                                }));
+                                .map(p => {
+                                    let name = p.programa
+                                        .replace(/ESPECIALIZACI[\u00d3O]N/gi, 'Esp.')
+                                        .replace(/TECNOLOG[\u00cdI]A/gi, 'Tec.')
+                                        .replace(/ADMINISTRACI[\u00d3O]N/gi, 'Adm.')
+                                        .replace(/INGENIER[\u00cdI]A/gi, 'Ing.')
+                                        .replace(/MAESTR[\u00cdI]A/gi, 'Mtr.')
+                                        .replace(/CONTADUR[\u00cdI]A/gi, 'Cont.')
+                                        .replace(/LICENCIATURA/gi, 'Lic.')
+                                        .replace(/INTERNACIONAL(ES)?/gi, 'Intl.')
+                                        .replace(/SEGURIDAD/gi, 'Seg.')
+                                        .replace(/NEGOCIOS/gi, 'Neg.');
+                                    return { ...p, displayName: name };
+                                });
+
+                            const maxMeta = Math.max(...filtered.map(p => p.meta), 1);
 
                             if (filtered.length === 0) {
-                                return <div className="flex items-center justify-center h-full text-slate-400 text-sm font-medium">Sin datos para esta área</div>;
+                                return <div className="flex items-center justify-center py-12 text-slate-400 text-sm font-medium">Sin datos para esta \u00e1rea</div>;
                             }
 
-                            return (
-                                <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100}>
-                                    <BarChart data={filtered} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }} barSize={18} barGap={-18}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
-                                        <XAxis
-                                            type="number"
-                                            tick={{ fontSize: 10, fill: '#94a3b8' }}
-                                            axisLine={false}
-                                            tickLine={false}
-                                        />
-                                        <YAxis
-                                            type="category"
-                                            dataKey="shortName"
-                                            tick={{ fontSize: 9, fontWeight: 600, fill: '#475569' }}
-                                            width={140}
-                                            axisLine={false}
-                                            tickLine={false}
-                                        />
-                                        <Tooltip
-                                            contentStyle={{
-                                                backgroundColor: '#0f172a',
-                                                border: 'none',
-                                                borderRadius: '12px',
-                                                color: '#fff',
-                                                fontSize: '12px',
-                                                fontWeight: 700,
-                                                padding: '10px 14px'
-                                            }}
-                                            formatter={(value, name) => [
-                                                value.toLocaleString(),
-                                                name === 'meta' ? 'Meta' : 'Pagados'
-                                            ]}
-                                            labelFormatter={(label) => label}
-                                        />
-                                        <Bar dataKey="meta" fill="#cbd5e1" radius={[0, 6, 6, 0]} name="meta" />
-                                        <Bar dataKey="pagados" fill="#10b981" radius={[0, 6, 6, 0]} name="pagados" />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            );
+                            return filtered.map((prog, i) => {
+                                const metaWidth = (prog.meta / maxMeta) * 100;
+                                const pagadosWidth = (prog.pagados / maxMeta) * 100;
+                                const barColors = ['#10b981', '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6', '#6366f1', '#8b5cf6', '#a78bfa', '#10b981', '#14b8a6'];
+
+                                return (
+                                    <motion.div
+                                        key={prog.programa}
+                                        initial={{ opacity: 0, x: -15 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: 0.3 + i * 0.04 }}
+                                    >
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="text-[11px] font-bold text-slate-700 truncate" style={{ maxWidth: '70%' }} title={prog.programa}>
+                                                {prog.displayName}
+                                            </span>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-emerald-600 font-black text-xs">{prog.pagados}</span>
+                                                <span className="text-slate-400 text-[10px] font-bold">/ {prog.meta}</span>
+                                            </div>
+                                        </div>
+                                        <div className="w-full h-7 bg-slate-100/60 rounded-xl relative overflow-hidden border border-slate-200/40">
+                                            {/* Meta bar (gray background) */}
+                                            <motion.div
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${Math.max(metaWidth, 4)}%` }}
+                                                transition={{ duration: 1.2, delay: 0.4 + i * 0.04, ease: 'easeOut' }}
+                                                className="absolute inset-y-0 left-0 bg-slate-200/80 rounded-xl"
+                                            />
+                                            {/* Pagados bar (colored, overlaid) */}
+                                            <motion.div
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${Math.max(pagadosWidth, 3)}%` }}
+                                                transition={{ duration: 1.4, delay: 0.5 + i * 0.05, ease: [0.34, 1.56, 0.64, 1] }}
+                                                className="absolute inset-y-0 left-0 rounded-xl overflow-hidden shadow-[3px_0_10px_rgba(0,0,0,0.1)]"
+                                                style={{ backgroundColor: barColors[i] || '#10b981' }}
+                                            >
+                                                <div
+                                                    className="absolute inset-0 opacity-10 pointer-events-none animate-liquid-1"
+                                                    style={{
+                                                        backgroundImage: `repeating-linear-gradient(-45deg, transparent, transparent 10px, white 10px, white 20px)`,
+                                                        width: '300%'
+                                                    }}
+                                                />
+                                                <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
+                                            </motion.div>
+                                        </div>
+                                    </motion.div>
+                                );
+                            });
                         })()}
                     </div>
-                    <div className="flex items-center justify-center gap-6 mt-2">
+                    <div className="flex items-center justify-center gap-6 mt-4">
                         <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded-sm bg-slate-300" />
+                            <div className="w-3 h-3 rounded-sm bg-slate-200" />
                             <span className="text-[10px] font-bold text-slate-500 uppercase">Meta</span>
                         </div>
                         <div className="flex items-center gap-2">
