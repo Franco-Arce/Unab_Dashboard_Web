@@ -236,12 +236,12 @@ export default function OverviewPage() {
             {/* KPI Cards */}
             <SummaryCards kpis={kpis} />
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
                 {/* Funnel Section */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
                     className="lg:col-span-2 space-y-6"
                 >
                     <div className="bg-white border border-nods-border rounded-3xl p-8 relative group shadow-xl">
@@ -281,7 +281,7 @@ export default function OverviewPage() {
                                             <motion.div
                                                 initial={{ width: 0 }}
                                                 animate={{ width: `${Math.max(entry.percent, 18)}%` }}
-                                                transition={{ duration: 1.6, delay: index * 0.08, ease: [0.34, 1.56, 0.64, 1] }}
+                                                transition={{ duration: 1.4, delay: index * 0.06, ease: [0.34, 1.56, 0.64, 1] }}
                                                 className="h-full flex items-center justify-between px-5 relative z-10 shadow-[4px_0_15px_rgba(0,0,0,0.12)] overflow-hidden rounded-2xl"
                                                 style={{ backgroundColor: barColor }}
                                             >
@@ -342,7 +342,7 @@ export default function OverviewPage() {
                     <motion.div
                         initial={{ opacity: 0, x: 30 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.6, delay: 0.6, type: "spring" }}
+                        transition={{ duration: 0.5, delay: 0.3 }}
                         className="bg-white border border-slate-100 rounded-[2.5rem] p-6 shadow-xl shadow-slate-200/50 w-full relative overflow-hidden group flex-1"
                     >
                         <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 italic">Eficiencia</h4>
@@ -361,7 +361,7 @@ export default function OverviewPage() {
                     <motion.div
                         initial={{ opacity: 0, x: 30 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.6, delay: 0.7, type: "spring" }}
+                        transition={{ duration: 0.5, delay: 0.4 }}
                         className="bg-white border border-slate-100 rounded-[2.5rem] p-6 shadow-xl shadow-slate-200/50 w-full relative overflow-hidden group flex-1"
                     >
                         <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 italic">Salud de Base</h4>
@@ -381,7 +381,7 @@ export default function OverviewPage() {
                     <motion.div
                         initial={{ opacity: 0, x: 30 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.6, delay: 0.8, type: "spring" }}
+                        transition={{ duration: 0.5, delay: 0.5 }}
                         className="bg-white border border-slate-100 rounded-[2.5rem] p-6 shadow-xl shadow-slate-200/50 w-full relative overflow-hidden group flex-1"
                     >
                         <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 italic">Avance vs Meta</h4>
@@ -515,7 +515,7 @@ export default function OverviewPage() {
                             }
 
                             return (
-                                <ResponsiveContainer width="100%" height="100%">
+                                <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100}>
                                     <BarChart data={filtered} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }} barSize={18} barGap={-18}>
                                         <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
                                         <XAxis
