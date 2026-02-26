@@ -35,6 +35,9 @@ export default function DashboardLayout() {
     const navigate = useNavigate();
     const location = useLocation();
 
+    // Derive current page name from path for page-specific AI insights
+    const currentPage = location.pathname.split('/').pop() || 'overview';
+
     useEffect(() => {
         api.me().then(setUser).catch(() => navigate('/'));
         loadMeta();
@@ -243,7 +246,7 @@ export default function DashboardLayout() {
                                 onClick={() => setShowAI(false)}
                                 className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-40"
                             />
-                            <AIPanel initialTab={aiInitialTab} onClose={() => setShowAI(false)} />
+                            <AIPanel initialTab={aiInitialTab} page={currentPage} onClose={() => setShowAI(false)} />
                         </>
                     )}
                 </AnimatePresence>

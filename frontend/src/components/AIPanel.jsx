@@ -10,7 +10,7 @@ const ICON_MAP = {
     star: <Sparkles size={14} className="text-violet-500" />,
 };
 
-export default function AIPanel({ initialTab, onClose }) {
+export default function AIPanel({ initialTab, page, onClose }) {
     const [tab, setTab] = useState('chat');
     const [messages, setMessages] = useState([
         { role: 'assistant', content: '¡Hola! Soy tu analista experto de UNAB. ¿En qué puedo ayudarte hoy con los datos de la campaña?' }
@@ -49,7 +49,7 @@ export default function AIPanel({ initialTab, onClose }) {
         if (insights) return;
         setLoadingInsights(true);
         try {
-            const res = await api.aiInsights();
+            const res = await api.aiInsights(page);
             setInsights(res.insights);
         } catch (e) {
             setInsights([{ icon: 'alert', title: 'Error', description: 'No se pudieron generar insights.' }]);
@@ -60,6 +60,11 @@ export default function AIPanel({ initialTab, onClose }) {
     useEffect(() => {
         if (tab === 'insights') loadInsights();
     }, [tab]);
+
+    // Reset insights when the page changes so they regenerate for new page
+    useEffect(() => {
+        setInsights(null);
+    }, [page]);
 
     const TABS = [
         { key: 'chat', label: '💬 Chat' },

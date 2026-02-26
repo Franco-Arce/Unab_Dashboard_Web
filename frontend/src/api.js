@@ -150,9 +150,9 @@ export const api = {
             method: 'POST',
             body: JSON.stringify({ message, history, context_data: dashboardContext }),
         }),
-    aiInsights: () => request('/api/ai/insights', {
+    aiInsights: (page = null) => request('/api/ai/insights', {
         method: 'POST',
-        body: JSON.stringify({ context_data: dashboardContext }),
+        body: JSON.stringify({ context_data: dashboardContext, page }),
     }),
     aiPredictions: () => request('/api/ai/predictions', {
         method: 'POST',
