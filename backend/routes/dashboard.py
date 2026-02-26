@@ -162,10 +162,11 @@ async def get_no_util(nivel: Optional[str] = Query(None), _user: str = Depends(r
         """
         no_util_rows = await fetch_all(query, *programs_of_level)
         no_util = [dict(r) for r in no_util_rows]
-        total = sum(item.get("leads", 0) for item in no_util)
     else:
         no_util = data.get("no_util", [])
-        total = data.get("no_util_total", 0)
+
+    # Always calculate the total sum from the returned list to ensure 100% participation sum
+    total = sum(item.get("leads", 0) for item in no_util)
 
     result = []
     for item in no_util:

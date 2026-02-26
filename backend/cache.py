@@ -192,7 +192,9 @@ class DashboardCache:
             data["en_gestion"] = total_en_gestion
             data["op_venta"] = total_op_venta
             data["proceso_pago"] = total_proceso_pago
-            data["no_util_total"] = total_no_util
+            
+            # Use the sum from the subcategory breakdown to ensure percentages are consistent
+            data["no_util_total"] = sum(item.get("leads", 0) for item in data.get("no_util", []))
 
             data["totals"] = {
                 "solicitados": total_sol,
