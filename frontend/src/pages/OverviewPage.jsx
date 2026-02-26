@@ -490,7 +490,7 @@ export default function OverviewPage() {
                             {[1, 2, 3, 4].map(i => <div key={i} className="h-44 bg-slate-50 border border-slate-100 rounded-3xl animate-pulse" />)}
                         </div>
                     </div>
-                ) : aiCards.length > 0 && (
+                ) : aiInsightsData.length > 0 && (
                     <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-indigo-500/10 rounded-lg"><Star className="w-5 h-5 text-indigo-500" /></div>
