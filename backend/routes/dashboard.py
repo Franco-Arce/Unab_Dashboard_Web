@@ -347,7 +347,7 @@ async def download_no_util_csv(_user: str = Depends(require_auth)):
     """Download the full agg_no_utiles_completo table as a CSV file."""
     from database import fetch_all
     try:
-        rows = await fetch_all("SELECT * FROM agg_no_utiles_completo ORDER BY leads_no_utiles DESC")
+        rows = await fetch_all("SELECT * FROM agg_no_utiles_completo")
     except Exception as e:
         print(f"[no-util-csv] Error fetching agg_no_utiles_completo: {e}")
         return Response(content=f"Error al acceder a la tabla: {e}", media_type="text/plain", status_code=500)
