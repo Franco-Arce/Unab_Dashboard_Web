@@ -141,18 +141,6 @@ export default function NoUtilPage() {
                     <p className="text-nods-text-muted text-sm font-medium">Análisis detallado de los descartes por subcategoría</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button
-                        onClick={handleExport}
-                        disabled={isExporting}
-                        className={`flex items-center gap-2 bg-white text-nods-text-primary border border-nods-border px-4 py-2 rounded-xl text-xs font-black transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${isExporting ? 'bg-amber-50 border-amber-500 text-amber-500' : 'hover:border-amber-500 hover:text-amber-500'}`}
-                    >
-                        {isExporting ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                            <Download className="w-4 h-4" />
-                        )}
-                        {isExporting ? 'EXPORTANDO...' : 'EXPORTAR DATA'}
-                    </button>
                     <div className="bg-amber-50 border border-amber-100 px-4 py-2 rounded-xl text-[10px] font-black text-amber-600 uppercase tracking-[0.15em]">
                         Filtro: {nivel}
                     </div>
