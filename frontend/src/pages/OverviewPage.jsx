@@ -334,7 +334,9 @@ export default function OverviewPage() {
                                                         </motion.div>
                                                         <div className="absolute right-4 inset-y-0 flex items-center gap-3 pointer-events-none z-20">
                                                             <span className={`font-black tracking-tight ${index === 0 ? 'text-xl text-emerald-500' : 'text-lg text-slate-800'}`}>{entry.value.toLocaleString()}</span>
-                                                            <span className="bg-slate-900 text-white text-[10px] font-black px-2.5 py-1 rounded-lg">{entry.percent}%</span>
+                                                            <div className="bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-lg shadow-inner">
+                                                                <span className="text-emerald-400 text-[10px] font-black">{entry.percent}%</span>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>

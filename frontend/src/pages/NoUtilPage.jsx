@@ -231,7 +231,7 @@ export default function NoUtilPage() {
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <div className="bg-slate-900 px-2 py-0.5 rounded-md min-w-[50px] text-center">
-                                            <span className="text-[10px] font-black text-emerald-400">{((entry.value / totalLeadsNoUtil) * 100).toFixed(1)}%</span>
+                                            <span className="text-[10px] font-black text-amber-400">{((entry.value / totalLeadsNoUtil) * 100).toFixed(1)}%</span>
                                         </div>
                                         <span className="text-sm font-black text-slate-900 min-w-[40px] text-right">{entry.value.toLocaleString()}</span>
                                     </div>
@@ -262,7 +262,7 @@ export default function NoUtilPage() {
                                 <div key={item.name} className="space-y-2">
                                     <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-slate-500">
                                         <span className="truncate max-w-[150px]">{item.name}</span>
-                                        <div className="bg-slate-900 px-1.5 py-0.5 rounded text-[9px] text-emerald-400 font-black">
+                                        <div className="bg-slate-900 px-1.5 py-0.5 rounded text-[9px] text-amber-400 font-black">
                                             {((item.value / totalLeadsNoUtil) * 100).toFixed(1)}%
                                         </div>
                                     </div>
@@ -386,7 +386,7 @@ export default function NoUtilPage() {
                                             <td className="px-6 py-6 tabular-nums">
                                                 <div className="flex flex-col items-center gap-2">
                                                     <div className="bg-slate-900 px-3 py-1 rounded-lg">
-                                                        <span className="text-xs font-black text-emerald-400">
+                                                        <span className="text-xs font-black text-amber-400">
                                                             {item.porcentaje}%
                                                         </span>
                                                     </div>
