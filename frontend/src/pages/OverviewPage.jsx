@@ -159,7 +159,7 @@ export default function OverviewPage() {
                             conversion: parseFloat(((p.pagados / p.leads) * 100).toFixed(1))
                         }))
                         .sort((a, b) => b.conversion - a.conversion)
-                        .slice(0, 8);
+                        .slice(0, 15);
                     setTopPrograms(progs);
 
                     // Store all programs with area info for Avance vs Meta chart
@@ -491,7 +491,7 @@ export default function OverviewPage() {
                             const filtered = allPrograms
                                 .filter(p => selectedArea === 'TODAS' || p.area === selectedArea)
                                 .sort((a, b) => b.pagados - a.pagados)
-                                .slice(0, 10)
+                                .slice(0, 15)
                                 .map(p => {
                                     let name = p.programa
                                         .replace(/ESPECIALIZACI[\u00d3O]N/gi, 'Esp.')
