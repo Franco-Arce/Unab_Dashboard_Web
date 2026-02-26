@@ -26,7 +26,7 @@ export const SummaryCards = ({ kpis = {} }) => {
             id: 2,
             label: 'EN GESTIÓN',
             value: en_gestion,
-            color: 'from-orange-500 to-amber-600',
+            color: 'from-blue-600 to-blue-800',
             icon: UserCheck,
             percentage: total_leads > 0 ? Math.round((en_gestion / total_leads) * 100) : 0,
             description: `${total_leads > 0 ? ((en_gestion / total_leads) * 100).toFixed(1) : 0}% del total`
@@ -44,7 +44,7 @@ export const SummaryCards = ({ kpis = {} }) => {
             id: 4,
             label: 'PROCESO PAGO',
             value: proceso_pago,
-            color: 'from-violet-500 to-purple-600',
+            color: 'from-cyan-500 to-teal-600',
             icon: CreditCard,
             percentage: op_venta > 0 ? Math.round((proceso_pago / op_venta) * 100) : 0,
             description: `${op_venta > 0 ? ((proceso_pago / op_venta) * 100).toFixed(1) : 0}% de op. venta`
@@ -62,7 +62,7 @@ export const SummaryCards = ({ kpis = {} }) => {
             id: 6,
             label: 'CONVERSIÓN',
             value: `${total_leads > 0 ? ((pagados / total_leads) * 100).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0}%`,
-            color: 'from-orange-500 to-amber-600',
+            color: 'from-slate-600 to-slate-800',
             icon: Target,
             percentage: total_leads > 0 ? Math.round((pagados / total_leads) * 100 * 5) : 0,
             description: "Leads -> Pagados",
