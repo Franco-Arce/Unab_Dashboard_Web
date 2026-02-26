@@ -315,7 +315,7 @@ export default function OverviewPage() {
                                             {/* Volume + Percentage — always outside on the right */}
                                             <div className="absolute right-4 inset-y-0 flex items-center gap-3 pointer-events-none z-20">
                                                 {index === 0 ? (
-                                                    <span className="font-black text-lg leading-none tracking-tight text-white bg-gradient-to-r from-emerald-500 to-teal-500 px-3 py-1.5 rounded-xl shadow-lg shadow-emerald-500/25">
+                                                    <span className="font-black text-xl leading-none tracking-tight text-emerald-500" style={{ textShadow: '0 2px 8px rgba(16,185,129,0.4)' }}>
                                                         {entry.value.toLocaleString()}
                                                     </span>
                                                 ) : (
@@ -422,7 +422,15 @@ export default function OverviewPage() {
                                 >
                                     <div className="flex items-center justify-between mb-1">
                                         <span className="text-xs font-bold text-slate-700 truncate max-w-[55%]" title={prog.programa}>
-                                            {prog.programa.length > 30 ? prog.programa.slice(0, 30) + '…' : prog.programa}
+                                            {prog.programa
+                                                .replace(/ESPECIALIZACI[ÓO]N/gi, 'Esp.')
+                                                .replace(/TECNOLOG[ÍI]A/gi, 'Tec.')
+                                                .replace(/ADMINISTRACI[ÓO]N/gi, 'Adm.')
+                                                .replace(/INGENIER[ÍI]A/gi, 'Ing.')
+                                                .replace(/MAESTR[ÍI]A/gi, 'Mtr.')
+                                                .replace(/CONTADUR[ÍI]A/gi, 'Cont.')
+                                                .replace(/LICENCIATURA/gi, 'Lic.')
+                                            }
                                         </span>
                                         <div className="flex items-center gap-2">
                                             <span className="text-[10px] text-slate-400 font-bold">{prog.pagados}/{prog.leads}</span>
@@ -478,7 +486,7 @@ export default function OverviewPage() {
                             ))}
                         </select>
                     </div>
-                    <div className="w-full" style={{ height: 320 }}>
+                    <div className="w-full" style={{ height: 380 }}>
                         {(() => {
                             const filtered = allPrograms
                                 .filter(p => selectedArea === 'TODAS' || p.area === selectedArea)
@@ -494,8 +502,11 @@ export default function OverviewPage() {
                                             .replace(/INGENIER[ÍI]A/gi, 'Ing.')
                                             .replace(/MAESTR[ÍI]A/gi, 'Mtr.')
                                             .replace(/CONTADUR[ÍI]A/gi, 'Cont.')
-                                            .replace(/LICENCIATURA/gi, 'Lic.');
-                                        return n.length > 24 ? n.slice(0, 22) + '…' : n;
+                                            .replace(/LICENCIATURA/gi, 'Lic.')
+                                            .replace(/INTERNACIONAL(ES)?/gi, 'Intl.')
+                                            .replace(/SEGURIDAD/gi, 'Seg.')
+                                            .replace(/NEGOCIOS/gi, 'Neg.');
+                                        return n.length > 20 ? n.slice(0, 18) + '…' : n;
                                     })()
                                 }));
 
