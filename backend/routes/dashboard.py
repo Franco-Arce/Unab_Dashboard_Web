@@ -19,12 +19,16 @@ async def export_leads(
     estado: Optional[str] = Query(None),
     fecha_inicio: Optional[str] = Query(None),
     fecha_fin: Optional[str] = Query(None),
+    no_util: Optional[bool] = Query(False),
     _user: str = Depends(require_auth),
 ):
     from database import fetch_all
     
     where_clauses = ["1=1"]
     args = []
+
+    if no_util:
+        where_clauses.append("(descrip_cat ILIKE '%no util%' OR descrip_cat ILIKE '%descarte%')")
     
     if search:
         where_clauses.append(f"(txtnombreapellido ILIKE ${len(args)+1} OR emlmail ILIKE ${len(args)+1} OR teltelefono ILIKE ${len(args)+1})")

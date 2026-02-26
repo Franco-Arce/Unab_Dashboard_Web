@@ -99,7 +99,7 @@ export default function NoUtilPage() {
     }
 
     const handleExport = () => {
-        api.exportLeads({ estado: 'NO UTIL', nivel });
+        api.exportLeads({ no_util: true, nivel });
     };
 
     const CustomTooltip = ({ active, payload }) => {
