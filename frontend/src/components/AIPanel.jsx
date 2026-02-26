@@ -10,7 +10,7 @@ const ICON_MAP = {
     star: <Sparkles size={14} className="text-violet-500" />,
 };
 
-export default function AIPanel({ onClose }) {
+export default function AIPanel({ initialTab, onClose }) {
     const [tab, setTab] = useState('chat');
     const [messages, setMessages] = useState([
         { role: 'assistant', content: '¡Hola! Soy tu analista experto de UNAB. ¿En qué puedo ayudarte hoy con los datos de la campaña?' }
