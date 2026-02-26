@@ -331,7 +331,7 @@ export default function NoUtilPage() {
                         ) : (
                             <Download className="w-4 h-4" />
                         )}
-                        {isDownloadingCsv ? 'DESCARGANDO...' : 'DESCARGAR CSV COMPLETO'}
+                        {isDownloadingCsv ? 'DESCARGANDO...' : 'DESCARGAR DATOS DE LEADS NO ÚTILES'}
                     </button>
                 </div>
 
