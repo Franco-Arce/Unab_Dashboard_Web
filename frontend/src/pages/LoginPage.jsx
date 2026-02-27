@@ -37,61 +37,91 @@ export default function LoginPage() {
 
     return (
         <div className="flex min-h-screen font-sans bg-[#f8fafc] overflow-hidden text-slate-900">
-            {/* Panel Izquierdo */}
-            <div className="hidden lg:flex w-[45%] bg-[#0a0f18] relative flex-col items-center justify-center p-16 text-white overflow-hidden">
-                {/* Fondo abstracto */}
-                <div className="absolute inset-0 opacity-20">
-                    <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                        <defs>
-                            <pattern id="grid" width="8" height="8" patternUnits="userSpaceOnUse">
-                                <path d="M 8 0 L 0 0 0 8" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="0.1" />
-                            </pattern>
-                        </defs>
-                        <rect width="100" height="100" fill="url(#grid)" />
-                        <path d="M0,85 Q20,75 40,85 T80,65 T100,75" fill="none" stroke="rgba(59, 130, 246, 0.4)" strokeWidth="0.2" />
-                        <path d="M0,40 Q30,50 60,30 T100,45" fill="none" stroke="rgba(148, 163, 184, 0.2)" strokeWidth="0.2" />
-                    </svg>
+            {/* Panel Izquierdo — wrapped in rotating beam container */}
+            <div className="hidden lg:block w-[45%] relative flex-shrink-0">
+                {/* Outer beam wrapper — same technique as card */}
+                <div className="absolute inset-0 overflow-hidden">
+                    {/* Primary slow beam */}
+                    <div
+                        className="absolute animate-panel-beam-slow"
+                        style={{
+                            width: '200%',
+                            height: '200%',
+                            top: '-50%',
+                            left: '-50%',
+                            background: 'conic-gradient(from 0deg, transparent 0%, transparent 70%, #3b82f6 80%, #6366f1 85%, transparent 95%)',
+                            opacity: 0.5,
+                        }}
+                    />
+                    {/* Secondary faster beam, offset */}
+                    <div
+                        className="absolute animate-panel-beam-fast"
+                        style={{
+                            width: '200%',
+                            height: '200%',
+                            top: '-50%',
+                            left: '-50%',
+                            background: 'conic-gradient(from 180deg, transparent 0%, transparent 78%, #818cf8 86%, #a5b4fc 90%, transparent 98%)',
+                            opacity: 0.3,
+                        }}
+                    />
                 </div>
 
-                {/* Glows */}
-                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-900/10 rounded-full blur-[120px]" />
-                <div className="absolute bottom-[-5%] right-[-5%] w-[40%] h-[40%] bg-slate-800/20 rounded-full blur-[100px]" />
-
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
-                    className="relative z-10 text-center max-w-sm"
-                >
-                    {/* Logo UNAB */}
-                    <div className="mb-8 inline-flex items-center justify-center">
-                        <img src={logoUnab} alt="UNAB" className="h-20 w-auto drop-shadow-[0_0_25px_rgba(255,255,255,0.15)]" />
+                <div className="relative h-full bg-[#0a0f18] flex flex-col items-center justify-center p-16 text-white overflow-hidden">
+                    {/* Fondo abstracto */}
+                    <div className="absolute inset-0 opacity-20">
+                        <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <defs>
+                                <pattern id="grid" width="8" height="8" patternUnits="userSpaceOnUse">
+                                    <path d="M 8 0 L 0 0 0 8" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="0.1" />
+                                </pattern>
+                            </defs>
+                            <rect width="100" height="100" fill="url(#grid)" />
+                            <path d="M0,85 Q20,75 40,85 T80,65 T100,75" fill="none" stroke="rgba(59, 130, 246, 0.4)" strokeWidth="0.2" />
+                            <path d="M0,40 Q30,50 60,30 T100,45" fill="none" stroke="rgba(148, 163, 184, 0.2)" strokeWidth="0.2" />
+                        </svg>
                     </div>
 
-                    <div className="mb-4 inline-flex items-center justify-center w-full">
-                        <img src={nodsWhite} alt="Grupo NODS" className="h-12 w-auto" />
-                    </div>
-                    <p className="text-slate-400 text-sm font-bold tracking-[0.3em] uppercase opacity-80">
-                        IA DASHBOARD
-                    </p>
+                    {/* Glows */}
+                    <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-900/10 rounded-full blur-[120px]" />
+                    <div className="absolute bottom-[-5%] right-[-5%] w-[40%] h-[40%] bg-slate-800/20 rounded-full blur-[100px]" />
 
-                    <div className="mt-16 flex justify-between items-center opacity-60 px-4">
-                        <div className="flex flex-col items-center gap-3">
-                            <Activity size={20} className="text-blue-400" />
-                            <span className="text-[10px] uppercase font-bold tracking-widest">Métricas</span>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8 }}
+                        className="relative z-10 text-center max-w-sm"
+                    >
+                        {/* Logo UNAB */}
+                        <div className="mb-8 inline-flex items-center justify-center">
+                            <img src={logoUnab} alt="UNAB" className="h-20 w-auto drop-shadow-[0_0_25px_rgba(255,255,255,0.15)]" />
                         </div>
-                        <div className="w-px h-8 bg-slate-700" />
-                        <div className="flex flex-col items-center gap-3">
-                            <BarChart3 size={20} className="text-blue-400" />
-                            <span className="text-[10px] uppercase font-bold tracking-widest">Análisis</span>
+
+                        <div className="mb-4 inline-flex items-center justify-center w-full">
+                            <img src={nodsWhite} alt="Grupo NODS" className="h-12 w-auto" />
                         </div>
-                        <div className="w-px h-8 bg-slate-700" />
-                        <div className="flex flex-col items-center gap-3">
-                            <ShieldCheck size={20} className="text-blue-400" />
-                            <span className="text-[10px] uppercase font-bold tracking-widest">Seguridad</span>
+                        <p className="text-slate-400 text-sm font-bold tracking-[0.3em] uppercase opacity-80">
+                            IA DASHBOARD
+                        </p>
+
+                        <div className="mt-16 flex justify-between items-center opacity-60 px-4">
+                            <div className="flex flex-col items-center gap-3">
+                                <Activity size={20} className="text-blue-400" />
+                                <span className="text-[10px] uppercase font-bold tracking-widest">Métricas</span>
+                            </div>
+                            <div className="w-px h-8 bg-slate-700" />
+                            <div className="flex flex-col items-center gap-3">
+                                <BarChart3 size={20} className="text-blue-400" />
+                                <span className="text-[10px] uppercase font-bold tracking-widest">Análisis</span>
+                            </div>
+                            <div className="w-px h-8 bg-slate-700" />
+                            <div className="flex flex-col items-center gap-3">
+                                <ShieldCheck size={20} className="text-blue-400" />
+                                <span className="text-[10px] uppercase font-bold tracking-widest">Seguridad</span>
+                            </div>
                         </div>
-                    </div>
-                </motion.div>
+                    </motion.div>
+                </div>
             </div>
 
             {/* Panel Derecho: Formulario */}
@@ -243,6 +273,20 @@ export default function LoginPage() {
                     height: 200%;
                     top: -50%;
                     left: -50%;
+                }
+                @keyframes panel-beam-slow {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                @keyframes panel-beam-fast {
+                    0% { transform: rotate(180deg); }
+                    100% { transform: rotate(540deg); }
+                }
+                .animate-panel-beam-slow {
+                    animation: panel-beam-slow 8s linear infinite;
+                }
+                .animate-panel-beam-fast {
+                    animation: panel-beam-fast 5s linear infinite;
                 }
             `}} />
         </div>
