@@ -286,8 +286,8 @@ export default function DashboardLayout() {
                             <div className="absolute inset-0 bg-indigo-400/20 rounded-2xl animate-ai-pulse" />
 
                             {/* Main body */}
-                            <div className="relative flex items-center justify-center w-16 h-16 bg-gradient-to-tr from-indigo-600 via-indigo-600 to-violet-500 rounded-2xl shadow-[0_15px_30px_-5px_rgba(79,70,229,0.4)] border border-white/20 transition-all duration-300 transform hover:scale-110 hover:-translate-y-2 animate-ai-float active:scale-95">
-                                <Sparkles className="text-white w-8 h-8 drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
+                            <div className="relative flex items-center justify-center w-[60px] h-[60px] bg-gradient-to-tr from-indigo-600 via-indigo-600 to-violet-500 rounded-2xl shadow-[0_15px_30px_-5px_rgba(79,70,229,0.4)] border border-white/20 transition-all duration-300 transform hover:scale-110 hover:-translate-y-2 animate-ai-float active:scale-95">
+                                <Sparkles className="text-white w-7 h-7 drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
 
                                 {/* Active indicator */}
                                 <div className="absolute -top-1 -right-1 flex h-4 w-4">
