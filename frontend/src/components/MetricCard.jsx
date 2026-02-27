@@ -47,8 +47,9 @@ const WaveEffect = ({ color, opacity = 1, duration = 4, delay = 0, speed = 1 }) 
             animate={{ x: "0%" }}
             transition={{
                 repeat: Infinity,
+                repeatType: "reverse",
                 duration: duration / speed,
-                ease: "linear",
+                ease: "easeInOut",
                 delay: delay
             }}
         >
