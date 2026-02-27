@@ -457,43 +457,39 @@ async def export_no_util(
 ):
     from database import fetch_all
     
-    # Consulta completa para traer todo el detalle
-    query = """
-        SELECT 
-            programa AS "PROGRAMA",
-            area AS "AREA",
-            nivel AS "NIVEL",
-            descripcion_sub AS "MOTIVO DESCARTE",
-            leads_no_utiles AS "CANTIDAD LEADS"
-        FROM agg_no_utiles_completo
-    """
-    args = []
-    
-    if nivel and nivel.upper() != "TODOS":
-        query += " WHERE UPPER(TRIM(nivel)) = $1"
-        args.append(nivel.upper())
-    
-    query += " ORDER BY programa ASC, leads_no_utiles DESC"
-    
     try:
-        rows = await fetch_all(query, *args)
+        rows = await fetch_all("SELECT * FROM agg_no_utiles_completo")
     except Exception as e:
-        print(f"[Export No Util] Error fetching detailed data: {e}")
+        print(f"[Export No Util] Error: {e}")
         from fastapi import HTTPException
-        raise HTTPException(status_code=500, detail=f"Error en base de datos: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al acceder a la tabla: {str(e)}")
 
     if not rows:
         from fastapi import HTTPException
-        raise HTTPException(status_code=404, detail="No se encontraron datos detallados para los filtros seleccionados")
+        raise HTTPException(status_code=404, detail="Sin datos en agg_no_utiles_completo")
 
     df = pd.DataFrame(rows)
+    
+    # Convertir nombres de columnas a mayúsculas para el reporte
+    df.columns = [col.upper() for col in df.columns]
+    
+    # Filtrar por nivel si se especifica
+    if nivel and nivel.upper() != "TODOS":
+        nivel_col = None
+        for col in df.columns:
+            if "NIVEL" in col.upper():
+                nivel_col = col
+                break
+        if nivel_col:
+            df = df[df[nivel_col].str.upper().str.strip() == nivel.upper()]
+    
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='Detalle No Utiles')
         apply_excel_style(writer.sheets['Detalle No Utiles'])
 
     output.seek(0)
-    filename = f"Detalle_No_Utiles_{nivel if nivel else 'GLOBAL'}_{datetime.now().strftime('%Y%m%d')}.xlsx"
+    filename = f"Detalle_No_Utiles_{nivel if nivel else 'TODOS'}_{datetime.now().strftime('%Y%m%d')}.xlsx"
     
     return StreamingResponse(
         output,
