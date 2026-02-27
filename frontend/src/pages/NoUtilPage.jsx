@@ -76,22 +76,22 @@ export default function NoUtilPage() {
 
     if (loading) return (
         <div className="space-y-8 animate-pulse p-8">
-            <div className="h-8 w-48 bg-zinc-800 rounded-lg" />
+            <div className="h-8 w-48 bg-slate-200 rounded-lg" />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[1, 2, 3].map(i => <div key={i} className="h-32 bg-zinc-800 rounded-3xl" />)}
+                {[1, 2, 3].map(i => <div key={i} className="h-32 bg-slate-100 rounded-3xl" />)}
             </div>
-            <div className="h-96 bg-zinc-800 rounded-3xl" />
+            <div className="h-96 bg-slate-100 rounded-3xl" />
         </div>
     );
 
     if (!data || !data.no_util || data.no_util.length === 0) {
         return (
             <div className="h-[60vh] flex flex-col items-center justify-center space-y-4">
-                <div className="p-6 bg-zinc-900 rounded-full border border-zinc-800 shadow-2xl">
-                    <AlertOctagon className="w-12 h-12 text-zinc-700" />
+                <div className="p-6 bg-slate-100 rounded-full border border-slate-200 shadow-sm">
+                    <AlertOctagon className="w-12 h-12 text-slate-400" />
                 </div>
-                <h3 className="text-xl font-bold text-zinc-400">No hay datos disponibles</h3>
-                <p className="text-zinc-500 text-sm">Los leads clasificados como no útiles aparecerán aquí.</p>
+                <h3 className="text-xl font-bold text-slate-500">No hay datos disponibles</h3>
+                <p className="text-slate-400 text-sm">Los leads clasificados como no útiles aparecerán aquí.</p>
             </div>
         );
     }

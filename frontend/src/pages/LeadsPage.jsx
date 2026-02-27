@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import {
     Search,
     Filter,
@@ -22,8 +23,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api';
 import { useFilters } from '../context/FilterContext';
 import { SummaryCards } from '../components/SummaryCards';
+import InsightsSection from '../components/InsightsSection';
 
 export default function LeadsPage() {
+    const { openAIPanel } = useOutletContext() || {};
     const [leads, setLeads] = useState([]);
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -344,18 +347,33 @@ export default function LeadsPage() {
                             <ChevronLeft className="w-4 h-4 text-nods-text-primary" />
                         </button>
                         <div className="flex items-center gap-1 px-2">
-                            {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                                const pNum = i + 1; // Simplified pagination for demo
-                                return (
-                                    <button
-                                        key={i}
-                                        onClick={() => setPage(pNum)}
-                                        className={`w-8 h-8 rounded-lg text-xs font-black transition-all ${page === pNum ? 'bg-nods-accent text-white shadow-md shadow-nods-accent/20' : 'text-nods-text-muted hover:text-nods-text-primary hover:bg-slate-100'}`}
-                                    >
-                                        {pNum}
-                                    </button>
-                                );
-                            })}
+                            {(() => {
+                                const pages = [];
+                                const addPage = (n) => {
+                                    if (!pages.includes(n) && n >= 1 && n <= totalPages) pages.push(n);
+                                };
+                                addPage(1);
+                                for (let i = page - 1; i <= page + 1; i++) addPage(i);
+                                addPage(totalPages);
+                                pages.sort((a, b) => a - b);
+
+                                const result = [];
+                                pages.forEach((p, idx) => {
+                                    if (idx > 0 && p - pages[idx - 1] > 1) {
+                                        result.push(<span key={`dots-${idx}`} className="text-xs text-nods-text-muted px-1">...</span>);
+                                    }
+                                    result.push(
+                                        <button
+                                            key={p}
+                                            onClick={() => setPage(p)}
+                                            className={`w-8 h-8 rounded-lg text-xs font-black transition-all ${page === p ? 'bg-nods-accent text-white shadow-md shadow-nods-accent/20' : 'text-nods-text-muted hover:text-nods-text-primary hover:bg-slate-100'}`}
+                                        >
+                                            {p}
+                                        </button>
+                                    );
+                                });
+                                return result;
+                            })()}
                         </div>
                         <button
                             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
@@ -471,6 +489,9 @@ export default function LeadsPage() {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* AI Insights */}
+            <InsightsSection page="leads" openAIPanel={openAIPanel} />
         </div>
     );
 }
