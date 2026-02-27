@@ -456,45 +456,42 @@ async def export_no_util(
     _user: str = Depends(require_auth)
 ):
     from database import fetch_all
-    data_cache = await cache.get_all()
     
-    # Logic similar to get_no_util but for full export
-    rows = []
+    # Consulta completa para traer todo el detalle
+    query = """
+        SELECT 
+            programa AS "PROGRAMA",
+            area AS "AREA",
+            nivel AS "NIVEL",
+            descripcion_sub AS "MOTIVO DESCARTE",
+            leads_no_utiles AS "CANTIDAD LEADS"
+        FROM agg_no_utiles_completo
+    """
+    args = []
+    
+    if nivel and nivel.upper() != "TODOS":
+        query += " WHERE UPPER(TRIM(nivel)) = $1"
+        args.append(nivel.upper())
+    
+    query += " ORDER BY programa ASC, leads_no_utiles DESC"
+    
     try:
-        if nivel and nivel.upper() != "TODOS":
-            target_nivel = nivel.upper()
-            programs_of_level = [p["programa"] for p in data_cache.get("merged_programs", []) if p.get("nivel") == target_nivel]
-            if programs_of_level:
-                placeholders = ",".join(f"${i+1}" for i in range(len(programs_of_level)))
-                query = f"""
-                    SELECT descripcion_sub as "MOTIVO",
-                           SUM(leads_no_utiles) AS "CANTIDAD LEADS"
-                    FROM agg_no_utiles
-                    WHERE UPPER(TRIM(programa)) IN ({placeholders})
-                    GROUP BY descripcion_sub
-                    ORDER BY "CANTIDAD LEADS" DESC
-                """
-                rows = await fetch_all(query, *programs_of_level)
-        else:
-            rows = await fetch_all(
-                'SELECT descripcion_sub as "MOTIVO", SUM(leads_no_utiles) AS "CANTIDAD LEADS" FROM agg_no_utiles GROUP BY descripcion_sub ORDER BY "CANTIDAD LEADS" DESC'
-            )
-    except:
+        rows = await fetch_all(query, *args)
+    except Exception as e:
+        print(f"[Export No Util] Error fetching detailed data: {e}")
         rows = []
 
     if not rows:
-        # Fallback to cache if table query fails
-        cached_no_util = data_cache.get("no_util", [])
-        rows = [{"MOTIVO": item.get("descripcion_sub"), "CANTIDAD LEADS": item.get("leads")} for item in cached_no_util]
+        return Response(content="Sin datos detallados disponibles para exportar", media_type="text/plain")
 
     df = pd.DataFrame(rows)
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, sheet_name='No Utiles')
-        apply_excel_style(writer.sheets['No Utiles'])
+        df.to_excel(writer, index=False, sheet_name='Detalle No Utiles')
+        apply_excel_style(writer.sheets['Detalle No Utiles'])
 
     output.seek(0)
-    filename = f"Reporte_No_Utiles_{nivel if nivel else 'GLOBAL'}_{datetime.now().strftime('%Y%m%d')}.xlsx"
+    filename = f"Detalle_No_Utiles_{nivel if nivel else 'GLOBAL'}_{datetime.now().strftime('%Y%m%d')}.xlsx"
     
     return StreamingResponse(
         output,
