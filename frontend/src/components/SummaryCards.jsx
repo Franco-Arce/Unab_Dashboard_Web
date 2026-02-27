@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Users, UserCheck, BadgeDollarSign, CreditCard, GraduationCap, Target } from 'lucide-react';
+import { Users, UserCheck, Lightbulb, CreditCard, GraduationCap, Target } from 'lucide-react';
 import { MetricCard } from './MetricCard';
 
 export const SummaryCards = ({ kpis = {} }) => {
@@ -36,7 +36,7 @@ export const SummaryCards = ({ kpis = {} }) => {
             label: 'OP. DE VENTA',
             value: op_venta,
             color: 'from-blue-500 to-blue-700',
-            icon: BadgeDollarSign,
+            icon: Lightbulb,
             percentage: en_gestion > 0 ? Math.round((op_venta / en_gestion) * 100) : 0,
             description: `${en_gestion > 0 ? ((op_venta / en_gestion) * 100).toFixed(1) : 0}% de en gestión`
         },
