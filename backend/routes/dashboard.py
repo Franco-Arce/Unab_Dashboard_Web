@@ -3,11 +3,19 @@ from fastapi.responses import StreamingResponse
 from typing import Optional
 from routes.auth import require_auth
 from cache import cache
+from datetime import datetime
 import pandas as pd
 import io
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
 router = APIRouter(prefix="/api/dashboard", tags=["dashboard"])
+
+
+def _pct(num, den):
+    """Calcula el porcentaje de forma segura."""
+    if not den or den == 0:
+        return 0.0
+    return round(float(num) / float(den) * 100, 1)
 
 
 def apply_excel_style(worksheet, sheet_name="Sheet1"):
