@@ -4,6 +4,51 @@ import { X, Send, Sparkles, Loader2, Bot, User } from 'lucide-react';
 import api from '../api';
 
 export default function AIPanel({ onClose }) {
+    // Simple markdown to HTML renderer
+    const renderMarkdown = (text) => {
+        const lines = text.split('\n');
+        let html = '';
+        let inList = false;
+
+        lines.forEach((line) => {
+            const trimmed = line.trim();
+
+            // Headers
+            if (trimmed.startsWith('### ')) {
+                if (inList) { html += '</ul>'; inList = false; }
+                html += `<h4 class="font-black text-sm mt-3 mb-1 text-slate-800">${trimmed.slice(4)}</h4>`;
+            } else if (trimmed.startsWith('## ')) {
+                if (inList) { html += '</ul>'; inList = false; }
+                html += `<h3 class="font-black text-sm mt-3 mb-1 text-slate-800">${trimmed.slice(3)}</h3>`;
+            } else if (trimmed.startsWith('# ')) {
+                if (inList) { html += '</ul>'; inList = false; }
+                html += `<h2 class="font-black text-base mt-3 mb-1 text-slate-900">${trimmed.slice(2)}</h2>`;
+            }
+            // Unordered list
+            else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+                if (!inList) { html += '<ul class="list-disc pl-4 space-y-0.5 my-1">'; inList = true; }
+                html += `<li class="text-[13px]">${trimmed.slice(2)}</li>`;
+            }
+            // Numbered list
+            else if (/^\d+\.\s/.test(trimmed)) {
+                if (!inList) { html += '<ol class="list-decimal pl-4 space-y-0.5 my-1">'; inList = true; }
+                html += `<li class="text-[13px]">${trimmed.replace(/^\d+\.\s/, '')}</li>`;
+            }
+            // Regular paragraph
+            else {
+                if (inList) { html += '</ul>'; inList = false; }
+                if (trimmed) html += `<p class="my-1">${trimmed}</p>`;
+            }
+        });
+
+        if (inList) html += '</ul>';
+
+        // Bold
+        html = html.replace(/\*\*(.+?)\*\*/g, '<strong class="font-black">$1</strong>');
+
+        return html;
+    };
+
     const [messages, setMessages] = useState([
         { role: 'assistant', content: '¡Hola! Soy tu analista experto de UNAB. ¿En qué puedo ayudarte hoy con los datos de la campaña?' }
     ]);
@@ -75,7 +120,11 @@ export default function AIPanel({ onClose }) {
                                 ? 'bg-nods-accent text-white rounded-tr-none'
                                 : 'bg-white text-nods-text-primary border border-nods-border rounded-tl-none'
                                 }`}>
-                                {msg.content}
+                                {msg.role === 'assistant' ? (
+                                    <div dangerouslySetInnerHTML={{ __html: renderMarkdown(msg.content) }} />
+                                ) : (
+                                    msg.content
+                                )}
                             </div>
                         </motion.div>
                     ))}
