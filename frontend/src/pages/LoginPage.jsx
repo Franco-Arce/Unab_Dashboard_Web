@@ -68,7 +68,7 @@ export default function LoginPage() {
                     </div>
 
                     <h1 className="text-5xl font-black tracking-tighter mb-4">
-                        Grupo <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">NODS BI</span>
+                        Grupo <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">NODS</span>
                     </h1>
                     <p className="text-slate-400 text-sm font-bold tracking-[0.3em] uppercase opacity-80">
                         Dashboard de Control de Campaña
