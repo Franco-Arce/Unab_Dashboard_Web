@@ -121,7 +121,7 @@ export default function LoginPage() {
                                 background: 'conic-gradient(from 0deg, transparent 0%, transparent 75%, #3b82f6 85%, transparent 100%)',
                             }}
                         />
-                        <div className="bg-white/70 backdrop-blur-2xl p-8 sm:p-12 rounded-[3rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.08)] relative z-10 transition-all hover:shadow-[0_40px_80px_-12px_rgba(0,0,0,0.12)]">
+                        <div className="bg-white backdrop-blur-2xl p-8 sm:p-12 rounded-[3rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.08)] relative z-10 transition-all hover:shadow-[0_40px_80px_-12px_rgba(0,0,0,0.12)]">
                             <div className="mb-12">
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="h-1 w-12 bg-blue-600 rounded-full" />
