@@ -10,6 +10,47 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 router = APIRouter(prefix="/api/dashboard", tags=["dashboard"])
 
 
+def apply_excel_style(worksheet, sheet_name="Sheet1"):
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    
+    # Styling constants
+    header_fill = PatternFill(start_color='1E3A8A', end_color='1E3A8A', fill_type='solid') # Blue-900
+    header_font = Font(color='FFFFFF', bold=True, size=11)
+    center_alignment = Alignment(horizontal='center', vertical='center')
+    border = Border(
+        left=Side(style='thin', color='E2E8F0'),
+        right=Side(style='thin', color='E2E8F0'),
+        top=Side(style='thin', color='E2E8F0'),
+        bottom=Side(style='thin', color='E2E8F0')
+    )
+    
+    # Format Headers (First Row)
+    for cell in worksheet[1]:
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = center_alignment
+        cell.border = border
+        
+    # Auto-adjust column width and alternate row shading
+    for col in worksheet.columns:
+        max_length = 0
+        column = col[0].column_letter # Get the column name
+        for cell in col:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+                
+                # Apply borders and padding-like styling
+                if cell.row > 1:
+                    cell.border = border
+                    if cell.row % 2 == 0:
+                        cell.fill = PatternFill(start_color='F8FAFC', end_color='F8FAFC', fill_type='solid')
+            except:
+                pass
+        adjusted_width = (max_length + 4)
+        worksheet.column_dimensions[column].width = min(adjusted_width, 50) # Cap width
+
+
 @router.get("/export")
 async def export_leads(
     search: Optional[str] = Query(None),
@@ -92,47 +133,7 @@ async def export_leads(
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='Leads')
-        
-        # Access openpyxl workbook and sheet
-        workbook = writer.book
-        worksheet = writer.sheets['Leads']
-        
-        # Styling constants
-        header_fill = PatternFill(start_color='1E3A8A', end_color='1E3A8A', fill_type='solid') # Blue-900
-        header_font = Font(color='FFFFFF', bold=True, size=11)
-        center_alignment = Alignment(horizontal='center', vertical='center')
-        border = Border(
-            left=Side(style='thin', color='E2E8F0'),
-            right=Side(style='thin', color='E2E8F0'),
-            top=Side(style='thin', color='E2E8F0'),
-            bottom=Side(style='thin', color='E2E8F0')
-        )
-        
-        # Format Headers
-        for cell in worksheet[1]:
-            cell.fill = header_fill
-            cell.font = header_font
-            cell.alignment = center_alignment
-            cell.border = border
-            
-        # Auto-adjust column width and alternate row shading
-        for col in worksheet.columns:
-            max_length = 0
-            column = col[0].column_letter # Get the column name
-            for cell in col:
-                try:
-                    if len(str(cell.value)) > max_length:
-                        max_length = len(str(cell.value))
-                    
-                    # Apply borders and padding-like styling
-                    if cell.row > 1:
-                        cell.border = border
-                        if cell.row % 2 == 0:
-                            cell.fill = PatternFill(start_color='F8FAFC', end_color='F8FAFC', fill_type='solid')
-                except:
-                    pass
-            adjusted_width = (max_length + 4)
-            worksheet.column_dimensions[column].width = min(adjusted_width, 50) # Cap width
+        apply_excel_style(writer.sheets['Leads'])
 
     output.seek(0)
     
@@ -144,6 +145,49 @@ async def export_leads(
         output,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers=headers
+    )
+
+
+@router.get("/export-admisiones")
+async def export_admisiones(
+    nivel: Optional[str] = Query(None),
+    _user: str = Depends(require_auth)
+):
+    data = await cache.get_all()
+    merged = data.get("merged_programs", [])
+    
+    if nivel and nivel.upper() != "TODOS":
+        nivel = nivel.upper()
+        merged = [p for p in merged if p.get("nivel") == nivel]
+    
+    # Clean data for export
+    export_data = []
+    for p in merged:
+        export_data.append({
+            "PROGRAMA": p.get("programa"),
+            "NIVEL": p.get("nivel"),
+            "AREA": p.get("area"),
+            "LEADS": p.get("leads"),
+            "SOLICITADOS": p.get("solicitados"),
+            "ADMITIDOS": p.get("admitidos"),
+            "PAGADOS": p.get("pagados"),
+            "META": p.get("meta"),
+            "CUMPLIMIENTO %": _pct(p.get("pagados", 0), p.get("meta", 0))
+        })
+    
+    df = pd.DataFrame(export_data)
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Admisiones')
+        apply_excel_style(writer.sheets['Admisiones'])
+
+    output.seek(0)
+    filename = f"Reporte_Admisiones_{nivel if nivel else 'GLOBAL'}_{datetime.now().strftime('%Y%m%d')}.xlsx"
+    
+    return StreamingResponse(
+        output,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={'Content-Disposition': f'attachment; filename="{filename}"'}
     )
 
 
@@ -251,6 +295,53 @@ async def get_admisiones(nivel: Optional[str] = Query(None), _user: str = Depend
         "trends": data.get("trends", {}),
     }
 
+
+@router.get("/export-estados")
+async def export_estados(
+    nivel: Optional[str] = Query(None),
+    _user: str = Depends(require_auth)
+):
+    data = await cache.get_all()
+    merged = data.get("merged_programs", [])
+    
+    if nivel and nivel.upper() != "TODOS":
+        nivel = nivel.upper()
+        merged = [p for p in merged if p.get("nivel") == nivel]
+    
+    # Clean data for export
+    export_data = []
+    for p in merged:
+        export_data.append({
+            "PROGRAMA": p.get("programa"),
+            "NIVEL": p.get("nivel"),
+            "LEADS": p.get("leads"),
+            "EN GESTION": p.get("en_gestion"),
+            "NO UTIL": p.get("no_util"),
+            "OP. VENTA": p.get("op_venta"),
+            "PROC. PAGO": p.get("proceso_pago"),
+            "SOLICITADOS": p.get("solicitados"),
+            "ADMITIDOS": p.get("admitidos"),
+            "PAGADOS": p.get("pagados"),
+            "META": p.get("meta"),
+            "AVANCE %": _pct(p.get("pagados", 0), p.get("meta", 0)),
+            "CONVERSION %": _pct(p.get("pagados", 0), p.get("leads", 0))
+        })
+    
+    df = pd.DataFrame(export_data)
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Estados de Gestion')
+        apply_excel_style(writer.sheets['Estados de Gestion'])
+
+    output.seek(0)
+    filename = f"Reporte_Estados_{nivel if nivel else 'GLOBAL'}_{datetime.now().strftime('%Y%m%d')}.xlsx"
+    
+    return StreamingResponse(
+        output,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={'Content-Disposition': f'attachment; filename="{filename}"'}
+    )
+
 @router.get("/estados")
 async def get_estados(nivel: Optional[str] = Query(None), _user: str = Depends(require_auth)):
     data = await cache.get_all()
@@ -340,6 +431,59 @@ async def get_no_util(nivel: Optional[str] = Query(None), _user: str = Depends(r
     ]
 
     return {"no_util": result, "no_util_total": total, "trends": data_cache.get("trends", {})}
+
+
+@router.get("/export-no-util")
+async def export_no_util(
+    nivel: Optional[str] = Query(None),
+    _user: str = Depends(require_auth)
+):
+    from database import fetch_all
+    data_cache = await cache.get_all()
+    
+    # Logic similar to get_no_util but for full export
+    rows = []
+    try:
+        if nivel and nivel.upper() != "TODOS":
+            target_nivel = nivel.upper()
+            programs_of_level = [p["programa"] for p in data_cache.get("merged_programs", []) if p.get("nivel") == target_nivel]
+            if programs_of_level:
+                placeholders = ",".join(f"${i+1}" for i in range(len(programs_of_level)))
+                query = f"""
+                    SELECT descripcion_sub as "MOTIVO",
+                           SUM(leads_no_utiles) AS "CANTIDAD LEADS"
+                    FROM agg_no_utiles
+                    WHERE UPPER(TRIM(programa)) IN ({placeholders})
+                    GROUP BY descripcion_sub
+                    ORDER BY "CANTIDAD LEADS" DESC
+                """
+                rows = await fetch_all(query, *programs_of_level)
+        else:
+            rows = await fetch_all(
+                'SELECT descripcion_sub as "MOTIVO", SUM(leads_no_utiles) AS "CANTIDAD LEADS" FROM agg_no_utiles GROUP BY descripcion_sub ORDER BY "CANTIDAD LEADS" DESC'
+            )
+    except:
+        rows = []
+
+    if not rows:
+        # Fallback to cache if table query fails
+        cached_no_util = data_cache.get("no_util", [])
+        rows = [{"MOTIVO": item.get("descripcion_sub"), "CANTIDAD LEADS": item.get("leads")} for item in cached_no_util]
+
+    df = pd.DataFrame(rows)
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='No Utiles')
+        apply_excel_style(writer.sheets['No Utiles'])
+
+    output.seek(0)
+    filename = f"Reporte_No_Utiles_{nivel if nivel else 'GLOBAL'}_{datetime.now().strftime('%Y%m%d')}.xlsx"
+    
+    return StreamingResponse(
+        output,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={'Content-Disposition': f'attachment; filename="{filename}"'}
+    )
 
 
 @router.get("/no-util-csv")

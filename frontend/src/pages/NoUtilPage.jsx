@@ -105,13 +105,13 @@ export default function NoUtilPage() {
         }
     };
 
-    const handleDownloadCsv = async () => {
+    const handleExportExcel = async () => {
         try {
-            setIsDownloadingCsv(true);
-            await api.noUtilCsv();
+            setIsDownloadingCsv(true); // Reusing the same loading state
+            await api.exportNoUtil(nivel);
         } catch (error) {
             console.error(error);
-            alert('Error al descargar el CSV');
+            alert('Error al exportar el Excel');
         } finally {
             setIsDownloadingCsv(false);
         }
@@ -310,7 +310,7 @@ export default function NoUtilPage() {
                         />
                     </div>
                     <button
-                        onClick={handleDownloadCsv}
+                        onClick={handleExportExcel}
                         disabled={isDownloadingCsv}
                         className={`flex items-center gap-2 bg-white text-nods-text-primary border border-nods-border px-4 py-2.5 rounded-xl text-xs font-black transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${isDownloadingCsv ? 'bg-amber-50 border-amber-500 text-amber-500' : 'hover:border-amber-500 hover:text-amber-500'}`}
                     >
@@ -319,7 +319,7 @@ export default function NoUtilPage() {
                         ) : (
                             <Download className="w-4 h-4" />
                         )}
-                        {isDownloadingCsv ? 'DESCARGANDO...' : 'DESCARGAR DATOS DE LEADS NO ÚTILES'}
+                        {isDownloadingCsv ? 'EXPORTANDO...' : 'EXPORTAR RESUMEN EXCEL'}
                     </button>
                 </div>
 

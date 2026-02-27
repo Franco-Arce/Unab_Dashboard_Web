@@ -23,8 +23,13 @@ export default function AdmisionesPage() {
         return p.programa.toLowerCase().includes(searchTerm.toLowerCase());
     }) : [];
 
-    const handleExport = () => {
-        exportToCSV(data.programas, 'admisiones_unab_2026');
+    const handleExport = async () => {
+        try {
+            await api.exportAdmisiones(nivel);
+        } catch (error) {
+            console.error(error);
+            alert('Error al exportar los datos');
+        }
     };
 
     const StatusIcon = ({ val }) => {

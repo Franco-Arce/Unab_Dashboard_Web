@@ -158,21 +158,73 @@ export const api = {
         method: 'POST',
         body: JSON.stringify({ context_data: dashboardContext }),
     }),
+
     exportLeads: async (params = {}) => {
         const q = new URLSearchParams();
         Object.entries(params).forEach(([k, v]) => { if (v) q.set(k, v); });
-
         const res = await fetch(`${API_URL}/api/dashboard/export?${q.toString()}`, {
             headers: authHeaders(),
         });
-
         if (!res.ok) throw new Error('Error al exportar Excel');
-
         const blob = await res.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
         a.download = `Reporte_Leads_${new Date().toISOString().split('T')[0]}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    },
+
+    exportAdmisiones: async (nivel) => {
+        const q = new URLSearchParams();
+        if (nivel) q.set('nivel', nivel);
+        const res = await fetch(`${API_URL}/api/dashboard/export-admisiones?${q.toString()}`, {
+            headers: authHeaders(),
+        });
+        if (!res.ok) throw new Error('Error al exportar Admisiones');
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Reporte_Admisiones_${nivel || 'Global'}_${new Date().toISOString().split('T')[0]}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    },
+
+    exportNoUtil: async (nivel) => {
+        const q = new URLSearchParams();
+        if (nivel) q.set('nivel', nivel);
+        const res = await fetch(`${API_URL}/api/dashboard/export-no-util?${q.toString()}`, {
+            headers: authHeaders(),
+        });
+        if (!res.ok) throw new Error('Error al exportar No Útiles');
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Reporte_No_Utiles_${nivel || 'Global'}_${new Date().toISOString().split('T')[0]}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    },
+
+    exportEstados: async (nivel) => {
+        const q = new URLSearchParams();
+        if (nivel) q.set('nivel', nivel);
+        const res = await fetch(`${API_URL}/api/dashboard/export-estados?${q.toString()}`, {
+            headers: authHeaders(),
+        });
+        if (!res.ok) throw new Error('Error al exportar Estados');
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Reporte_Estados_${nivel || 'Global'}_${new Date().toISOString().split('T')[0]}.xlsx`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);

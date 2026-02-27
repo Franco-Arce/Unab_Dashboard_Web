@@ -20,8 +20,13 @@ export default function EstadosPage() {
 
     if (loading) return <div className="h-96 bg-white animate-pulse rounded-3xl border border-nods-border shadow-2xl" />;
 
-    const handleExport = () => {
-        exportToCSV(data.estados_by_programa, 'estados_gestion_unab_2026');
+    const handleExport = async () => {
+        try {
+            await api.exportEstados(nivel);
+        } catch (error) {
+            console.error(error);
+            alert('Error al exportar los datos');
+        }
     };
 
 
