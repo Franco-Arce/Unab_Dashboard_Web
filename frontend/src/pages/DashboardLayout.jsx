@@ -39,9 +39,10 @@ export default function DashboardLayout() {
     // Derive current page name from path for page-specific AI insights
     const currentPage = location.pathname.split('/').pop() || 'overview';
 
-    // Close sidebar on navigation (mobile)
+    // Close sidebar on navigation (mobile) + scroll to top
     useEffect(() => {
         setSidebarOpen(false);
+        window.scrollTo(0, 0);
     }, [location.pathname]);
 
     useEffect(() => {
