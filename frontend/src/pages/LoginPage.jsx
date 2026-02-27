@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { User, Lock, AlertCircle, Activity, BarChart3, ShieldCheck, ChevronRight, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '../api';
-import logoUnab from '../assets/logo-unab.png';
+import logoUnab from '../assets/logo-unab-full.png';
 import nodsDark from '../assets/nods-dark.png';
 
 export default function LoginPage() {
