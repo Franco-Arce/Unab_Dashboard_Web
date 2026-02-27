@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import api from '../api';
 import logoUnab from '../assets/logo-unab-full.png';
 import nodsDark from '../assets/nods-dark.png';
+import nodsWhite from '../assets/nods-white.png';
 
 export default function LoginPage() {
     const [username, setUsername] = useState('');
@@ -67,9 +68,9 @@ export default function LoginPage() {
                         <img src={logoUnab} alt="UNAB" className="h-20 w-auto drop-shadow-[0_0_25px_rgba(255,255,255,0.15)]" />
                     </div>
 
-                    <h1 className="text-5xl font-black tracking-tighter mb-4">
-                        Grupo <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">NODS</span>
-                    </h1>
+                    <div className="mb-4 inline-flex items-center justify-center w-full">
+                        <img src={nodsWhite} alt="Grupo NODS" className="h-12 w-auto" />
+                    </div>
                     <p className="text-slate-400 text-sm font-bold tracking-[0.3em] uppercase opacity-80">
                         IA DASHBOARD
                     </p>
