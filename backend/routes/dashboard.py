@@ -51,7 +51,16 @@ def apply_excel_style(worksheet, sheet_name="Sheet1"):
                 # Apply borders and padding-like styling
                 if cell.row > 1:
                     cell.border = border
-                    if cell.row % 2 == 0:
+                    
+                    # Colores condicionales para el NIVEL
+                    val_str = str(cell.value).upper() if cell.value else ""
+                    if val_str == "GRADO":
+                        cell.fill = PatternFill(start_color='DBEAFE', end_color='DBEAFE', fill_type='solid') # Azul claro
+                        cell.font = Font(color='1E40AF', bold=True) # Azul oscuro
+                    elif val_str == "POSGRADO":
+                        cell.fill = PatternFill(start_color='F3E8FF', end_color='F3E8FF', fill_type='solid') # Violeta claro
+                        cell.font = Font(color='6B21A8', bold=True) # Violeta oscuro
+                    elif cell.row % 2 == 0:
                         cell.fill = PatternFill(start_color='F8FAFC', end_color='F8FAFC', fill_type='solid')
             except:
                 pass
