@@ -70,7 +70,7 @@ export default function AdmisionesPage() {
         <div className="space-y-8">
             <header className="flex justify-between items-end">
                 <div>
-                    <h2 className="text-2xl font-black text-nods-text-primary tracking-tight uppercase italic mb-2">Admisiones & Metas</h2>
+                    <h2 className="text-2xl font-black text-nods-text-primary tracking-tight uppercase italic mb-2">Admisiones y Metas</h2>
                     <div className="h-1 w-20 bg-gradient-to-r from-blue-900 to-transparent rounded-full" />
                 </div>
             </header>
