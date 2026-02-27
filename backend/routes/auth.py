@@ -8,8 +8,11 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 SECRET = os.getenv("JWT_SECRET")
 ALGORITHM = "HS256"
-VALID_USER = os.getenv("AUTH_USER")
-VALID_PASS = os.getenv("AUTH_PASSWORD")
+# Diccionario de usuarios permitidos
+VALID_USERS = {
+    "usuario": "test1234",
+    "Admin": "Admin123"
+}
 
 
 class LoginRequest(BaseModel):
@@ -38,9 +41,13 @@ async def require_auth(authorization: str = Header(...)):
 
 @router.post("/login", response_model=LoginResponse)
 async def login(body: LoginRequest):
-    if body.username == VALID_USER and body.password == VALID_PASS:
+    # Verificar si el usuario existe y la contraseña coincide
+    expected_password = VALID_USERS.get(body.username)
+    
+    if expected_password and expected_password == body.password:
         token = create_token(body.username)
         return LoginResponse(token=token, username=body.username)
+    
     raise HTTPException(status_code=401, detail="Credenciales incorrectas")
 
 
