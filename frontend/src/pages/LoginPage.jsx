@@ -63,8 +63,8 @@ export default function LoginPage() {
                     className="relative z-10 text-center max-w-sm"
                 >
                     {/* Logo UNAB */}
-                    <div className="mb-8 inline-flex items-center justify-center px-8 py-5 bg-white rounded-3xl shadow-[0_0_40px_rgba(59,130,246,0.15),0_20px_40px_rgba(0,0,0,0.3)] ring-1 ring-white/20">
-                        <img src={logoUnab} alt="UNAB" className="h-14 w-auto" />
+                    <div className="mb-8 inline-flex items-center justify-center">
+                        <img src={logoUnab} alt="UNAB" className="h-20 w-auto drop-shadow-[0_0_25px_rgba(255,255,255,0.15)]" />
                     </div>
 
                     <h1 className="text-5xl font-black tracking-tighter mb-4">
