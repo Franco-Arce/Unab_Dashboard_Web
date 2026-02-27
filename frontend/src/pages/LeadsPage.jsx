@@ -132,7 +132,7 @@ export default function LeadsPage() {
         <div className="space-y-8">
             <header className="flex justify-between items-end">
                 <div>
-                    <h2 className="text-sm font-black text-blue-900 uppercase tracking-[0.3em] mb-2 italic">Explorador de Leads</h2>
+                    <h2 className="text-2xl font-black text-nods-text-primary tracking-tight uppercase italic mb-2">Explorador de Leads</h2>
                     <div className="h-1 w-20 bg-gradient-to-r from-blue-900 to-transparent rounded-full" />
                 </div>
             </header>

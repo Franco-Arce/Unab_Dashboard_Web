@@ -225,7 +225,7 @@ export default function OverviewPage() {
                                 <div className="bg-white border border-nods-border rounded-3xl p-8 relative group shadow-xl h-full">
                                     <div className="flex justify-between items-end mb-10 relative z-10">
                                         <div>
-                                            <h3 className="text-xl font-bold mb-1 text-nods-text-primary">Embudo de Conversión</h3>
+                                            <h3 className="text-2xl font-black text-nods-text-primary tracking-tight uppercase italic mb-1">Embudo de Conversión</h3>
                                             <p className="text-nods-text-muted text-sm font-medium">Rendimiento de las etapas de la campaña</p>
                                         </div>
                                         <div className="bg-slate-50 px-4 py-2 rounded-xl text-xs font-bold border border-nods-border text-nods-text-primary uppercase tracking-widest">
@@ -319,7 +319,7 @@ export default function OverviewPage() {
                     <>
                         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="bg-white border border-nods-border rounded-3xl p-8 shadow-xl">
                             <div className="mb-6">
-                                <h3 className="text-xl font-bold text-nods-text-primary">Top Conversión por Programa</h3>
+                                <h3 className="text-2xl font-black text-nods-text-primary tracking-tight uppercase italic mb-1">Top Conversión por Programa</h3>
                                 <p className="text-nods-text-muted text-sm font-medium">Programas con mayor tasa de conversión (leads → pagados)</p>
                             </div>
                             <div className="space-y-3">
@@ -353,7 +353,7 @@ export default function OverviewPage() {
                         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white border border-nods-border rounded-3xl p-8 shadow-xl">
                             <div className="flex justify-between items-start mb-6">
                                 <div>
-                                    <h3 className="text-xl font-bold text-nods-text-primary">Avance vs Meta por Programa</h3>
+                                    <h3 className="text-2xl font-black text-nods-text-primary tracking-tight uppercase italic mb-1">Avance vs Meta por Programa</h3>
                                     <p className="text-nods-text-muted text-sm font-medium">Progreso hacia la Meta (Gráfico de Barras)</p>
                                 </div>
                                 <select value={selectedArea} onChange={(e) => setSelectedArea(e.target.value)} className="bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
