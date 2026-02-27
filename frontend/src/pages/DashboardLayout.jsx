@@ -25,11 +25,9 @@ export default function DashboardLayout() {
     const [meta, setMeta] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
     const [showAI, setShowAI] = useState(false);
-    const [aiInitialTab, setAiInitialTab] = useState('chat');
     const { nivel, setNivel } = useFilters();
 
-    const openAIPanel = (tabName = 'chat') => {
-        setAiInitialTab(tabName);
+    const openAIPanel = () => {
         setShowAI(true);
     };
     const navigate = useNavigate();
@@ -218,23 +216,27 @@ export default function DashboardLayout() {
                                 className="w-full h-auto object-contain mix-blend-multiply"
                             />
                         </div>
-                        <button
-                            onClick={() => openAIPanel('chat')}
-                            className={`p-2.5 rounded-xl border transition-all ${showAI
-                                ? 'bg-nods-accent border-nods-accent text-white shadow-lg shadow-nods-accent/20 scale-110'
-                                : 'bg-white border-nods-border text-nods-text-muted hover:border-nods-accent/50 hover:text-nods-accent hover:bg-slate-50'
-                                }`}
-                            title="Asistente IA"
-                        >
-                            <Sparkles size={18} className={showAI ? 'animate-pulse' : ''} />
-                        </button>
                     </div>
                 </header>
 
                 {/* Page Content */}
                 <div className="p-4 md:p-8 max-w-[1600px] mx-auto w-full">
-                    <Outlet context={{ openAIPanel }} />
+                    <Outlet context={{ openAIPanel, currentPage }} />
                 </div>
+
+                {/* Floating AI Chat Button */}
+                {!showAI && (
+                    <motion.button
+                        onClick={openAIPanel}
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="fixed bottom-8 right-8 z-30 w-14 h-14 bg-gradient-to-br from-indigo-600 to-blue-700 text-white rounded-2xl shadow-2xl shadow-indigo-500/40 flex items-center justify-center hover:scale-110 hover:shadow-indigo-500/60 transition-all duration-300 group"
+                        title="Chat con IA"
+                    >
+                        <Sparkles size={22} className="group-hover:animate-pulse" />
+                        <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-white animate-pulse" />
+                    </motion.button>
+                )}
 
                 <AnimatePresence>
                     {showAI && (
@@ -246,7 +248,7 @@ export default function DashboardLayout() {
                                 onClick={() => setShowAI(false)}
                                 className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-40"
                             />
-                            <AIPanel initialTab={aiInitialTab} page={currentPage} onClose={() => setShowAI(false)} />
+                            <AIPanel onClose={() => setShowAI(false)} />
                         </>
                     )}
                 </AnimatePresence>

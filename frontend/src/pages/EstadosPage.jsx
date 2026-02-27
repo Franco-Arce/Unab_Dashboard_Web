@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Download, Filter, Users, Target, CreditCard, UserCheck } from 'lucide-react';
 import api from '../api';
 import { useFilters } from '../context/FilterContext';
 import { exportToCSV } from '../utils/export';
 import { SummaryCards } from '../components/SummaryCards';
+import InsightsSection from '../components/InsightsSection';
 
 export default function EstadosPage() {
+    const { openAIPanel } = useOutletContext() || {};
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const { nivel } = useFilters();
@@ -169,6 +172,9 @@ export default function EstadosPage() {
                     </table>
                 </div>
             </div>
+
+            {/* AI Insights */}
+            <InsightsSection page="estados" onOpenChat={openAIPanel} />
         </div>
     );
 }

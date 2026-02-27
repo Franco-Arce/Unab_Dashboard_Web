@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search, Download, CheckCircle, AlertTriangle, XCircle, Minus, Users, UserPlus, CreditCard } from 'lucide-react';
 import api from '../api';
 import { useFilters } from '../context/FilterContext';
 import { exportToCSV } from '../utils/export';
 import { SummaryCards } from '../components/SummaryCards';
+import InsightsSection from '../components/InsightsSection';
 
 export default function AdmisionesPage() {
+    const { openAIPanel } = useOutletContext() || {};
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -176,6 +179,9 @@ export default function AdmisionesPage() {
                     </table>
                 </div>
             </div>
+
+            {/* AI Insights */}
+            <InsightsSection page="admisiones" onOpenChat={openAIPanel} />
         </div>
     );
 }

@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { Download, Search, AlertOctagon, ArrowRight, TrendingDown, Loader2 } from 'lucide-react';
 import api from '../api';
 import { useFilters } from '../context/FilterContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SummaryCards } from '../components/SummaryCards';
 import { MetricCard } from '../components/MetricCard';
+import InsightsSection from '../components/InsightsSection';
 import {
     PieChart,
     Pie,
@@ -20,6 +22,7 @@ const COLORS = [
 ];
 
 export default function NoUtilPage() {
+    const { openAIPanel } = useOutletContext() || {};
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isExporting, setIsExporting] = useState(false);
@@ -384,6 +387,9 @@ export default function NoUtilPage() {
                     </div>
                 </div>
             </div>
+
+            {/* AI Insights */}
+            <InsightsSection page="no-util" onOpenChat={openAIPanel} />
         </div>
     );
 }

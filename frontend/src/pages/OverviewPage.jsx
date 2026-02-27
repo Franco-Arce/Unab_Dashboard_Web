@@ -24,6 +24,7 @@ import { MetricCard } from '../components/MetricCard';
 import { SummaryCards } from '../components/SummaryCards';
 import { CircularLiquidGauge } from '../components/CircularLiquidGauge';
 import { SectionPlaceholder } from '../components/ElegantLoader';
+import InsightsSection from '../components/InsightsSection';
 
 // Floating bubbles component for liquid effect
 const FloatingBubbles = ({ count = 6 }) => {
@@ -63,7 +64,6 @@ const SemiGauge = ({ percent, current, total, label }) => {
     const cx = 100;
     const cy = 85;
 
-    // Use blue-teal gradient matching dashboard theme
     const gradientId = 'semi-gauge-gradient';
     const colors = clampedPercent >= 75
         ? ['#10b981', '#06b6d4']
@@ -97,7 +97,6 @@ const SemiGauge = ({ percent, current, total, label }) => {
                         </feMerge>
                     </filter>
                 </defs>
-                {/* Background track */}
                 <path
                     d={`M ${cx - radius} ${cy} A ${radius} ${radius} 0 0 1 ${cx + radius} ${cy}`}
                     fill="none"
@@ -105,7 +104,6 @@ const SemiGauge = ({ percent, current, total, label }) => {
                     strokeWidth={strokeWidth}
                     strokeLinecap="round"
                 />
-                {/* Progress arc with gradient and glow */}
                 <motion.path
                     d={`M ${cx - radius} ${cy} A ${radius} ${radius} 0 0 1 ${cx + radius} ${cy}`}
                     fill="none"
@@ -118,7 +116,6 @@ const SemiGauge = ({ percent, current, total, label }) => {
                     transition={{ duration: 2, delay: 0.3, ease: 'circOut' }}
                     filter="url(#semi-glow)"
                 />
-                {/* Center percentage */}
                 <text x={cx} y={cy - 18} textAnchor="middle" fill="#0f172a" style={{ fontSize: '28px', fontWeight: 900 }}>
                     {clampedPercent.toFixed(1)}%
                 </text>
@@ -130,60 +127,10 @@ const SemiGauge = ({ percent, current, total, label }) => {
     );
 };
 
-// Specialized card for AI Insights with improved typography and readability
-const AICard = ({ insight, idx, onVerMas }) => {
-    const Icon = insight.icon;
-    const isEven = idx % 2 === 0;
-
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.1 }}
-            className="group relative bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/50 flex flex-col h-full overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-1"
-        >
-            {/* Background Gradient Accent */}
-            <div className={`absolute top-0 right-0 w-32 h-32 opacity-5 -mr-8 -mt-8 rounded-full blur-3xl transition-opacity group-hover:opacity-10 ${isEven ? 'bg-indigo-600' : 'bg-emerald-600'}`} />
-
-            <div className="flex justify-between items-start mb-6">
-                <div className={`p-3 rounded-2xl shadow-lg text-white transition-transform group-hover:rotate-6 duration-500 ${isEven ? 'bg-indigo-600 shadow-indigo-200' : 'bg-emerald-500 shadow-emerald-200'}`}>
-                    {Icon && <Icon size={22} strokeWidth={2.5} />}
-                </div>
-                <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full">
-                    <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${isEven ? 'bg-indigo-500' : 'bg-emerald-500'}`} />
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">IA Insight</span>
-                </div>
-            </div>
-
-            <div className="flex-1 space-y-3">
-                <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight leading-tight group-hover:text-slate-900 transition-colors">
-                    {insight.title}
-                </h3>
-                <p className="text-xs font-medium text-slate-500 leading-relaxed tracking-normal line-clamp-4 group-hover:text-slate-600 transition-colors">
-                    {insight.description}
-                </p>
-            </div>
-
-            <div className="mt-8 pt-6 border-t border-slate-50 flex items-center justify-between">
-                <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-lg ${isEven ? 'bg-indigo-50 text-indigo-600' : 'bg-emerald-50 text-emerald-600'}`}>
-                    Recomendación
-                </span>
-                <button
-                    onClick={onVerMas}
-                    className="flex items-center gap-1 text-[10px] font-black text-slate-300 group-hover:text-nods-accent transition-colors uppercase tracking-widest"
-                >
-                    Ver más <ArrowUpRight size={14} />
-                </button>
-            </div>
-        </motion.div>
-    );
-};
-
 export default function OverviewPage() {
     const { openAIPanel } = useOutletContext() || {};
     const [kpis, setKpis] = useState(null);
     const [funnel, setFunnel] = useState(null);
-    const [insights, setInsights] = useState(null);
     const [topPrograms, setTopPrograms] = useState(null);
     const [allPrograms, setAllPrograms] = useState(null);
     const [areas, setAreas] = useState([]);
@@ -192,7 +139,6 @@ export default function OverviewPage() {
     const chartsRef = useRef(null);
     const { nivel } = useFilters();
 
-    // Lazy render: only show bottom charts when scrolled into view
     useEffect(() => {
         const el = chartsRef.current;
         if (!el) return;
@@ -205,17 +151,13 @@ export default function OverviewPage() {
     }, [kpis]);
 
     useEffect(() => {
-        // Reset states for new level
         setKpis(null);
         setFunnel(null);
-        setInsights(null);
         setTopPrograms(null);
         setAllPrograms(null);
 
-        // Individual calls for progressive loading
         api.kpis(nivel).then(setKpis).catch(console.error);
         api.funnel(nivel).then(setFunnel).catch(console.error);
-        api.aiInsights().then(res => setInsights(res.insights || [])).catch(() => setInsights([]));
 
         api.admisiones(nivel).then(adm => {
             const progs = (adm.programas || [])
@@ -246,28 +188,9 @@ export default function OverviewPage() {
         });
     }, [nivel]);
 
-    const getIcon = (iconStr) => {
-        switch (iconStr) {
-            case 'trending_up': return TrendingUp;
-            case 'trending_down': return TrendingDown;
-            case 'alert': return AlertCircle;
-            case 'star': return Star;
-            default: return Star;
-        }
-    };
-
-    const aiInsightsData = useMemo(() => {
-        if (!insights) return [];
-        return insights.map((insight, idx) => ({
-            title: insight.title,
-            description: insight.description,
-            icon: getIcon(insight.icon)
-        }));
-    }, [insights]);
-
     return (
         <div className="space-y-8">
-            {/* KPI Cards Section */}
+            {/* KPI Cards */}
             <div className="min-h-[140px]">
                 <AnimatePresence mode="wait">
                     {!kpis ? (
@@ -290,7 +213,7 @@ export default function OverviewPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-                {/* Funnel Section */}
+                {/* Funnel */}
                 <div className="lg:col-span-2 min-h-[460px]">
                     <AnimatePresence mode="wait">
                         {!funnel ? (
@@ -298,13 +221,7 @@ export default function OverviewPage() {
                                 <SectionPlaceholder height="460px" />
                             </motion.div>
                         ) : (
-                            <motion.div
-                                key="funnel-content"
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5 }}
-                                className="space-y-6 h-full"
-                            >
+                            <motion.div key="funnel-content" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="space-y-6 h-full">
                                 <div className="bg-white border border-nods-border rounded-3xl p-8 relative group shadow-xl h-full">
                                     <div className="flex justify-between items-end mb-10 relative z-10">
                                         <div>
@@ -315,12 +232,10 @@ export default function OverviewPage() {
                                             {nivel === 'TODOS' ? 'Global' : nivel}
                                         </div>
                                     </div>
-
                                     <div className="py-4 w-full flex flex-col gap-2 relative z-10 min-h-[320px]">
                                         {funnel.map((entry, index) => {
                                             const themeColors = ["#1e3a8a", "#2563eb", "#3b82f6", "#06b6d4", "#10b981"];
                                             const barColor = themeColors[index] || entry.color;
-
                                             return (
                                                 <div key={index} className="relative">
                                                     <div className="w-full h-14 bg-slate-100/60 rounded-2xl border border-slate-200/40 relative overflow-hidden group cursor-default">
@@ -373,7 +288,6 @@ export default function OverviewPage() {
                                         </div>
                                     </div>
                                 </div>
-
                                 <div className="bg-white border border-slate-100 rounded-[2.5rem] p-6 shadow-xl shadow-slate-200/50 w-full relative overflow-hidden group flex-1">
                                     <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 italic">Salud de Base</h4>
                                     <div className="flex items-center gap-8 relative z-10">
@@ -384,7 +298,6 @@ export default function OverviewPage() {
                                         </div>
                                     </div>
                                 </div>
-
                                 <div className="bg-white border border-slate-100 rounded-[2.5rem] p-6 shadow-xl shadow-slate-200/50 w-full relative overflow-hidden group flex-1">
                                     <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 italic">Avance vs Meta</h4>
                                     <SemiGauge percent={kpis.metas > 0 ? (kpis.pagados / kpis.metas) * 100 : 0} current={kpis.pagados || 0} total={kpis.metas || 0} label="pagados" />
@@ -395,7 +308,7 @@ export default function OverviewPage() {
                 </div>
             </div>
 
-            {/* Bottom Charts Section */}
+            {/* Bottom Charts */}
             <div ref={chartsRef} className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[400px]">
                 {!chartsVisible || !topPrograms || !allPrograms ? (
                     <>
@@ -487,36 +400,7 @@ export default function OverviewPage() {
             </div>
 
             {/* AI Insights Section */}
-            <AnimatePresence mode="wait">
-                {!insights ? (
-                    <div className="space-y-4">
-                        <div className="w-48 h-6 bg-slate-100 rounded animate-pulse" />
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {[1, 2, 3, 4].map(i => <div key={i} className="h-44 bg-slate-50 border border-slate-100 rounded-3xl animate-pulse" />)}
-                        </div>
-                    </div>
-                ) : aiInsightsData.length > 0 && (
-                    <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-indigo-500/10 rounded-lg"><Star className="w-5 h-5 text-indigo-500" /></div>
-                            <div>
-                                <h3 className="text-xl font-bold text-nods-text-primary">Insights del Analista</h3>
-                                <p className="text-nods-text-muted text-sm font-medium">Análisis predictivo y recomendaciones inteligentes</p>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {aiInsightsData.map((insight, i) => (
-                                <AICard
-                                    key={i}
-                                    insight={insight}
-                                    idx={i}
-                                    onVerMas={() => openAIPanel?.('insights')}
-                                />
-                            ))}
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            <InsightsSection page="overview" onOpenChat={openAIPanel} />
         </div>
     );
 }
