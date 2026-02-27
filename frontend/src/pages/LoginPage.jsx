@@ -112,98 +112,107 @@ export default function LoginPage() {
                     transition={{ duration: 0.6, delay: 0.3 }}
                     className="w-full max-w-md"
                 >
-                    {/* Card Glassmorphism */}
-                    <div className="bg-white/70 backdrop-blur-2xl border border-white p-8 sm:p-12 rounded-[3rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.08)] relative z-10 transition-all hover:shadow-[0_40px_80px_-12px_rgba(0,0,0,0.12)]">
-                        <div className="mb-12">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="h-1 w-12 bg-blue-600 rounded-full" />
-                                <span className="text-xs font-bold text-blue-600 uppercase tracking-widest">Acceso Administrativo</span>
-                            </div>
-                            <h2 className="text-4xl font-bold text-slate-900 tracking-tight">Bienvenido.</h2>
-                            <p className="text-slate-500 mt-3 text-lg">Inicia sesión en la plataforma de control.</p>
-                        </div>
-
-                        <form onSubmit={handleLogin} className="space-y-7">
-                            {/* Usuario */}
-                            <div className="space-y-2">
-                                <label className="text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Usuario</label>
-                                <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors">
-                                        <User size={18} />
-                                    </div>
-                                    <input
-                                        type="text"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
-                                        placeholder="Ingresá tu usuario"
-                                        className="w-full pl-12 pr-4 py-[1.125rem] bg-slate-50/50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600/50 transition-all text-slate-800 placeholder:text-slate-400 font-medium"
-                                        required
-                                    />
+                    {/* Card with Border Beam */}
+                    <div className="relative rounded-[3rem] p-[2px] overflow-hidden">
+                        {/* Rotating beam */}
+                        <div
+                            className="absolute animate-border-beam rounded-[3rem]"
+                            style={{
+                                background: 'conic-gradient(from 0deg, transparent 0%, transparent 75%, #3b82f6 85%, transparent 100%)',
+                            }}
+                        />
+                        <div className="bg-white/70 backdrop-blur-2xl p-8 sm:p-12 rounded-[3rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.08)] relative z-10 transition-all hover:shadow-[0_40px_80px_-12px_rgba(0,0,0,0.12)]">
+                            <div className="mb-12">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="h-1 w-12 bg-blue-600 rounded-full" />
+                                    <span className="text-xs font-bold text-blue-600 uppercase tracking-widest">Acceso Administrativo</span>
                                 </div>
+                                <h2 className="text-4xl font-bold text-slate-900 tracking-tight">Bienvenido.</h2>
+                                <p className="text-slate-500 mt-3 text-lg">Inicia sesión en la plataforma de control.</p>
                             </div>
 
-                            {/* Contraseña */}
-                            <div className="space-y-2">
-                                <label className="text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Contraseña</label>
-                                <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors">
-                                        <Lock size={18} />
+                            <form onSubmit={handleLogin} className="space-y-7">
+                                {/* Usuario */}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Usuario</label>
+                                    <div className="relative group">
+                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                                            <User size={18} />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            value={username}
+                                            onChange={(e) => setUsername(e.target.value)}
+                                            placeholder="Ingresá tu usuario"
+                                            className="w-full pl-12 pr-4 py-[1.125rem] bg-slate-50/50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600/50 transition-all text-slate-800 placeholder:text-slate-400 font-medium"
+                                            required
+                                        />
                                     </div>
-                                    <input
-                                        type={showPassword ? 'text' : 'password'}
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        placeholder="••••••••••••"
-                                        className="w-full pl-12 pr-12 py-[1.125rem] bg-slate-50/50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600/50 transition-all text-slate-800 placeholder:text-slate-400 font-medium"
-                                        required
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500 transition-colors"
+                                </div>
+
+                                {/* Contraseña */}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Contraseña</label>
+                                    <div className="relative group">
+                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                                            <Lock size={18} />
+                                        </div>
+                                        <input
+                                            type={showPassword ? 'text' : 'password'}
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            placeholder="••••••••••••"
+                                            className="w-full pl-12 pr-12 py-[1.125rem] bg-slate-50/50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600/50 transition-all text-slate-800 placeholder:text-slate-400 font-medium"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500 transition-colors"
+                                        >
+                                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Error */}
+                                {error && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -5 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="flex items-center gap-2.5 text-red-600 text-xs font-bold bg-red-50 p-3.5 rounded-xl border border-red-100"
                                     >
-                                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                                        <span>{error}</span>
+                                    </motion.div>
+                                )}
+
+                                {/* Submit */}
+                                <div className="pt-4">
+                                    <button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="group w-full py-5 bg-[#1e40af] hover:bg-blue-700 text-white font-bold rounded-2xl shadow-xl shadow-blue-900/20 transform transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg"
+                                    >
+                                        {loading ? (
+                                            <>
+                                                <motion.div
+                                                    animate={{ rotate: 360 }}
+                                                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                                                    className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                                                />
+                                                Ingresando...
+                                            </>
+                                        ) : (
+                                            <>
+                                                Iniciar Sesión
+                                                <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                                            </>
+                                        )}
                                     </button>
                                 </div>
-                            </div>
-
-                            {/* Error */}
-                            {error && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: -5 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    className="flex items-center gap-2.5 text-red-600 text-xs font-bold bg-red-50 p-3.5 rounded-xl border border-red-100"
-                                >
-                                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                                    <span>{error}</span>
-                                </motion.div>
-                            )}
-
-                            {/* Submit */}
-                            <div className="pt-4">
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="group w-full py-5 bg-[#1e40af] hover:bg-blue-700 text-white font-bold rounded-2xl shadow-xl shadow-blue-900/20 transform transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg"
-                                >
-                                    {loading ? (
-                                        <>
-                                            <motion.div
-                                                animate={{ rotate: 360 }}
-                                                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                                                className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
-                                            />
-                                            Ingresando...
-                                        </>
-                                    ) : (
-                                        <>
-                                            Iniciar Sesión
-                                            <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                                        </>
-                                    )}
-                                </button>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
 
                     {/* Footer */}
@@ -220,6 +229,21 @@ export default function LoginPage() {
                     </div>
                 </motion.div>
             </div>
+
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                @keyframes border-beam {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                .animate-border-beam {
+                    animation: border-beam 4s linear infinite;
+                    width: 200%;
+                    height: 200%;
+                    top: -50%;
+                    left: -50%;
+                }
+            `}} />
         </div>
     );
 }
