@@ -479,10 +479,12 @@ async def export_no_util(
         rows = await fetch_all(query, *args)
     except Exception as e:
         print(f"[Export No Util] Error fetching detailed data: {e}")
-        rows = []
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail=f"Error en base de datos: {str(e)}")
 
     if not rows:
-        return Response(content="Sin datos detallados disponibles para exportar", media_type="text/plain")
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="No se encontraron datos detallados para los filtros seleccionados")
 
     df = pd.DataFrame(rows)
     output = io.BytesIO()
