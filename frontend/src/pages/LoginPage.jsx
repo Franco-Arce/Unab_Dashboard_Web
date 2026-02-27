@@ -71,7 +71,7 @@ export default function LoginPage() {
                         Grupo <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">NODS</span>
                     </h1>
                     <p className="text-slate-400 text-sm font-bold tracking-[0.3em] uppercase opacity-80">
-                        Dashboard de Control de Campaña
+                        IA DASHBOARD
                     </p>
 
                     <div className="mt-16 flex justify-between items-center opacity-60 px-4">
