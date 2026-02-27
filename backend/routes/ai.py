@@ -253,49 +253,55 @@ def _build_generic_context(data: dict, prev: dict) -> str:
     return json.dumps(ctx, default=str, ensure_ascii=False)
 
 
-# ── Page-specific system prompts ──────────────────────────────────────────────
+# ── Page-specific system prompts with predefined questions ─────────────────────
+
+_JSON_FORMAT = (
+    'Formato JSON: [{"icon": "trending_up|trending_down|alert|star", "title": "TÍTULO CORTO EN MAYÚSCULAS", "description": "..."}]. '
+    'Responde SOLO el JSON, sin markdown ni texto extra. En español. Sé conciso y directo.'
+)
 
 _PROMPT_NO_UTIL = (
-    "Eres un analista de datos de UNAB especializado en calidad de leads. "
-    "Se te proporcionan datos de la página NO ÚTIL del dashboard. "
-    "Genera exactamente 4 insights breves, accionables y específicos. OBLIGATORIO incluir:\n"
-    "1. Comparación del % de leads no útiles ACTUAL vs la actualización ANTERIOR (¿subió o bajó?).\n"
-    "2. Análisis de si hubo cambios en los motivos de no utilidad (¿apareció o creció algún motivo nuevo?).\n"
-    "3. El motivo de descarte principal y qué acción concreta se puede tomar.\n"
-    "4. Un cuarto insight relevante adicional.\n"
-    "Formato JSON: [{\"icon\": \"trending_up|trending_down|alert|star\", \"title\": \"TÍTULO EN MAYÚSCULAS\", \"description\": \"...\"}]. "
-    "Responde SOLO el JSON. En español."
+    "Eres un analista de calidad de leads de UNAB. "
+    "Se te proporcionan datos actuales y de la actualización anterior sobre leads no útiles. "
+    "Responde exactamente estas 4 preguntas como insights breves y accionables:\n\n"
+    "1. VARIACIÓN NO ÚTILES: ¿Aumentó o disminuyó el porcentaje de leads no útiles respecto a la actualización anterior? Indica el % actual vs anterior y la dirección del cambio.\n"
+    "2. CAMBIOS EN MOTIVOS: ¿Hubo algún cambio significativo en los motivos de descarte? ¿Apareció o creció algún motivo nuevo respecto a la actualización anterior?\n"
+    "3. MOTIVO PRINCIPAL: ¿Cuál es el motivo de descarte con más volumen y qué acción concreta se puede tomar para reducirlo?\n"
+    "4. INSIGHT ADICIONAL: Genera un insight adicional relevante que observes en los datos (tendencia, patrón, oportunidad de mejora).\n\n"
+    + _JSON_FORMAT
 )
 
 _PROMPT_ADMISIONES = (
     "Eres un analista de admisiones universitarias de UNAB. "
-    "Se te proporcionan métricas de conversión del pipeline de admisiones. "
-    "Genera exactamente 4 insights breves, accionables y específicos. OBLIGATORIO incluir:\n"
-    "1. Comparación de la tasa de conversión Admitidos/Pagados ACTUAL vs la actualización ANTERIOR.\n"
-    "2. Identificación del cuello de botella principal (¿dónde se pierden más leads: de Solicitados a Admitidos, o de Admitidos a Pagados?).\n"
-    "3. Avance respecto a la meta y proyección de cumplimiento.\n"
-    "4. Un cuarto insight accionable adicional.\n"
-    "Formato JSON: [{\"icon\": \"trending_up|trending_down|alert|star\", \"title\": \"TÍTULO EN MAYÚSCULAS\", \"description\": \"...\"}]. "
-    "Responde SOLO el JSON. En español."
+    "Se te proporcionan datos del pipeline de admisiones actual y de la actualización anterior. "
+    "Responde exactamente estas 4 preguntas como insights breves y accionables:\n\n"
+    "1. CONVERSIÓN ADMITIDOS→PAGADOS: ¿Cómo cambió el porcentaje de admitidos que se convierten en pagados comparando la actualización actual vs la anterior? ¿Mejoró o empeoró?\n"
+    "2. CUELLO DE BOTELLA: ¿Dónde se pierden más leads: de Solicitados a Admitidos o de Admitidos a Pagados? Indica los porcentajes de pérdida en cada etapa.\n"
+    "3. METAS EN RIESGO: ¿Qué programas están más lejos de cumplir su meta de pagados? Menciona los más críticos.\n"
+    "4. RECOMENDACIÓN: ¿Qué acción concreta se recomienda para mejorar la tasa de conversión o el cumplimiento de metas?\n\n"
+    + _JSON_FORMAT
 )
 
 _PROMPT_ESTADOS = (
     "Eres un analista de ventas y gestión de leads de UNAB. "
     "Se te proporcionan datos del embudo de conversión completo: Leads → En Gestión → Op. Venta → Proceso Pago → Pagados. "
-    "Genera exactamente 4 insights breves, accionables y específicos. OBLIGATORIO incluir:\n"
-    "1. Identificación de la etapa del embudo donde se pierde el mayor % de leads.\n"
-    "2. Comparación del embudo ACTUAL vs la actualización ANTERIOR (¿mejoró o empeoró alguna etapa?).\n"
-    "3. Análisis de la etapa Proceso Pago → Pagados (¿cuántos quedan sin cerrar y qué se puede hacer?).\n"
-    "4. Un cuarto insight accionable adicional sobre dónde enfocar esfuerzos.\n"
-    "Formato JSON: [{\"icon\": \"trending_up|trending_down|alert|star\", \"title\": \"TÍTULO EN MAYÚSCULAS\", \"description\": \"...\"}]. "
-    "Responde SOLO el JSON. En español."
+    "Responde exactamente estas 4 preguntas como insights breves y accionables:\n\n"
+    "1. MAYOR PÉRDIDA: ¿En qué etapa del embudo se pierde el mayor porcentaje de leads? Indica la etapa y el % de pérdida.\n"
+    "2. COMPARACIÓN: ¿Mejoró o empeoró alguna etapa del embudo respecto a la actualización anterior? Indica qué cambió.\n"
+    "3. PROCESO PAGO: ¿Cuántos leads están trabados en Proceso de Pago sin convertirse en pagados y qué se puede hacer al respecto?\n"
+    "4. PRIORIDAD: ¿Qué etapa del embudo debería ser prioridad para mejorar la eficiencia general? Justifica brevemente.\n\n"
+    + _JSON_FORMAT
 )
 
 _PROMPT_GENERIC = (
-    "Eres un analista de datos de UNAB. Genera exactamente 4 insights breves y accionables. "
-    "Incluye información sobre lo que cambió desde la última actualización si es relevante.\n"
-    "Formato JSON: [{\"icon\": \"trending_up|trending_down|alert|star\", \"title\": \"TÍTULO EN MAYÚSCULAS\", \"description\": \"...\"}]. "
-    "Responde SOLO el JSON. En español."
+    "Eres un analista de datos de UNAB. "
+    "Se te proporcionan los KPIs generales de la campaña de captación. "
+    "Responde exactamente estas 4 preguntas como insights breves y accionables:\n\n"
+    "1. ESTADO GENERAL: ¿Cuál es el estado general de la campaña hoy? Resume en una frase el panorama.\n"
+    "2. DESTACADOS: ¿Qué KPI destaca positivamente y cuál es el más preocupante?\n"
+    "3. AVANCE METAS: ¿Cómo va el avance general de pagados respecto a las metas totales?\n"
+    "4. ACCIÓN INMEDIATA: ¿Qué acción inmediata tendría el mayor impacto positivo en los resultados?\n\n"
+    + _JSON_FORMAT
 )
 
 
@@ -407,49 +413,3 @@ async def ai_insights(body: Optional[ContextRequest] = None, _user: str = Depend
         title = "IA Ocupada" if "429" in error_msg else "Error de IA"
         desc = "Servicio de OpenAI saturado." if "429" in error_msg else error_msg[:100]
         return {"insights": [{"icon": "alert", "title": title, "description": desc}]}
-
-
-@router.post("/predictions")
-async def ai_predictions(body: Optional[ContextRequest] = None, _user: str = Depends(require_auth)):
-    try:
-        data = await cache.get_all()
-
-        local_context = body.context_data if body else {}
-        context = {
-            **local_context,
-            "fecha_servidor": data.get("fecha_actualizacion"),
-        }
-
-        context_str = json.dumps(context, default=str, ensure_ascii=False)
-
-        messages = [
-            {
-                "role": "system",
-                "content": (
-                    "Eres un analista predictivo de UNAB. Proyecta el cumplimiento de metas basado en los datos actuales. "
-                    "Formato JSON: [{\"period\": \"Semana X\", \"predicted_leads\": N, \"predicted_matriculados\": N, \"confidence\": 0.0-1.0}]. "
-                    "Responde SOLO el JSON."
-                ),
-            },
-            {"role": "user", "content": f"Contexto histórico y actual:\n{context_str}"},
-        ]
-
-        try:
-            log_ai("Requesting OpenAI predictions...")
-            raw = (await _openai_chat(messages)).strip()
-            log_ai("OpenAI predictions successful")
-        except Exception as e:
-            log_ai(f"OpenAI predictions failed: {e}")
-            raise e
-        try:
-            if "```" in raw:
-                raw = raw.split("```")[1]
-                if raw.startswith("json"):
-                    raw = raw[4:]
-            predictions = json.loads(raw)
-        except Exception:
-            predictions = []
-
-        return {"predictions": predictions}
-    except Exception as e:
-        return {"predictions": []}

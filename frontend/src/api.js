@@ -154,10 +154,6 @@ export const api = {
         method: 'POST',
         body: JSON.stringify({ context_data: dashboardContext, page }),
     }),
-    aiPredictions: () => request('/api/ai/predictions', {
-        method: 'POST',
-        body: JSON.stringify({ context_data: dashboardContext }),
-    }),
 
     exportLeads: async (params = {}) => {
         const q = new URLSearchParams();
